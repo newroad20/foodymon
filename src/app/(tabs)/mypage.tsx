@@ -12,6 +12,7 @@ import {
 import { Image } from 'expo-image';
 import Constants from 'expo-constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { useAuth } from '@/context/AuthContext';
 import { levelsData, mealTargetOptions, sleepTargetOptions } from '@/constants/foodymonData';
@@ -136,6 +137,19 @@ export default function MyPageScreen() {
             )}
           </TouchableOpacity>
         </View>
+
+        {/* Collection */}
+        <TouchableOpacity
+          style={[styles.card, styles.linkCard]}
+          activeOpacity={0.8}
+          onPress={() => router.push('/collection')}>
+          <Text style={styles.linkIcon}>📖</Text>
+          <View style={styles.linkText}>
+            <Text style={styles.sectionTitleInline}>컬렉션 도감</Text>
+            <Text style={styles.linkSub}>진화 도감 · 의상/소품 · 배지와 방패</Text>
+          </View>
+          <Text style={styles.chevron}>›</Text>
+        </TouchableOpacity>
 
         {/* Account */}
         <View style={styles.card}>
@@ -314,6 +328,31 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '800',
+  },
+  linkCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  linkIcon: {
+    fontSize: 28,
+  },
+  linkText: {
+    flex: 1,
+    gap: 2,
+  },
+  sectionTitleInline: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#1E293B',
+  },
+  linkSub: {
+    fontSize: 12,
+    color: '#94A3B8',
+  },
+  chevron: {
+    fontSize: 24,
+    color: '#CBD5E1',
   },
   rowBtn: {
     paddingVertical: 12,

@@ -1,98 +1,134 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  Alert,
+  StatusBar,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFoodyMon } from '@/context/FoodyMonContext';
+import { useAuth } from '@/context/AuthContext';
+import { RoomBackground } from '@/components/foodymon/RoomBackground';
+import { TopStatsHeader } from '@/components/foodymon/TopStatsHeader';
+import { PetAvatar } from '@/components/foodymon/PetAvatar';
+import { ActionDock } from '@/components/foodymon/ActionDock';
+import { MealModal } from '@/components/foodymon/MealModal';
+import { SleepModal } from '@/components/foodymon/SleepModal';
+import { EmotionModal } from '@/components/foodymon/EmotionModal';
+import { BagShopModal } from '@/components/foodymon/BagShopModal';
+import { HistoryModal } from '@/components/foodymon/HistoryModal';
+import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
+export default function FoodyMonHomeScreen() {
+  const { state, advanceToNextDay } = useFoodyMon();
+
+  // Modals state
+  const [showMealModal, setShowMealModal] = useState(false);
+  const [showSleepModal, setShowSleepModal] = useState(false);
+  const [showEmotionModal, setShowEmotionModal] = useState(false);
+  const [showBagModal, setShowBagModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+
+  const handleNextDaySimulation = () => {
+    Alert.alert(
+      '다음 날 시뮬레이션',
+      '하루가 지나간 것으로 시뮬레이션하여 스트릭 갱신 및 보상을 확인하시겠습니까?',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '확인',
+          onPress: () => {
+            const res = advanceToNextDay();
+            if (res.rewardedJelly > 0) {
+              let bonusMsg = `출석 보상으로 젤리 ✨ +${res.rewardedJelly}개를 받았습니다!`;
+              if (res.shieldEarned) {
+                bonusMsg += '\n🛡️ 7일 연속 보상으로 스트릭 방패 1개를 추가 획득했습니다!';
+              }
+              Alert.alert('새로운 하루 시작! 🌅', bonusMsg);
+            } else if (res.shieldUsed) {
+              Alert.alert(
+                '방패 사용! 🛡️',
+                '어제 기록이 없었지만, 스트릭 방패가 사용되어 연속 기록이 유지되었습니다!'
+              );
+            } else {
+              Alert.alert(
+                '새로운 하루 😢',
+                '어제 기록이 없어 연속 기록이 초기화되었습니다. 오늘부터 다시 힘내봐요!'
+              );
+            }
+          },
+        },
+      ]
     );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+  };
 
-export default function HomeScreen() {
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+
+      {/* Cozy My Room Background */}
+      <RoomBackground />
+
       <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+        {/* Top Badges & History */}
+        <TopStatsHeader onOpenHistory={() => setShowHistoryModal(true)} />
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+        {/* Center Room & Interactive Pet Avatar */}
+        <View style={styles.petSection}>
+          <PetAvatar />
+        </View>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
+        {/* Bottom Action Dock */}
+        <ActionDock
+          onOpenMeal={() => setShowMealModal(true)}
+          onOpenSleep={() => setShowSleepModal(true)}
+          onOpenEmotion={() => setShowEmotionModal(true)}
+          onOpenBag={() => setShowBagModal(true)}
+          onNextDay={handleNextDaySimulation}
+        />
       </SafeAreaView>
-    </ThemedView>
+
+      {/* Feature Modals */}
+      <MealModal
+        visible={showMealModal}
+        onClose={() => setShowMealModal(false)}
+      />
+      <SleepModal
+        visible={showSleepModal}
+        onClose={() => setShowSleepModal(false)}
+      />
+      <EmotionModal
+        visible={showEmotionModal}
+        onClose={() => setShowEmotionModal(false)}
+      />
+      <BagShopModal
+        visible={showBagModal}
+        onClose={() => setShowBagModal(false)}
+      />
+      <HistoryModal
+        visible={showHistoryModal}
+        onClose={() => setShowHistoryModal(false)}
+      />
+
+      {/* Onboarding Prologue Modal (Shown on first launch) */}
+      <OnboardingModal visible={!state.onboarded} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
+    backgroundColor: '#FFF9F0',
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    justifyContent: 'space-between',
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  petSection: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

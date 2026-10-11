@@ -2,6 +2,7 @@
   "expo": {
     "name": "foodymon",
     "slug": "foodymon",
+    "owner": "newroad",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -32,11 +33,24 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6e591e60-4305-44f8-9ad5-c379ba2c3964"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/6e591e60-4305-44f8-9ad5-c379ba2c3964"
     }
   }
 }

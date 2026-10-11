@@ -48,6 +48,7 @@ const defaultState: UserState = {
 };
 
 interface FoodyMonContextType {
+  userId: string;
   state: UserState;
   /** True until the first load from the server finished (or failed). */
   loading: boolean;
@@ -388,6 +389,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
   return (
     <FoodyMonContext.Provider
       value={{
+        userId,
         state,
         loading,
         syncError,

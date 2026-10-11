@@ -18,6 +18,7 @@ export default function TabLayout() {
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
       }}>
       <Tabs.Screen name="index" options={{ title: '홈', tabBarIcon: tabIcon('🏠') }} />
+      <Tabs.Screen name="summary" options={{ title: '요약', tabBarIcon: tabIcon('📊') }} />
       <Tabs.Screen name="mypage" options={{ title: '마이', tabBarIcon: tabIcon('👤') }} />
     </Tabs>
   );

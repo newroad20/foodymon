@@ -29,7 +29,12 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
-  signUp: (email: string, password: string, nickname: string) => Promise<{ error: string | null }>;
+  /** needsConfirmation: false when Supabase signed the user in right away (email confirmation off). */
+  signUp: (
+    email: string,
+    password: string,
+    nickname: string
+  ) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
@@ -68,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, nickname: string) => {
     // The profile row is created by the on_auth_user_created trigger (supabase/schema.sql).
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -77,8 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     });
 
-    if (error) return { error: error.message };
-    return { error: null };
+    if (error) return { error: error.message, needsConfirmation: false };
+    return { error: null, needsConfirmation: !data.session };
   };
 
   const signIn = async (email: string, password: string) => {

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserState, LogItem } from '@/types/foodymon';
-import { costumesData, backgroundsData, dialoguesData, levelsData } from '@/constants/foodymonData';
+import { BACKFILL_COST, costumesData, backgroundsData, dialoguesData, levelsData } from '@/constants/foodymonData';
 import { closeDay, toDateKey, RolloverResult } from '@/lib/dayRollover';
 import { calcDailyScore } from '@/lib/score';
 import { formatLogTime } from '@/lib/serverState';
@@ -45,6 +45,7 @@ const defaultState: UserState = {
   level: 3,
   logs: [],
   lastActiveDate: null,
+  backfill: null,
 };
 
 interface FoodyMonContextType {
@@ -62,6 +63,11 @@ interface FoodyMonContextType {
   skipMeal: () => Promise<void>;
   logSleep: (hours: number) => Promise<void>;
   logEmotion: (score: number) => Promise<void>;
+  backfillYesterday: (day: {
+    sleepHours: number | null;
+    mealCount: number;
+    emotion: number | null;
+  }) => Promise<{ success: boolean; message: string }>;
   updateSettings: (values: { nickname: string; targetSleep: number; targetMeals: number }) => Promise<boolean>;
   buyItem: (type: 'costume' | 'background', id: string) => Promise<{ success: boolean; message: string }>;
   toggleCostume: (id: string) => void;
@@ -292,6 +298,40 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     });
   };
 
+  /** Fills in yesterday for jelly; the server restores the streak and any shield used (S25). */
+  const backfillYesterday = async (day: { sleepHours: number | null; mealCount: number; emotion: number | null }) => {
+    const current = stateRef.current;
+    if (!current.backfill) return { success: false, message: '복구할 기록이 없어요.' };
+
+    const sleepDiff = day.sleepHours === null ? null : Math.abs(current.targetSleep - day.sleepHours);
+    const yesterday = {
+      sleepDiff,
+      sleepHours: day.sleepHours,
+      mealCount: day.mealCount,
+      badMealCount: 0,
+      emotion: day.emotion,
+    };
+    // Score yesterday with the streak it had before it was closed.
+    const { score } = calcDailyScore(
+      { today: yesterday, targetMeals: current.targetMeals, streak: current.backfill.prevStreak },
+      levelsData
+    );
+
+    const res = await gameApi.backfillYesterday(toDateKey(new Date()), { ...yesterday, score });
+    if (!res.ok) {
+      const messages: Record<gameApi.BackfillError, string> = {
+        insufficient_jelly: `젤리가 부족해요! 복구에는 젤리 ${BACKFILL_COST}개가 필요해요.`,
+        nothing_to_backfill: '복구할 수 있는 기간이 지났어요. 오늘 기록부터 다시 시작해요!',
+        network: '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.',
+      };
+      if (res.error === 'nothing_to_backfill') await syncFromServer();
+      return { success: false, message: messages[res.error] };
+    }
+
+    await syncFromServer();
+    return { success: true, message: `어제 기록을 복구했어요! 연속 기록이 이어졌어요 🔥 (건강 지수 ${score}점)` };
+  };
+
   /** Updates name and lifestyle goals; today's score is recalculated against the new goals. */
   const updateSettings = async (values: { nickname: string; targetSleep: number; targetMeals: number }) => {
     const current = stateRef.current;
@@ -401,6 +441,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         skipMeal,
         logSleep,
         logEmotion,
+        backfillYesterday,
         updateSettings,
         buyItem,
         toggleCostume,

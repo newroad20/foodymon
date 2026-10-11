@@ -46,7 +46,7 @@ export async function fetchGameState(
   const profileRes = await supabase
     .from('profiles')
     .select(
-      'nickname, onboarded, target_sleep, target_meals, usual_meal_size, jelly_balance, streak, shields, equipped_costume, equipped_backgrounds, history_scores, last_checkin_date'
+      'nickname, onboarded, target_sleep, target_meals, usual_meal_size, jelly_balance, streak, shields, equipped_costume, equipped_backgrounds, history_scores, last_checkin_date, missed_date, missed_prev_streak'
     )
     .eq('id', userId)
     .single();
@@ -203,4 +203,36 @@ export async function fetchDailyRecords(userId: string): Promise<DailyRecordRow[
     .order('log_date', { ascending: true });
   if (res.error) throw res.error;
   return (res.data ?? []) as DailyRecordRow[];
+}
+
+export type BackfillError = 'insufficient_jelly' | 'nothing_to_backfill' | 'network';
+
+/** Fills in yesterday's check-ins for jelly (S25). The server restores the streak and any shield used. */
+export async function backfillYesterday(
+  todayKey: string,
+  day: {
+    sleepHours: number | null;
+    sleepDiff: number | null;
+    mealCount: number;
+    badMealCount: number;
+    emotion: number | null;
+    score: number;
+  }
+): Promise<{ ok: true } | { ok: false; error: BackfillError }> {
+  const res = await supabase.rpc('backfill_yesterday', {
+    p_today: todayKey,
+    p_sleep_hours: day.sleepHours,
+    p_sleep_diff: day.sleepDiff,
+    p_meal_count: day.mealCount,
+    p_bad_meal_count: day.badMealCount,
+    p_emotion: day.emotion,
+    p_daily_score: day.score,
+  });
+  if (res.error) {
+    const msg = res.error.message ?? '';
+    if (msg.includes('insufficient jelly')) return { ok: false, error: 'insufficient_jelly' };
+    if (msg.includes('nothing to backfill')) return { ok: false, error: 'nothing_to_backfill' };
+    return { ok: false, error: 'network' };
+  }
+  return { ok: true };
 }

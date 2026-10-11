@@ -80,6 +80,63 @@ await assert.rejects(rpc(`select public.buy_item('costume','crown') r`), /insuff
 await assert.rejects(rpc(`select public.buy_item('costume','nope') r`), /item not found/);
 assert.equal((await q(`select count(*)::int c from public.user_items`))[0].c, 1);
 
+// ---------- backfill_yesterday (S25) ----------
+const backfill = (score = 80, meals = 2) =>
+  rpc(`select public.backfill_yesterday($1::date, 7, 0, $2::smallint, 0::smallint, 80::smallint, $3::smallint) r`,
+      [today, meals, score]);
+await q(`delete from public.daily_logs`);
+
+// streak 4, no shield, nothing logged yesterday -> reset to 0, but backfillable
+await setProfile(`streak=4, shields=0, jelly_balance=30, last_checkin_date='${today}'::date-1, history_scores='{50,60}'`);
+r = await close();
+assert.equal(r.streak, 0);
+p = (await q(`select * from public.profiles where id=$1`, [U]))[0];
+assert.equal(p.missed_prev_streak, 4); assert.equal(p.missed_used_shield, false);
+r = await backfill(85);
+assert.deepEqual([r.streak, r.shields, r.jelly_balance, r.shield_refunded], [5, 0, 10, false]);
+p = (await q(`select * from public.profiles where id=$1`, [U]))[0];
+assert.deepEqual(p.history_scores, [50, 60, 85]);
+assert.equal(p.missed_date, null);
+let y = (await q(`select * from public.daily_logs where user_id=$1 and log_date='${today}'::date-1`, [U]))[0];
+assert.equal(y.meal_count, 2); assert.equal(y.daily_score, 85);
+// only once
+await assert.rejects(backfill(), /nothing to backfill/);
+
+// shield was used yesterday -> refunded, streak continues
+await setProfile(`streak=6, shields=1, jelly_balance=20, last_checkin_date='${today}'::date-1`);
+await q(`delete from public.daily_logs`);
+r = await close();
+assert.deepEqual([r.streak, r.shields], [6, 0]);
+r = await backfill();
+assert.deepEqual([r.streak, r.shields, r.jelly_balance, r.shield_refunded], [7, 1, 0, true]);
+
+// skipped several days: only the last one (yesterday) is backfillable
+await setProfile(`streak=3, shields=0, jelly_balance=50, last_checkin_date='${today}'::date-3`);
+r = await close();
+assert.equal(r.streak, 0);
+r = await backfill();
+assert.equal(r.streak, 1);
+
+// yesterday was logged -> nothing to backfill; not enough jelly; empty input
+await setProfile(`streak=1, shields=0, jelly_balance=50, last_checkin_date='${today}'::date-1`);
+await q(`insert into public.daily_logs(user_id,log_date,meal_count) values ($1,'${today}'::date-1,1) on conflict (user_id,log_date) do update set meal_count=1`, [U]);
+await close();
+await assert.rejects(backfill(), /nothing to backfill/);
+await q(`delete from public.daily_logs`);
+await setProfile(`streak=2, shields=0, jelly_balance=5, last_checkin_date='${today}'::date-1`);
+await close();
+await assert.rejects(backfill(), /insufficient jelly/);
+await setProfile(`jelly_balance=50`);
+await assert.rejects(
+  rpc(`select public.backfill_yesterday($1::date, null, null, 0::smallint, 0::smallint, null, 40::smallint) r`, [today]),
+  /empty backfill/
+);
+
+// clients cannot write the backfill bookkeeping columns
+const grants = await q(`select column_name from information_schema.column_privileges
+  where table_name='profiles' and grantee='authenticated' and privilege_type='UPDATE'`);
+assert.ok(!grants.some((g) => g.column_name.startsWith('missed_')));
+
 // unauthenticated
 await asUser('');
 await assert.rejects(close(), /not authenticated/);

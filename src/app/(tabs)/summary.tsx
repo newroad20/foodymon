@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData } from '@/constants/foodymonData';
@@ -93,6 +93,10 @@ export default function SummaryScreen() {
               🔥 {state.streak}일 연속 기록 보너스 ×{parts.multiplier.toFixed(2)} 적용 중
             </Text>
           )}
+
+          <TouchableOpacity style={styles.shareBtn} activeOpacity={0.85} onPress={() => router.push('/share')}>
+            <Text style={styles.shareText}>📸 내 푸디몬 자랑하기</Text>
+          </TouchableOpacity>
         </View>
 
         {/* S5-2 Trend */}
@@ -263,6 +267,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#64748B',
     textAlign: 'center',
+  },
+  shareBtn: {
+    marginTop: 16,
+    borderRadius: 16,
+    paddingVertical: 13,
+    alignItems: 'center',
+    backgroundColor: '#FFF7ED',
+    borderWidth: 1.5,
+    borderColor: '#FED7AA',
+  },
+  shareText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#C2410C',
   },
   trendHeader: {
     flexDirection: 'row',

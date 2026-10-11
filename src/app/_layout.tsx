@@ -40,7 +40,7 @@ function AppContent() {
     // key: start fresh when a different account logs in
     <FoodyMonProvider key={session.user.id} userId={session.user.id}>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack>
     </FoodyMonProvider>
   );

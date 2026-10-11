@@ -9,6 +9,10 @@ export const levelsData: LevelInfo[] = [
   { level: 6, maxScore: 100, name: '천상계 푸디몬', image: require('@/assets/images/level6.png') },
 ];
 
+// Lifestyle goal choices shared by onboarding and My Page.
+export const sleepTargetOptions = [5, 6, 7, 8, 9];
+export const mealTargetOptions = [1, 2, 3, 4];
+
 export const costumesData: CostumeItem[] = [
   { id: 'crown', icon: '👑', name: '왕관', price: 50 },
   { id: 'ribbon', icon: '🎀', name: '리본', price: 30 },

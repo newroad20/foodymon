@@ -86,12 +86,8 @@ export async function fetchGameState(
   return { state, rollover: rollover && rollover.daysPassed > 0 ? rollover : null };
 }
 
-/** Saves today's check-in totals and appends the history entry. */
-export async function saveCheckin(
-  userId: string,
-  state: UserState,
-  log: Pick<LogItem, 'type' | 'content'>
-): Promise<void> {
+/** Saves the current day's check-in totals and score. */
+export async function saveDailyLog(userId: string, state: UserState): Promise<void> {
   const logDate = state.lastActiveDate;
   if (!logDate) throw new Error('lastActiveDate is not set');
 
@@ -99,8 +95,16 @@ export async function saveCheckin(
     .from('daily_logs')
     .upsert(toDailyLogRow(state, userId, logDate), { onConflict: 'user_id,log_date' });
   if (daily.error) throw daily.error;
+}
 
-  await addHistoryLog(userId, logDate, log);
+/** Saves today's check-in totals and appends the history entry. */
+export async function saveCheckin(
+  userId: string,
+  state: UserState,
+  log: Pick<LogItem, 'type' | 'content'>
+): Promise<void> {
+  await saveDailyLog(userId, state);
+  await addHistoryLog(userId, state.lastActiveDate!, log);
 }
 
 export async function saveOnboarding(
@@ -115,6 +119,21 @@ export async function saveOnboarding(
       target_sleep: values.targetSleep,
       target_meals: values.targetMeals,
       usual_meal_size: values.usualMealSize,
+    })
+    .eq('id', userId);
+  if (res.error) throw res.error;
+}
+
+export async function saveSettings(
+  userId: string,
+  values: { nickname: string; targetSleep: number; targetMeals: number }
+): Promise<void> {
+  const res = await supabase
+    .from('profiles')
+    .update({
+      nickname: values.nickname,
+      target_sleep: values.targetSleep,
+      target_meals: values.targetMeals,
     })
     .eq('id', userId);
   if (res.error) throw res.error;

@@ -1,6 +1,29 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { Alert } from 'react-native';
+import * as Linking from 'expo-linking';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { describeAuthLinkError, parseAuthLink } from '@/lib/authLink';
+
+// Where the sign-up confirmation email sends the user back: this app's root
+// (foodymon:// in builds, exp://<dev server>/--/ in Expo Go). It must be listed
+// under Supabase → Authentication → URL Configuration → Redirect URLs.
+const emailRedirectTo = Linking.createURL('/');
+
+/** Signs in with the tokens from a confirmation link that opened the app. */
+async function handleAuthLink(url: string | null) {
+  if (!url) return;
+  const result = parseAuthLink(url);
+  if (result.kind === 'error') {
+    Alert.alert('이메일 인증', describeAuthLinkError(result.message));
+  } else if (result.kind === 'session') {
+    const { error } = await supabase.auth.setSession({
+      access_token: result.accessToken,
+      refresh_token: result.refreshToken,
+    });
+    if (error) Alert.alert('이메일 인증', describeAuthLinkError(error.message));
+  }
+}
 
 interface AuthContextType {
   session: Session | null;
@@ -33,7 +56,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // Confirmation links can open the app cold or while it is running.
+    Linking.getInitialURL().then(handleAuthLink);
+    const linkSub = Linking.addEventListener('url', ({ url }) => handleAuthLink(url));
+
+    return () => {
+      subscription.unsubscribe();
+      linkSub.remove();
+    };
   }, []);
 
   const signUp = async (email: string, password: string, nickname: string) => {
@@ -43,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         data: { nickname },
+        emailRedirectTo,
       },
     });
 

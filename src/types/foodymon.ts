@@ -63,4 +63,6 @@ export interface UserState {
   averageScore: number;
   level: number;
   logs: LogItem[];
+  /** Local date (YYYY-MM-DD) of the day `today` belongs to. */
+  lastActiveDate: string | null;
 }

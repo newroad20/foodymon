@@ -18,13 +18,15 @@ export function ActionDock({
 }: ActionDockProps) {
   return (
     <View style={styles.container}>
-      {/* Simulation Next Day Test Button */}
-      <TouchableOpacity
-        style={styles.testButton}
-        activeOpacity={0.8}
-        onPress={onNextDay}>
-        <Text style={styles.testButtonText}>🗓️ [테스트] 다음 날로 시뮬레이션</Text>
-      </TouchableOpacity>
+      {/* Simulation Next Day Test Button (development builds only) */}
+      {__DEV__ && (
+        <TouchableOpacity
+          style={styles.testButton}
+          activeOpacity={0.8}
+          onPress={onNextDay}>
+          <Text style={styles.testButtonText}>🗓️ [테스트] 다음 날로 시뮬레이션</Text>
+        </TouchableOpacity>
+      )}
 
       {/* Main 4 Action Buttons */}
       <View style={styles.dock}>

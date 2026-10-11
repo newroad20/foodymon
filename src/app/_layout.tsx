@@ -51,6 +51,16 @@ function AppContent() {
             headerShadowVisible: false,
           }}
         />
+        <Stack.Screen
+          name="share"
+          options={{
+            headerShown: true,
+            title: '자랑하기',
+            headerBackTitle: '요약',
+            headerStyle: { backgroundColor: '#FFF9F0' },
+            headerShadowVisible: false,
+          }}
+        />
       </Stack>
     </FoodyMonProvider>
   );

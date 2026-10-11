@@ -37,7 +37,8 @@ function AppContent() {
 
   // Logged in — show the main Foody-Mon app
   return (
-    <FoodyMonProvider>
+    // key: start fresh when a different account logs in
+    <FoodyMonProvider key={session.user.id} userId={session.user.id}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack>

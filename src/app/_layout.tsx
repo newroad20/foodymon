@@ -41,6 +41,16 @@ function AppContent() {
     <FoodyMonProvider key={session.user.id} userId={session.user.id}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="collection"
+          options={{
+            headerShown: true,
+            title: '컬렉션 도감',
+            headerBackTitle: '마이',
+            headerStyle: { backgroundColor: '#FFF9F0' },
+            headerShadowVisible: false,
+          }}
+        />
       </Stack>
     </FoodyMonProvider>
   );

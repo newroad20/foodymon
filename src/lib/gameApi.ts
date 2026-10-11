@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { LogItem, UserState } from '@/types/foodymon';
 import { RolloverResult } from '@/lib/dayRollover';
+import { DailyRecordRow } from '@/lib/collection';
 import {
   buildUserState,
   CheckinLogRow,
@@ -191,4 +192,15 @@ export async function fetchScoreHistory(
     .order('log_date', { ascending: true });
   if (res.error) throw res.error;
   return res.data ?? [];
+}
+
+/** Every day the user has a daily_logs row for (one row per day). */
+export async function fetchDailyRecords(userId: string): Promise<DailyRecordRow[]> {
+  const res = await supabase
+    .from('daily_logs')
+    .select('log_date, daily_score, meal_count, sleep_hours, emotion')
+    .eq('user_id', userId)
+    .order('log_date', { ascending: true });
+  if (res.error) throw res.error;
+  return (res.data ?? []) as DailyRecordRow[];
 }

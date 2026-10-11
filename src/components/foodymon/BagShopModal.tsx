@@ -20,8 +20,8 @@ export function BagShopModal({ visible, onClose }: BagShopModalProps) {
   const { state, buyItem, toggleCostume, toggleBackground } = useFoodyMon();
   const [activeTab, setActiveTab] = useState<'bag' | 'shop'>('bag');
 
-  const handleBuy = (type: 'costume' | 'background', id: string, name: string) => {
-    const res = buyItem(type, id);
+  const handleBuy = async (type: 'costume' | 'background', id: string, name: string) => {
+    const res = await buyItem(type, id);
     if (res.success) {
       Alert.alert('구매 성공', res.message);
     } else {

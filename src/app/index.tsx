@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
+  Text,
   StyleSheet,
   Alert,
   StatusBar,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFoodyMon } from '@/context/FoodyMonContext';
@@ -35,7 +37,8 @@ function describeRollover(r: RolloverResult): { title: string; message: string }
 
 
 export default function FoodyMonHomeScreen() {
-  const { state, advanceToNextDay, pendingRollover, dismissRollover } = useFoodyMon();
+  const { state, loading, syncError, retrySync, advanceToNextDay, pendingRollover, dismissRollover } =
+    useFoodyMon();
 
   // Tell the user what happened when the day changed (streak, jelly, shields).
   useEffect(() => {
@@ -56,7 +59,7 @@ export default function FoodyMonHomeScreen() {
   const handleNextDaySimulation = () => {
     Alert.alert(
       '다음 날 시뮬레이션',
-      '하루가 지나간 것으로 시뮬레이션하여 스트릭 갱신 및 보상을 확인하시겠습니까?',
+      '하루가 지나간 것으로 시뮬레이션하여 스트릭 갱신 및 보상을 확인하시겠습니까?\n(이 기기에서만 적용되고 서버에는 저장되지 않아요)',
       [
         { text: '취소', style: 'cancel' },
         {
@@ -94,6 +97,12 @@ export default function FoodyMonHomeScreen() {
       <RoomBackground />
 
       <SafeAreaView style={styles.safeArea}>
+        {syncError && (
+          <TouchableOpacity style={styles.syncBanner} activeOpacity={0.8} onPress={retrySync}>
+            <Text style={styles.syncBannerText}>☁️ 서버와 동기화하지 못했어요. 눌러서 다시 시도</Text>
+          </TouchableOpacity>
+        )}
+
         {/* Top Badges & History */}
         <TopStatsHeader onOpenHistory={() => setShowHistoryModal(true)} />
 
@@ -135,7 +144,7 @@ export default function FoodyMonHomeScreen() {
       />
 
       {/* Onboarding Prologue Modal (Shown on first launch) */}
-      <OnboardingModal visible={!state.onboarded} />
+      <OnboardingModal visible={!loading && !syncError && !state.onboarded} />
     </View>
   );
 }
@@ -148,6 +157,19 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     justifyContent: 'space-between',
+  },
+  syncBanner: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: '#FEE2E2',
+  },
+  syncBannerText: {
+    color: '#991B1B',
+    fontSize: 13,
+    textAlign: 'center',
   },
   petSection: {
     flex: 1,

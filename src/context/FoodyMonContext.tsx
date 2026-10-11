@@ -1,14 +1,18 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from 'react';
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UserState, LogItem, QuizQuestion } from '@/types/foodymon';
+import { UserState, LogItem } from '@/types/foodymon';
 import { costumesData, backgroundsData, dialoguesData, levelsData } from '@/constants/foodymonData';
-import { closeDay, rolloverToDate, toDateKey, RolloverResult } from '@/lib/dayRollover';
+import { closeDay, toDateKey, RolloverResult } from '@/lib/dayRollover';
+import { calcDailyScore } from '@/lib/score';
+import { formatLogTime } from '@/lib/serverState';
+import * as gameApi from '@/lib/gameApi';
 
 // How often to check whether the calendar day changed while the app stays open.
 const DAY_CHECK_INTERVAL_MS = 60 * 1000;
 
-const STORAGE_KEY = '@foodymon_user_state_v1';
+// Local cache of the server state, per account, so the app opens instantly.
+const storageKey = (userId: string) => `@foodymon_user_state_v2:${userId}`;
 
 const defaultState: UserState = {
   masterName: '',
@@ -45,6 +49,11 @@ const defaultState: UserState = {
 
 interface FoodyMonContextType {
   state: UserState;
+  /** True until the first load from the server finished (or failed). */
+  loading: boolean;
+  /** Last error talking to the server, if any. */
+  syncError: string | null;
+  retrySync: () => Promise<void>;
   currentDialogue: string;
   triggerPetInteraction: () => string;
   completeOnboarding: (name: string, sleep: number, meals: number, mealSize: number) => Promise<void>;
@@ -52,11 +61,10 @@ interface FoodyMonContextType {
   skipMeal: () => Promise<void>;
   logSleep: (hours: number) => Promise<void>;
   logEmotion: (score: number) => Promise<void>;
-  buyItem: (type: 'costume' | 'background', id: string) => { success: boolean; message: string };
+  buyItem: (type: 'costume' | 'background', id: string) => Promise<{ success: boolean; message: string }>;
   toggleCostume: (id: string) => void;
   toggleBackground: (id: string) => void;
   advanceToNextDay: () => { rewardedJelly: number; shieldUsed: boolean; shieldEarned: boolean };
-  resetAllData: () => Promise<void>;
   /** Result of the most recent automatic day change, until dismissed. */
   pendingRollover: RolloverResult | null;
   dismissRollover: () => void;
@@ -64,115 +72,100 @@ interface FoodyMonContextType {
 
 const FoodyMonContext = createContext<FoodyMonContextType | undefined>(undefined);
 
-export function FoodyMonProvider({ children }: { children: ReactNode }) {
+const errorMessage = (e: unknown) =>
+  e instanceof Error ? e.message : typeof e === 'object' && e && 'message' in e ? String(e.message) : String(e);
+
+export function FoodyMonProvider({ userId, children }: { userId: string; children: ReactNode }) {
   const [state, setState] = useState<UserState>(defaultState);
+  const [loading, setLoading] = useState(true);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [currentDialogue, setCurrentDialogue] = useState<string>('오늘 하루도 건강하게 지내자!');
   const [pendingRollover, setPendingRollover] = useState<RolloverResult | null>(null);
-  // Latest state for AppState/interval callbacks, which would otherwise see a stale closure.
+  // Latest state for async actions and AppState/interval callbacks, which would otherwise see a stale closure.
   const stateRef = useRef<UserState>(defaultState);
-  const hydratedRef = useRef(false);
+  const syncingRef = useRef<Promise<void> | null>(null);
 
-  // Save to AsyncStorage
-  const saveState = async (newState: UserState) => {
-    stateRef.current = newState;
-    setState(newState);
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
-    } catch (e) {
-      console.error('Failed to save foodymon state:', e);
-    }
+  const applyState = useCallback(
+    (next: UserState) => {
+      stateRef.current = next;
+      setState(next);
+      AsyncStorage.setItem(storageKey(userId), JSON.stringify(next)).catch((e) =>
+        console.error('Failed to cache foodymon state:', e)
+      );
+    },
+    [userId]
+  );
+
+  const withScore = (next: UserState): UserState => {
+    const { score, level } = calcDailyScore(next, levelsData);
+    return { ...next, currentDailyScore: score, level };
   };
 
-  // Close out any days that ended since the last check-in day.
-  const checkDayChange = useCallback(() => {
-    if (!hydratedRef.current) return;
-    const current = stateRef.current;
-    if (!current.onboarded) return;
-    const result = rolloverToDate(current, new Date());
-    if (result.state === current) return;
-    saveState(result.state);
-    if (result.daysPassed > 0) setPendingRollover(result);
-  }, []);
+  /** Reloads everything from the server; the server also closes out ended days. */
+  const syncFromServer = useCallback((): Promise<void> => {
+    if (syncingRef.current) return syncingRef.current;
+    const run = (async () => {
+      try {
+        const { state: next, rollover } = await gameApi.fetchGameState(
+          userId,
+          toDateKey(new Date()),
+          levelsData
+        );
+        applyState(next);
+        setSyncError(null);
+        if (rollover) setPendingRollover(rollover);
+      } catch (e) {
+        console.error('Failed to sync foodymon state:', e);
+        setSyncError(errorMessage(e));
+      } finally {
+        syncingRef.current = null;
+      }
+    })();
+    syncingRef.current = run;
+    return run;
+  }, [userId, applyState]);
 
-  // Load from AsyncStorage
+  /** Makes sure check-ins go to today, not to a day that already ended. */
+  const ensureCurrentDay = useCallback(async () => {
+    const current = stateRef.current;
+    if (current.onboarded && current.lastActiveDate !== toDateKey(new Date())) {
+      await syncFromServer();
+    }
+  }, [syncFromServer]);
+
+  // Show the cached state right away, then load from the server.
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          // Merge so states saved by older versions pick up new fields.
-          const parsed: UserState = { ...defaultState, ...JSON.parse(stored) };
+        const cached = await AsyncStorage.getItem(storageKey(userId));
+        if (cached && !cancelled && !syncingRef.current) {
+          const parsed: UserState = { ...defaultState, ...JSON.parse(cached) };
           stateRef.current = parsed;
           setState(parsed);
         }
       } catch (e) {
-        console.error('Failed to load foodymon state:', e);
+        console.error('Failed to load cached foodymon state:', e);
       }
-      hydratedRef.current = true;
-      checkDayChange();
+      await syncFromServer();
+      if (!cancelled) setLoading(false);
     })();
-  }, [checkDayChange]);
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, syncFromServer]);
 
   // Re-check when the app returns to the foreground and periodically (e.g. past midnight).
   useEffect(() => {
     const sub = AppState.addEventListener('change', (status) => {
-      if (status === 'active') checkDayChange();
+      if (status === 'active') ensureCurrentDay();
     });
-    const interval = setInterval(checkDayChange, DAY_CHECK_INTERVAL_MS);
+    const interval = setInterval(ensureCurrentDay, DAY_CHECK_INTERVAL_MS);
     return () => {
       sub.remove();
       clearInterval(interval);
     };
-  }, [checkDayChange]);
-
-  const getFormattedTime = () => {
-    const d = new Date();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    let hh = d.getHours();
-    const min = String(d.getMinutes()).padStart(2, '0');
-    const ampm = hh >= 12 ? '오후' : '오전';
-    hh = hh % 12 || 12;
-    return `${mm}월 ${dd}일 ${ampm} ${hh}:${min}`;
-  };
-
-  const calcScore = (curState: UserState): { score: number; level: number } => {
-    let sleepScore = 0;
-    if (curState.today.sleepDiff !== null) {
-      if (curState.today.sleepDiff <= 1) sleepScore = 100;
-      else if (curState.today.sleepDiff < 3) sleepScore = 50;
-      else sleepScore = 0;
-    }
-
-    let mealScore = 0;
-    if (curState.today.mealCount > 0) {
-      let base = (curState.today.mealCount / curState.targetMeals) * 100;
-      if (base > 100) base = 100;
-      base -= curState.today.badMealCount * 20;
-      mealScore = Math.max(0, base);
-    }
-
-    let emotionScore = curState.today.emotion !== null ? curState.today.emotion : 50;
-
-    let baseScore = sleepScore * 0.35 + mealScore * 0.35 + emotionScore * 0.3;
-
-    let multiplier = 1.0;
-    if (curState.streak >= 14) multiplier = 1.15;
-    else if (curState.streak >= 7) multiplier = 1.1;
-    else if (curState.streak >= 3) multiplier = 1.05;
-
-    const finalScore = Math.min(100, Math.round(baseScore * multiplier));
-
-    let lvl = 3;
-    for (const l of levelsData) {
-      if (finalScore <= l.maxScore) {
-        lvl = l.level;
-        break;
-      }
-    }
-
-    return { score: finalScore, level: lvl };
-  };
+  }, [ensureCurrentDay]);
 
   const triggerPetInteraction = () => {
     const pool = ['앗, 간지러워!', '에헤헤 🎵', '마스터 손길 최고야 🥰', '기분 좋아!', '오늘도 힘낼게! ✨'];
@@ -196,187 +189,170 @@ export function FoodyMonProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, [state.currentDailyScore, state.masterName]);
 
+  const newLog = (type: LogItem['type'], content: string): LogItem => ({
+    id: String(Date.now()),
+    time: formatLogTime(new Date()),
+    type,
+    content,
+  });
+
+  /** Applies a check-in locally right away, then saves it to the server. */
+  const recordCheckin = async (
+    update: (s: UserState) => UserState['today'],
+    log: Pick<LogItem, 'type' | 'content'>
+  ) => {
+    await ensureCurrentDay();
+    const current = stateRef.current;
+    const next = withScore({
+      ...current,
+      today: update(current),
+      logs: [newLog(log.type, log.content), ...current.logs],
+    });
+    applyState(next);
+    try {
+      await gameApi.saveCheckin(userId, next, log);
+      setSyncError(null);
+    } catch (e) {
+      console.error('Failed to save check-in:', e);
+      setSyncError(errorMessage(e));
+    }
+  };
+
   const completeOnboarding = async (
     name: string,
     sleep: number,
     meals: number,
     mealSize: number
   ) => {
-    const next: UserState = {
-      ...state,
-      masterName: name,
-      targetSleep: sleep,
-      targetMeals: meals,
-      usualMealSize: mealSize,
-      onboarded: true,
-      lastActiveDate: toDateKey(new Date()),
-      logs: [
-        {
-          id: String(Date.now()),
-          time: getFormattedTime(),
-          type: 'emotion',
-          content: `${name} 마스터와 푸디몬이 첫 만남을 가졌어요! 🎉`,
-        },
-      ],
-    };
-    const { score, level } = calcScore(next);
-    next.currentDailyScore = score;
-    next.level = level;
-    await saveState(next);
+    const firstLog = { type: 'emotion' as const, content: `${name} 마스터와 푸디몬이 첫 만남을 가졌어요! 🎉` };
+    applyState(
+      withScore({
+        ...stateRef.current,
+        masterName: name,
+        targetSleep: sleep,
+        targetMeals: meals,
+        usualMealSize: mealSize,
+        onboarded: true,
+        lastActiveDate: toDateKey(new Date()),
+        logs: [newLog(firstLog.type, firstLog.content)],
+      })
+    );
+    try {
+      await gameApi.saveOnboarding(userId, {
+        nickname: name,
+        targetSleep: sleep,
+        targetMeals: meals,
+        usualMealSize: mealSize,
+      });
+      await gameApi.addHistoryLog(userId, toDateKey(new Date()), firstLog);
+    } catch (e) {
+      console.error('Failed to save onboarding:', e);
+      setSyncError(errorMessage(e));
+    }
+    // Starts the day on the server (sets the first check-in date).
+    await syncFromServer();
   };
 
-  const logMeal = async (size: number, answerText: string) => {
+  const logMeal = (size: number, answerText: string) => {
     const isBad = size <= 0.33 || size >= 2.0;
-    const newBadCount = isBad ? state.today.badMealCount + 1 : state.today.badMealCount;
-    const newMealCount = state.today.mealCount + 1;
     const sizeDesc = size === 1.0 ? '정량' : `${Math.round(size * 100)}%`;
-
-    const newLogs: LogItem[] = [
-      {
-        id: String(Date.now()),
-        time: getFormattedTime(),
-        type: 'meal',
-        content: `식사 기록 (${sizeDesc}): "${answerText}"`,
-      },
-      ...state.logs,
-    ];
-
-    const next: UserState = {
-      ...state,
-      today: {
-        ...state.today,
-        mealCount: newMealCount,
-        badMealCount: newBadCount,
-      },
-      logs: newLogs,
-    };
-    const { score, level } = calcScore(next);
-    next.currentDailyScore = score;
-    next.level = level;
-    await saveState(next);
+    return recordCheckin(
+      (s) => ({
+        ...s.today,
+        mealCount: s.today.mealCount + 1,
+        badMealCount: isBad ? s.today.badMealCount + 1 : s.today.badMealCount,
+      }),
+      { type: 'meal', content: `식사 기록 (${sizeDesc}): "${answerText}"` }
+    );
   };
 
-  const skipMeal = async () => {
-    const next: UserState = {
-      ...state,
-      today: {
-        ...state.today,
-        badMealCount: state.today.badMealCount + 1,
-      },
-      logs: [
-        {
-          id: String(Date.now()),
-          time: getFormattedTime(),
-          type: 'skip',
-          content: '식사를 건너뛰었어요 😢',
-        },
-        ...state.logs,
-      ],
-    };
-    const { score, level } = calcScore(next);
-    next.currentDailyScore = score;
-    next.level = level;
-    await saveState(next);
+  const skipMeal = () =>
+    recordCheckin((s) => ({ ...s.today, badMealCount: s.today.badMealCount + 1 }), {
+      type: 'skip',
+      content: '식사를 건너뛰었어요 😢',
+    });
+
+  const logSleep = (hours: number) => {
+    const diff = Math.abs(stateRef.current.targetSleep - hours);
+    return recordCheckin((s) => ({ ...s.today, sleepHours: hours, sleepDiff: diff }), {
+      type: 'sleep',
+      content: `수면 ${hours}시간 기록 (목표 대비 ${diff === 0 ? '완벽 일치' : `${diff}시간 차이`})`,
+    });
   };
 
-  const logSleep = async (hours: number) => {
-    const diff = Math.abs(state.targetSleep - hours);
-    const next: UserState = {
-      ...state,
-      today: {
-        ...state.today,
-        sleepHours: hours,
-        sleepDiff: diff,
-      },
-      logs: [
-        {
-          id: String(Date.now()),
-          time: getFormattedTime(),
-          type: 'sleep',
-          content: `수면 ${hours}시간 기록 (목표 대비 ${diff === 0 ? '완벽 일치' : `${diff}시간 차이`})`,
-        },
-        ...state.logs,
-      ],
-    };
-    const { score, level } = calcScore(next);
-    next.currentDailyScore = score;
-    next.level = level;
-    await saveState(next);
-  };
-
-  const logEmotion = async (score: number) => {
+  const logEmotion = (score: number) => {
     let feel = '보통';
     if (score >= 80) feel = '좋음/매우 좋음 😊';
     else if (score <= 40) feel = '나쁨/매우 나쁨 🥺';
-
-    const next: UserState = {
-      ...state,
-      today: {
-        ...state.today,
-        emotion: score,
-      },
-      logs: [
-        {
-          id: String(Date.now()),
-          time: getFormattedTime(),
-          type: 'emotion',
-          content: `오늘의 기분 체크: ${feel}`,
-        },
-        ...state.logs,
-      ],
-    };
-    const { score: newScore, level } = calcScore(next);
-    next.currentDailyScore = newScore;
-    next.level = level;
-    await saveState(next);
+    return recordCheckin((s) => ({ ...s.today, emotion: score }), {
+      type: 'emotion',
+      content: `오늘의 기분 체크: ${feel}`,
+    });
   };
 
-  const buyItem = (type: 'costume' | 'background', id: string) => {
+  const buyItem = async (type: 'costume' | 'background', id: string) => {
     const item =
       type === 'costume'
         ? costumesData.find((c) => c.id === id)
         : backgroundsData.find((b) => b.id === id);
 
     if (!item) return { success: false, message: '아이템을 찾을 수 없습니다.' };
-    if (state.currency < item.price) {
+    if (stateRef.current.currency < item.price) {
       return { success: false, message: '젤리가 부족해요! 체크인으로 젤리를 모아보세요 ✨' };
     }
 
-    const next: UserState = {
-      ...state,
-      currency: state.currency - item.price,
-      ownedCostumes:
-        type === 'costume' ? [...state.ownedCostumes, id] : state.ownedCostumes,
+    const res = await gameApi.buyItem(type, id);
+    if (!res.ok) {
+      const messages: Record<gameApi.BuyError, string> = {
+        already_owned: '이미 가지고 있는 아이템이에요.',
+        insufficient_jelly: '젤리가 부족해요! 체크인으로 젤리를 모아보세요 ✨',
+        not_found: '아이템을 찾을 수 없습니다.',
+        network: '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.',
+      };
+      return { success: false, message: messages[res.error] };
+    }
+
+    const current = stateRef.current;
+    applyState({
+      ...current,
+      currency: res.jellyBalance,
+      ownedCostumes: type === 'costume' ? [...current.ownedCostumes, id] : current.ownedCostumes,
       ownedBackgrounds:
-        type === 'background' ? [...state.ownedBackgrounds, id] : state.ownedBackgrounds,
-    };
-    saveState(next);
+        type === 'background' ? [...current.ownedBackgrounds, id] : current.ownedBackgrounds,
+    });
     return { success: true, message: `${item.name}을(를) 구매했습니다! 🎒` };
   };
 
+  const saveEquipped = (next: UserState) => {
+    applyState(next);
+    gameApi
+      .saveEquipped(userId, { costume: next.equippedCostume, backgrounds: next.equippedBackgrounds })
+      .catch((e) => {
+        console.error('Failed to save equipped items:', e);
+        setSyncError(errorMessage(e));
+      });
+  };
+
   const toggleCostume = (id: string) => {
-    const nextCostume = state.equippedCostume === id ? null : id;
-    saveState({ ...state, equippedCostume: nextCostume });
+    const current = stateRef.current;
+    saveEquipped({ ...current, equippedCostume: current.equippedCostume === id ? null : id });
   };
 
   const toggleBackground = (id: string) => {
-    const isEquipped = state.equippedBackgrounds.includes(id);
+    const current = stateRef.current;
+    const isEquipped = current.equippedBackgrounds.includes(id);
     const nextBgs = isEquipped
-      ? state.equippedBackgrounds.filter((b) => b !== id)
-      : [...state.equippedBackgrounds, id];
-    saveState({ ...state, equippedBackgrounds: nextBgs });
+      ? current.equippedBackgrounds.filter((b) => b !== id)
+      : [...current.equippedBackgrounds, id];
+    saveEquipped({ ...current, equippedBackgrounds: nextBgs });
   };
 
-  // Dev-only: close the current day immediately without waiting for midnight.
+  // Dev-only: close the current day on this device without waiting for midnight.
+  // Not sent to the server; the next sync restores the server state.
   const advanceToNextDay = () => {
-    const { state: next, ...result } = closeDay(state);
-    saveState(next);
+    const { state: next, ...result } = closeDay(stateRef.current);
+    applyState(next);
     return result;
-  };
-
-  const resetAllData = async () => {
-    setPendingRollover(null);
-    await saveState(defaultState);
   };
 
   const dismissRollover = useCallback(() => setPendingRollover(null), []);
@@ -385,6 +361,9 @@ export function FoodyMonProvider({ children }: { children: ReactNode }) {
     <FoodyMonContext.Provider
       value={{
         state,
+        loading,
+        syncError,
+        retrySync: syncFromServer,
         currentDialogue,
         triggerPetInteraction,
         completeOnboarding,
@@ -396,7 +375,6 @@ export function FoodyMonProvider({ children }: { children: ReactNode }) {
         toggleCostume,
         toggleBackground,
         advanceToNextDay,
-        resetAllData,
         pendingRollover,
         dismissRollover,
       }}>

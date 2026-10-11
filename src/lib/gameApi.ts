@@ -177,3 +177,18 @@ export async function buyItem(
   }
   return { ok: true, jellyBalance: (res.data as { jelly_balance: number }).jelly_balance };
 }
+
+/** Stored daily health index per day, from `fromDate` (inclusive). */
+export async function fetchScoreHistory(
+  userId: string,
+  fromDate: string
+): Promise<{ log_date: string; daily_score: number | null }[]> {
+  const res = await supabase
+    .from('daily_logs')
+    .select('log_date, daily_score')
+    .eq('user_id', userId)
+    .gte('log_date', fromDate)
+    .order('log_date', { ascending: true });
+  if (res.error) throw res.error;
+  return res.data ?? [];
+}

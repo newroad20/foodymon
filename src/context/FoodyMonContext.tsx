@@ -1,7 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from 'react';
+import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserState, LogItem, QuizQuestion } from '@/types/foodymon';
 import { costumesData, backgroundsData, dialoguesData, levelsData } from '@/constants/foodymonData';
+import { closeDay, rolloverToDate, toDateKey, RolloverResult } from '@/lib/dayRollover';
+
+// How often to check whether the calendar day changed while the app stays open.
+const DAY_CHECK_INTERVAL_MS = 60 * 1000;
 
 const STORAGE_KEY = '@foodymon_user_state_v1';
 
@@ -35,6 +40,7 @@ const defaultState: UserState = {
   averageScore: 50,
   level: 3,
   logs: [],
+  lastActiveDate: null,
 };
 
 interface FoodyMonContextType {
@@ -51,6 +57,9 @@ interface FoodyMonContextType {
   toggleBackground: (id: string) => void;
   advanceToNextDay: () => { rewardedJelly: number; shieldUsed: boolean; shieldEarned: boolean };
   resetAllData: () => Promise<void>;
+  /** Result of the most recent automatic day change, until dismissed. */
+  pendingRollover: RolloverResult | null;
+  dismissRollover: () => void;
 }
 
 const FoodyMonContext = createContext<FoodyMonContextType | undefined>(undefined);
@@ -58,24 +67,14 @@ const FoodyMonContext = createContext<FoodyMonContextType | undefined>(undefined
 export function FoodyMonProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<UserState>(defaultState);
   const [currentDialogue, setCurrentDialogue] = useState<string>('오늘 하루도 건강하게 지내자!');
-
-  // Load from AsyncStorage
-  useEffect(() => {
-    (async () => {
-      try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          setState(parsed);
-        }
-      } catch (e) {
-        console.error('Failed to load foodymon state:', e);
-      }
-    })();
-  }, []);
+  const [pendingRollover, setPendingRollover] = useState<RolloverResult | null>(null);
+  // Latest state for AppState/interval callbacks, which would otherwise see a stale closure.
+  const stateRef = useRef<UserState>(defaultState);
+  const hydratedRef = useRef(false);
 
   // Save to AsyncStorage
   const saveState = async (newState: UserState) => {
+    stateRef.current = newState;
     setState(newState);
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
@@ -83,6 +82,48 @@ export function FoodyMonProvider({ children }: { children: ReactNode }) {
       console.error('Failed to save foodymon state:', e);
     }
   };
+
+  // Close out any days that ended since the last check-in day.
+  const checkDayChange = useCallback(() => {
+    if (!hydratedRef.current) return;
+    const current = stateRef.current;
+    if (!current.onboarded) return;
+    const result = rolloverToDate(current, new Date());
+    if (result.state === current) return;
+    saveState(result.state);
+    if (result.daysPassed > 0) setPendingRollover(result);
+  }, []);
+
+  // Load from AsyncStorage
+  useEffect(() => {
+    (async () => {
+      try {
+        const stored = await AsyncStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          // Merge so states saved by older versions pick up new fields.
+          const parsed: UserState = { ...defaultState, ...JSON.parse(stored) };
+          stateRef.current = parsed;
+          setState(parsed);
+        }
+      } catch (e) {
+        console.error('Failed to load foodymon state:', e);
+      }
+      hydratedRef.current = true;
+      checkDayChange();
+    })();
+  }, [checkDayChange]);
+
+  // Re-check when the app returns to the foreground and periodically (e.g. past midnight).
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (status) => {
+      if (status === 'active') checkDayChange();
+    });
+    const interval = setInterval(checkDayChange, DAY_CHECK_INTERVAL_MS);
+    return () => {
+      sub.remove();
+      clearInterval(interval);
+    };
+  }, [checkDayChange]);
 
   const getFormattedTime = () => {
     const d = new Date();
@@ -168,6 +209,7 @@ export function FoodyMonProvider({ children }: { children: ReactNode }) {
       targetMeals: meals,
       usualMealSize: mealSize,
       onboarded: true,
+      lastActiveDate: toDateKey(new Date()),
       logs: [
         {
           id: String(Date.now()),
@@ -325,60 +367,19 @@ export function FoodyMonProvider({ children }: { children: ReactNode }) {
     saveState({ ...state, equippedBackgrounds: nextBgs });
   };
 
+  // Dev-only: close the current day immediately without waiting for midnight.
   const advanceToNextDay = () => {
-    const hasLogged =
-      state.today.sleepDiff !== null ||
-      state.today.mealCount > 0 ||
-      state.today.emotion !== null;
-
-    let nextStreak = state.streak;
-    let nextShields = state.shields;
-    let rewardJelly = 0;
-    let shieldUsed = false;
-    let shieldEarned = false;
-
-    if (!hasLogged) {
-      if (nextShields > 0) {
-        nextShields -= 1;
-        shieldUsed = true;
-      } else {
-        nextStreak = 0;
-      }
-    } else {
-      nextStreak += 1;
-      rewardJelly = 10 + Math.floor(nextStreak / 3) * 5;
-      if (nextStreak % 7 === 0) {
-        nextShields += 1;
-        shieldEarned = true;
-      }
-    }
-
-    const nextScores = [...state.historyScores, state.currentDailyScore];
-    if (nextScores.length > 7) nextScores.shift();
-
-    const next: UserState = {
-      ...state,
-      streak: nextStreak,
-      shields: nextShields,
-      currency: state.currency + rewardJelly,
-      historyScores: nextScores,
-      today: {
-        sleepDiff: null,
-        sleepHours: null,
-        mealCount: 0,
-        badMealCount: 0,
-        emotion: null,
-      },
-      currentDailyScore: 40,
-      level: 3,
-    };
+    const { state: next, ...result } = closeDay(state);
     saveState(next);
-    return { rewardedJelly: rewardJelly, shieldUsed, shieldEarned };
+    return result;
   };
 
   const resetAllData = async () => {
+    setPendingRollover(null);
     await saveState(defaultState);
   };
+
+  const dismissRollover = useCallback(() => setPendingRollover(null), []);
 
   return (
     <FoodyMonContext.Provider
@@ -396,6 +397,8 @@ export function FoodyMonProvider({ children }: { children: ReactNode }) {
         toggleBackground,
         advanceToNextDay,
         resetAllData,
+        pendingRollover,
+        dismissRollover,
       }}>
       {children}
     </FoodyMonContext.Provider>

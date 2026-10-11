@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -18,10 +18,33 @@ import { EmotionModal } from '@/components/foodymon/EmotionModal';
 import { BagShopModal } from '@/components/foodymon/BagShopModal';
 import { HistoryModal } from '@/components/foodymon/HistoryModal';
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
+import { RolloverResult } from '@/lib/dayRollover';
+
+function describeRollover(r: RolloverResult): { title: string; message: string } {
+  const lines: string[] = [];
+  if (r.rewardedJelly > 0) lines.push(`어제 체크인 보상으로 젤리 ✨ +${r.rewardedJelly}개를 받았어요!`);
+  if (r.shieldEarned) lines.push('🛡️ 7일 연속 보상으로 스트릭 방패 1개를 추가 획득했어요!');
+  if (r.missedDays > 0) lines.push(`기록하지 못한 날이 ${r.missedDays}일 있었어요.`);
+  if (r.shieldsUsed > 0) lines.push(`🛡️ 스트릭 방패 ${r.shieldsUsed}개가 사용되었어요.`);
+  if (r.streakReset) lines.push('연속 기록이 초기화되었어요. 오늘부터 다시 힘내봐요! 😢');
+  else if (r.rewardedJelly === 0 && r.shieldsUsed > 0) lines.push('방패 덕분에 연속 기록이 유지되었어요!');
+
+  const title = r.rewardedJelly > 0 && !r.streakReset ? '새로운 하루 시작! 🌅' : '새로운 하루 🌅';
+  return { title, message: lines.join('\n') || '오늘도 건강한 하루 보내자!' };
+}
 
 
 export default function FoodyMonHomeScreen() {
-  const { state, advanceToNextDay } = useFoodyMon();
+  const { state, advanceToNextDay, pendingRollover, dismissRollover } = useFoodyMon();
+
+  // Tell the user what happened when the day changed (streak, jelly, shields).
+  useEffect(() => {
+    if (!pendingRollover) return;
+    const { title, message } = describeRollover(pendingRollover);
+    Alert.alert(title, message, [{ text: '확인', onPress: dismissRollover }], {
+      onDismiss: dismissRollover,
+    });
+  }, [pendingRollover, dismissRollover]);
 
   // Modals state
   const [showMealModal, setShowMealModal] = useState(false);

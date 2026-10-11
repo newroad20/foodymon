@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
+import { mealTargetOptions, sleepTargetOptions } from '@/constants/foodymonData';
 
 interface OnboardingModalProps {
   visible: boolean;
@@ -125,7 +126,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
                 "{name} 마스터, 반가워!{'\n'}평소 목표 수면 시간은 어느 정도야?"
               </Text>
               <View style={styles.optionsRow}>
-                {[5, 6, 7, 8, 9].map((hrs) => (
+                {sleepTargetOptions.map((hrs) => (
                   <TouchableOpacity
                     key={hrs}
                     style={[
@@ -156,7 +157,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
                 "하루 목표 식사 횟수는 몇 끼야?"
               </Text>
               <View style={styles.optionsRow}>
-                {[1, 2, 3, 4].map((m) => (
+                {mealTargetOptions.map((m) => (
                   <TouchableOpacity
                     key={m}
                     style={[

@@ -96,7 +96,7 @@ export default function FoodyMonHomeScreen() {
       {/* Cozy My Room Background */}
       <RoomBackground />
 
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
         {syncError && (
           <TouchableOpacity style={styles.syncBanner} activeOpacity={0.8} onPress={retrySync}>
             <Text style={styles.syncBannerText}>☁️ 서버와 동기화하지 못했어요. 눌러서 다시 시도</Text>

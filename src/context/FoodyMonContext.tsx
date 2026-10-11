@@ -61,6 +61,7 @@ interface FoodyMonContextType {
   skipMeal: () => Promise<void>;
   logSleep: (hours: number) => Promise<void>;
   logEmotion: (score: number) => Promise<void>;
+  updateSettings: (values: { nickname: string; targetSleep: number; targetMeals: number }) => Promise<boolean>;
   buyItem: (type: 'costume' | 'background', id: string) => Promise<{ success: boolean; message: string }>;
   toggleCostume: (id: string) => void;
   toggleBackground: (id: string) => void;
@@ -290,6 +291,33 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     });
   };
 
+  /** Updates name and lifestyle goals; today's score is recalculated against the new goals. */
+  const updateSettings = async (values: { nickname: string; targetSleep: number; targetMeals: number }) => {
+    const current = stateRef.current;
+    const sleepHours = current.today.sleepHours;
+    const next = withScore({
+      ...current,
+      masterName: values.nickname,
+      targetSleep: values.targetSleep,
+      targetMeals: values.targetMeals,
+      today: {
+        ...current.today,
+        sleepDiff: sleepHours === null ? null : Math.abs(values.targetSleep - sleepHours),
+      },
+    });
+    applyState(next);
+    try {
+      await gameApi.saveSettings(userId, values);
+      if (next.lastActiveDate) await gameApi.saveDailyLog(userId, next);
+      setSyncError(null);
+      return true;
+    } catch (e) {
+      console.error('Failed to save settings:', e);
+      setSyncError(errorMessage(e));
+      return false;
+    }
+  };
+
   const buyItem = async (type: 'costume' | 'background', id: string) => {
     const item =
       type === 'costume'
@@ -371,6 +399,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         skipMeal,
         logSleep,
         logEmotion,
+        updateSettings,
         buyItem,
         toggleCostume,
         toggleBackground,

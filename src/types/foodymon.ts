@@ -65,4 +65,6 @@ export interface UserState {
   logs: LogItem[];
   /** Local date (YYYY-MM-DD) of the day `today` belongs to. */
   lastActiveDate: string | null;
+  /** Yesterday was closed without check-ins and can still be filled in (S25). */
+  backfill: { date: string; prevStreak: number } | null;
 }

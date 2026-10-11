@@ -94,3 +94,13 @@ test('toDailyLogRow writes the current day totals', () => {
   assert.equal(row.meal_count, 1);
   assert.equal(row.daily_score, s.currentDailyScore);
 });
+
+test('buildUserState exposes a backfillable yesterday', () => {
+  const none = buildUserState({ profile, today: null, logs: [], items: [] }, levels);
+  assert.equal(none.backfill, null);
+  const s = buildUserState(
+    { profile: { ...profile, missed_date: '2026-10-10', missed_prev_streak: 4 }, today: null, logs: [], items: [] },
+    levels
+  );
+  assert.deepEqual(s.backfill, { date: '2026-10-10', prevStreak: 4 });
+});

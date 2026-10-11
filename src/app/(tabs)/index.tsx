@@ -20,6 +20,8 @@ import { EmotionModal } from '@/components/foodymon/EmotionModal';
 import { BagShopModal } from '@/components/foodymon/BagShopModal';
 import { HistoryModal } from '@/components/foodymon/HistoryModal';
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
+import { BackfillModal } from '@/components/foodymon/BackfillModal';
+import { BACKFILL_COST } from '@/constants/foodymonData';
 import { RolloverResult } from '@/lib/dayRollover';
 
 function describeRollover(r: RolloverResult): { title: string; message: string } {
@@ -55,6 +57,10 @@ export default function FoodyMonHomeScreen() {
   const [showEmotionModal, setShowEmotionModal] = useState(false);
   const [showBagModal, setShowBagModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [showBackfillModal, setShowBackfillModal] = useState(false);
+  // "나중에" hides the offer until the app restarts.
+  const [backfillDismissed, setBackfillDismissed] = useState<string | null>(null);
+  const backfillOffer = state.backfill && backfillDismissed !== state.backfill.date ? state.backfill : null;
 
   const handleNextDaySimulation = () => {
     Alert.alert(
@@ -106,6 +112,23 @@ export default function FoodyMonHomeScreen() {
         {/* Top Badges & History */}
         <TopStatsHeader onOpenHistory={() => setShowHistoryModal(true)} />
 
+        {/* S25: offer to fill in a missed yesterday */}
+        {backfillOffer && (
+          <View style={styles.backfillCard}>
+            <Text style={styles.backfillText}>어제 기록을 완료하지 못했어요. 지금 복구할까요?</Text>
+            <View style={styles.backfillActions}>
+              <TouchableOpacity
+                style={styles.backfillLater}
+                onPress={() => setBackfillDismissed(backfillOffer.date)}>
+                <Text style={styles.backfillLaterText}>나중에</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.backfillGo} onPress={() => setShowBackfillModal(true)}>
+                <Text style={styles.backfillGoText}>복구하기 ✨{BACKFILL_COST}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
         {/* Center Room & Interactive Pet Avatar */}
         <View style={styles.petSection}>
           <PetAvatar />
@@ -142,6 +165,7 @@ export default function FoodyMonHomeScreen() {
         visible={showHistoryModal}
         onClose={() => setShowHistoryModal(false)}
       />
+      <BackfillModal visible={showBackfillModal} onClose={() => setShowBackfillModal(false)} />
 
       {/* Onboarding Prologue Modal (Shown on first launch) */}
       <OnboardingModal visible={!loading && !syncError && !state.onboarded} />
@@ -170,6 +194,48 @@ const styles = StyleSheet.create({
     color: '#991B1B',
     fontSize: 13,
     textAlign: 'center',
+  },
+  backfillCard: {
+    marginHorizontal: 16,
+    marginTop: 4,
+    padding: 14,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderWidth: 1.5,
+    borderColor: '#FED7AA',
+    gap: 10,
+  },
+  backfillText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#334155',
+  },
+  backfillActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  backfillLater: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 12,
+    backgroundColor: '#F1F5F9',
+  },
+  backfillLaterText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#64748B',
+  },
+  backfillGo: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 12,
+    backgroundColor: '#F97316',
+  },
+  backfillGoText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#FFFFFF',
   },
   petSection: {
     flex: 1,

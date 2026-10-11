@@ -13,6 +13,17 @@ export const levelsData: LevelInfo[] = [
 export const sleepTargetOptions = [5, 6, 7, 8, 9];
 export const mealTargetOptions = [1, 2, 3, 4];
 
+export const emotionOptions = [
+  { score: 100, emoji: '🥰', label: '매우 좋음', desc: '기운이 넘치고 행복해요!' },
+  { score: 80, emoji: '🙂', label: '좋음', desc: '평온하고 기분 좋은 하루예요.' },
+  { score: 60, emoji: '😐', label: '보통', desc: '무난하고 평범한 일상이에요.' },
+  { score: 40, emoji: '🙁', label: '조금 지침', desc: '스트레스나 피로감이 있어요.' },
+  { score: 20, emoji: '😭', label: '매우 힘듦', desc: '지치고 위로가 필요해요...' },
+];
+
+// Jelly cost to fill in a missed yesterday (must match backfill_yesterday in supabase/002_game_rpc.sql).
+export const BACKFILL_COST = 20;
+
 export const costumesData: CostumeItem[] = [
   { id: 'crown', icon: '👑', name: '왕관', price: 50 },
   { id: 'ribbon', icon: '🎀', name: '리본', price: 30 },

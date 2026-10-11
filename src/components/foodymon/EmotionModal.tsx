@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
+import { emotionOptions } from '@/constants/foodymonData';
 
 interface EmotionModalProps {
   visible: boolean;
@@ -17,13 +18,7 @@ interface EmotionModalProps {
 export function EmotionModal({ visible, onClose }: EmotionModalProps) {
   const { logEmotion } = useFoodyMon();
 
-  const emotions = [
-    { score: 100, emoji: '🥰', label: '매우 좋음', desc: '기운이 넘치고 행복해요!' },
-    { score: 80, emoji: '🙂', label: '좋음', desc: '평온하고 기분 좋은 하루예요.' },
-    { score: 60, emoji: '😐', label: '보통', desc: '무난하고 평범한 일상이에요.' },
-    { score: 40, emoji: '🙁', label: '조금 지침', desc: '스트레스나 피로감이 있어요.' },
-    { score: 20, emoji: '😭', label: '매우 힘듦', desc: '지치고 위로가 필요해요...' },
-  ];
+  const emotions = emotionOptions;
 
   const handleSelect = async (score: number, label: string) => {
     await logEmotion(score);

@@ -26,6 +26,7 @@ function makeState(overrides: Partial<UserState> = {}): UserState {
     level: 3,
     logs: [],
     lastActiveDate: '2026-10-10',
+    backfill: null,
     ...overrides,
   };
 }

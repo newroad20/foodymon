@@ -15,6 +15,8 @@ export interface ProfileRow {
   equipped_backgrounds: string[];
   history_scores: number[];
   last_checkin_date: string | null;
+  missed_date?: string | null;
+  missed_prev_streak?: number | null;
 }
 
 export interface DailyLogRow {
@@ -106,6 +108,9 @@ export function buildUserState(
       content: l.content,
     })),
     lastActiveDate: profile.last_checkin_date,
+    backfill: profile.missed_date
+      ? { date: profile.missed_date, prevStreak: profile.missed_prev_streak ?? 0 }
+      : null,
   };
 
   const { score, level } = calcDailyScore(state, levels);

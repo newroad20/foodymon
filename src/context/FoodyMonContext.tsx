@@ -70,6 +70,8 @@ interface FoodyMonContextType {
   }) => Promise<{ success: boolean; message: string }>;
   updateSettings: (values: { nickname: string; targetSleep: number; targetMeals: number }) => Promise<boolean>;
   buyItem: (type: 'costume' | 'background', id: string) => Promise<{ success: boolean; message: string }>;
+  /** Claims a completed daily quest; the server pays the jelly. */
+  claimQuest: (questId: string) => Promise<boolean>;
   toggleCostume: (id: string) => void;
   toggleBackground: (id: string) => void;
   advanceToNextDay: () => { rewardedJelly: number; shieldUsed: boolean; shieldEarned: boolean };
@@ -392,6 +394,17 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     return { success: true, message: `${item.name}을(를) 구매했습니다! 🎒` };
   };
 
+  const claimQuest = async (questId: string) => {
+    try {
+      const { jellyBalance } = await gameApi.claimQuest(toDateKey(new Date()), questId);
+      applyState({ ...stateRef.current, currency: jellyBalance });
+      return true;
+    } catch (e) {
+      console.error('Failed to claim quest:', e);
+      return false;
+    }
+  };
+
   const saveEquipped = (next: UserState) => {
     applyState(next);
     gameApi
@@ -444,6 +457,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         backfillYesterday,
         updateSettings,
         buyItem,
+        claimQuest,
         toggleCostume,
         toggleBackground,
         advanceToNextDay,

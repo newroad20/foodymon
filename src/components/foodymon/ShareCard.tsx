@@ -62,11 +62,11 @@ export const ShareCard = forwardRef<View, { state: UserState }>(function ShareCa
 const styles = StyleSheet.create({
   card: {
     width: SHARE_CARD_WIDTH,
-    backgroundColor: '#FFF4E6',
+    backgroundColor: '#FDF5F5',
     borderRadius: 28,
     padding: 22,
     borderWidth: 3,
-    borderColor: '#FED7AA',
+    borderColor: '#B5E6D4',
   },
   topRow: {
     flexDirection: 'row',
@@ -75,20 +75,20 @@ const styles = StyleSheet.create({
   },
   brand: {
     fontSize: 12,
-    fontWeight: '900',
     letterSpacing: 1.5,
-    color: '#EA580C',
+    color: '#17765D',
+    fontWeight: '900',
   },
   date: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#9A3412',
+    color: '#17765D',
+    fontWeight: '700',
   },
   title: {
     marginTop: 10,
     fontSize: 20,
-    fontWeight: '800',
     color: '#1E293B',
+    fontWeight: '900',
   },
   stage: {
     marginTop: 14,
@@ -103,11 +103,13 @@ const styles = StyleSheet.create({
     top: 10,
     left: 12,
     fontSize: 18,
+    fontWeight: '600',
   },
   costume: {
     fontSize: 34,
     marginBottom: -16,
     zIndex: 1,
+    fontWeight: '600',
   },
   pet: {
     width: 170,
@@ -119,10 +121,10 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 999,
     overflow: 'hidden',
-    backgroundColor: '#FFEDD5',
-    color: '#C2410C',
+    backgroundColor: '#E3F6EF',
+    color: '#17765D',
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '900',
   },
   statsRow: {
     flexDirection: 'row',
@@ -138,12 +140,13 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 24,
-    fontWeight: '900',
     color: '#1E293B',
+    fontWeight: '900',
   },
   statLabel: {
     fontSize: 11,
     color: '#64748B',
+    fontWeight: '600',
   },
   divider: {
     width: 1,
@@ -153,6 +156,7 @@ const styles = StyleSheet.create({
     marginTop: 14,
     textAlign: 'center',
     fontSize: 11,
-    color: '#9A3412',
+    color: '#17765D',
+    fontWeight: '600',
   },
 });

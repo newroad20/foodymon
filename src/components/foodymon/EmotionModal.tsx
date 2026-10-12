@@ -88,8 +88,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
     color: '#2D3748',
+    fontWeight: '900',
   },
   closeBtn: {
     padding: 6,
@@ -97,13 +97,14 @@ const styles = StyleSheet.create({
   closeBtnText: {
     fontSize: 18,
     color: '#A0AEC0',
-    fontWeight: '700',
+    fontWeight: '800',
   },
   subtitle: {
     fontSize: 14,
     color: '#718096',
     marginBottom: 20,
     lineHeight: 20,
+    fontWeight: '600',
   },
   list: {
     gap: 12,
@@ -121,18 +122,20 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 32,
+    fontWeight: '600',
   },
   info: {
     flex: 1,
   },
   label: {
     fontSize: 16,
-    fontWeight: '700',
     color: '#1E293B',
     marginBottom: 2,
+    fontWeight: '800',
   },
   desc: {
     fontSize: 13,
     color: '#64748B',
+    fontWeight: '600',
   },
 });

@@ -79,14 +79,14 @@ export function RoomBackground() {
 const styles = StyleSheet.create({
   wall: {
     flex: 7,
-    backgroundColor: '#FFF9F0', // Soft creamy warm wall
+    backgroundColor: '#FDF5F5', // Soft creamy warm wall
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
   },
   windowFrame: {
     position: 'absolute',
-    top: 70,
+    top: 250,
     right: 25,
     width: 80,
     height: 95,
@@ -95,11 +95,6 @@ const styles = StyleSheet.create({
     borderColor: '#D7CCC8',
     backgroundColor: '#EFEBE9',
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   windowGlass: {
     flex: 1,
@@ -112,6 +107,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
+    fontWeight: '600',
   },
   windowDividerH: {
     position: 'absolute',
@@ -134,6 +130,7 @@ const styles = StyleSheet.create({
   },
   bookshelfEmoji: {
     fontSize: 38,
+    fontWeight: '600',
   },
   floor: {
     flex: 3,
@@ -166,8 +163,8 @@ const styles = StyleSheet.create({
   },
   carpetPattern: {
     fontSize: 11,
-    fontWeight: '600',
     color: '#D84315',
+    fontWeight: '700',
   },
   plantContainer: {
     position: 'absolute',
@@ -181,5 +178,6 @@ const styles = StyleSheet.create({
   },
   decorEmoji: {
     fontSize: 34,
+    fontWeight: '600',
   },
 });

@@ -226,7 +226,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF9F0',
+    backgroundColor: '#FDF5F5',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
@@ -244,12 +244,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
     position: 'relative',
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#E5E5E5',
   },
   backBtn: {
     position: 'absolute',
@@ -259,8 +257,8 @@ const styles = StyleSheet.create({
   },
   backBtnText: {
     fontSize: 14,
-    fontWeight: '700',
     color: '#94A3B8',
+    fontWeight: '800',
   },
   stepContent: {
     alignItems: 'center',
@@ -268,17 +266,17 @@ const styles = StyleSheet.create({
   },
   storyTitle: {
     fontSize: 18,
-    fontWeight: '800',
-    color: '#3B82F6',
+    color: '#1B7F66',
     marginBottom: 12,
+    fontWeight: '900',
   },
   dialogueText: {
     fontSize: 15,
-    fontWeight: '600',
     color: '#334155',
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 24,
+    fontWeight: '700',
   },
   input: {
     width: '100%',
@@ -290,6 +288,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     color: '#1E293B',
+    fontWeight: '600',
   },
   optionsRow: {
     flexDirection: 'row',
@@ -307,16 +306,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   optionChipActive: {
-    borderColor: '#3B82F6',
-    backgroundColor: '#EFF6FF',
+    borderColor: '#1B7F66',
+    backgroundColor: '#E3F6EF',
   },
   optionChipText: {
     fontSize: 14,
-    fontWeight: '700',
     color: '#475569',
+    fontWeight: '800',
   },
   optionChipTextActive: {
-    color: '#2563EB',
+    color: '#17765D',
   },
   optionsCol: {
     width: '100%',
@@ -332,20 +331,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   optionRowActive: {
-    borderColor: '#3B82F6',
-    backgroundColor: '#EFF6FF',
+    borderColor: '#1B7F66',
+    backgroundColor: '#E3F6EF',
   },
   optionRowText: {
     fontSize: 14,
-    fontWeight: '700',
     color: '#475569',
+    fontWeight: '800',
   },
   optionRowTextActive: {
-    color: '#2563EB',
+    color: '#17765D',
   },
   primaryBtn: {
     width: '100%',
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#1B7F66',
     padding: 16,
     borderRadius: 16,
     alignItems: 'center',
@@ -353,6 +352,6 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

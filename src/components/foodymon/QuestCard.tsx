@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
@@ -50,7 +51,10 @@ export function QuestCard() {
           load();
           setOpen(true);
         }}>
-        <Text style={styles.cardTitle}>📜 오늘의 퀘스트</Text>
+        <View style={styles.cardLeft}>
+          <Ionicons name="trophy" size={18} color="#FFC800" />
+          <Text style={styles.cardTitle}>오늘의 퀘스트</Text>
+        </View>
         <Text style={styles.cardMeta}>
           {ready > 0 ? `보상 ${ready}개 받기 ›` : `${claimed}/${quests.length} 완료 ›`}
         </Text>
@@ -60,7 +64,7 @@ export function QuestCard() {
         <View style={styles.overlay}>
           <View style={styles.sheet}>
             <View style={styles.header}>
-              <Text style={styles.title}>📜 오늘의 퀘스트</Text>
+              <Text style={styles.title}>오늘의 퀘스트</Text>
               <TouchableOpacity style={styles.closeBtn} onPress={() => setOpen(false)}>
                 <Text style={styles.closeText}>✕</Text>
               </TouchableOpacity>
@@ -119,17 +123,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#E5E5E5',
+  },
+  cardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   cardTitle: {
     fontSize: 14,
-    fontWeight: '800',
     color: '#334155',
+    fontWeight: '900',
   },
   cardMeta: {
     fontSize: 13,
-    fontWeight: '700',
-    color: '#EA580C',
+    color: '#17765D',
+    fontWeight: '800',
   },
   overlay: {
     flex: 1,
@@ -151,8 +163,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
     color: '#2D3748',
+    fontWeight: '900',
   },
   closeBtn: {
     padding: 6,
@@ -160,12 +172,13 @@ const styles = StyleSheet.create({
   closeText: {
     fontSize: 18,
     color: '#A0AEC0',
-    fontWeight: '700',
+    fontWeight: '800',
   },
   subtitle: {
     fontSize: 13,
     color: '#718096',
     lineHeight: 19,
+    fontWeight: '600',
   },
   quest: {
     flexDirection: 'row',
@@ -173,10 +186,11 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 12,
     borderRadius: 16,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#E3F6EF',
   },
   chest: {
     fontSize: 28,
+    fontWeight: '600',
   },
   questBody: {
     flex: 1,
@@ -184,23 +198,24 @@ const styles = StyleSheet.create({
   },
   questTitle: {
     fontSize: 14,
-    fontWeight: '700',
     color: '#334155',
+    fontWeight: '800',
   },
   track: {
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#FED7AA',
+    backgroundColor: '#B5E6D4',
     overflow: 'hidden',
   },
   fill: {
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#EA580C',
+    backgroundColor: '#17765D',
   },
   questMeta: {
     fontSize: 11,
     color: '#64748B',
+    fontWeight: '600',
   },
   claimBtn: {
     minWidth: 52,
@@ -208,7 +223,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 12,
-    backgroundColor: '#F97316',
+    backgroundColor: '#1B7F66',
+    borderBottomWidth: 4,
+    borderBottomColor: '#125A48',
   },
   claimBtnOff: {
     opacity: 0.35,
@@ -216,11 +233,11 @@ const styles = StyleSheet.create({
   claimText: {
     color: '#FFFFFF',
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: '900',
   },
   claimed: {
     fontSize: 13,
-    fontWeight: '700',
     color: '#94A3B8',
+    fontWeight: '800',
   },
 });

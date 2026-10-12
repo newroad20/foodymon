@@ -178,7 +178,7 @@ export default function FoodyMonHomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF9F0',
+    backgroundColor: '#FDF5F5',
   },
   safeArea: {
     flex: 1,
@@ -196,6 +196,7 @@ const styles = StyleSheet.create({
     color: '#991B1B',
     fontSize: 13,
     textAlign: 'center',
+    fontWeight: '600',
   },
   backfillCard: {
     marginHorizontal: 16,
@@ -204,13 +205,13 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderWidth: 1.5,
-    borderColor: '#FED7AA',
+    borderColor: '#B5E6D4',
     gap: 10,
   },
   backfillText: {
     fontSize: 14,
-    fontWeight: '700',
     color: '#334155',
+    fontWeight: '800',
   },
   backfillActions: {
     flexDirection: 'row',
@@ -225,19 +226,21 @@ const styles = StyleSheet.create({
   },
   backfillLaterText: {
     fontSize: 13,
-    fontWeight: '700',
     color: '#64748B',
+    fontWeight: '800',
   },
   backfillGo: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 12,
-    backgroundColor: '#F97316',
+    backgroundColor: '#1B7F66',
+    borderBottomWidth: 4,
+    borderBottomColor: '#125A48',
   },
   backfillGoText: {
     fontSize: 13,
-    fontWeight: '800',
     color: '#FFFFFF',
+    fontWeight: '900',
   },
   petSection: {
     flex: 1,

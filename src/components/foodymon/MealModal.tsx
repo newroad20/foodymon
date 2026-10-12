@@ -207,8 +207,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
     color: '#2D3748',
+    fontWeight: '900',
   },
   closeBtn: {
     padding: 6,
@@ -216,27 +216,28 @@ const styles = StyleSheet.create({
   closeBtnText: {
     fontSize: 18,
     color: '#A0AEC0',
-    fontWeight: '700',
+    fontWeight: '800',
   },
   subtitle: {
     fontSize: 14,
     color: '#718096',
     marginBottom: 16,
     lineHeight: 20,
+    fontWeight: '600',
   },
   quizBox: {
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#E3F6EF',
     borderLeftWidth: 4,
-    borderLeftColor: '#F97316',
+    borderLeftColor: '#1B7F66',
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
   },
   quizQuestion: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#C2410C',
+    color: '#17765D',
     lineHeight: 22,
+    fontWeight: '800',
   },
   yesNoContainer: {
     gap: 10,
@@ -251,13 +252,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   choiceBtnSelected: {
-    borderColor: '#F97316',
-    backgroundColor: '#FFEDD5',
+    borderColor: '#1B7F66',
+    backgroundColor: '#E3F6EF',
   },
   choiceBtnText: {
     fontSize: 15,
-    fontWeight: '700',
     color: '#334155',
+    fontWeight: '800',
   },
   textInput: {
     borderWidth: 1.5,
@@ -269,9 +270,10 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     marginBottom: 20,
     color: '#1E293B',
+    fontWeight: '600',
   },
   primaryBtn: {
-    backgroundColor: '#F97316',
+    backgroundColor: '#1B7F66',
     padding: 16,
     borderRadius: 16,
     alignItems: 'center',
@@ -280,7 +282,7 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   secondaryBtn: {
     backgroundColor: '#F1F5F9',
@@ -292,7 +294,7 @@ const styles = StyleSheet.create({
   secondaryBtnText: {
     color: '#64748B',
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   skipBtn: {
     padding: 12,
@@ -301,7 +303,7 @@ const styles = StyleSheet.create({
   skipBtnText: {
     color: '#EF4444',
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   portionGrid: {
     gap: 10,
@@ -319,10 +321,11 @@ const styles = StyleSheet.create({
   },
   portionEmoji: {
     fontSize: 24,
+    fontWeight: '600',
   },
   portionLabel: {
     fontSize: 15,
-    fontWeight: '700',
     color: '#334155',
+    fontWeight: '800',
   },
 });

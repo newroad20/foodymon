@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData } from '@/constants/foodymonData';
 
@@ -15,31 +16,21 @@ export function TopStatsHeader({ onOpenHistory }: TopStatsHeaderProps) {
     <View style={styles.container}>
       {/* Left Stat Badges */}
       <View style={styles.statsRow}>
-        {/* Level Badge */}
         <View style={styles.badge}>
-          <Text style={styles.badgeIcon}>⚡</Text>
           <Text style={styles.badgeText}>Lv.{state.level} {currentLvl.name}</Text>
         </View>
 
-        {/* Streak Flame */}
-        <View style={styles.badge}>
-          <Text style={styles.badgeIcon}>🔥</Text>
-          <Text style={styles.badgeText}>{state.streak}일</Text>
-        </View>
-
-        {/* Jelly Currency */}
-        <View style={styles.badge}>
-          <Text style={styles.badgeIcon}>✨</Text>
+        {/* Streak · jelly · shields in one pill */}
+        <View style={styles.badge} accessibilityLabel={`연속 ${state.streak}일, 젤리 ${state.currency}개, 방패 ${state.shields}개`}>
+          <Ionicons name="flame" size={14} color="#E8734A" />
+          <Text style={styles.badgeText}>{state.streak}</Text>
+          <View style={styles.sep} />
+          <Ionicons name="water" size={14} color="#1B7F66" />
           <Text style={styles.badgeText}>{state.currency}</Text>
+          <View style={styles.sep} />
+          <Ionicons name="shield-checkmark" size={14} color="#64748B" />
+          <Text style={styles.badgeText}>{state.shields}</Text>
         </View>
-
-        {/* Shield */}
-        {state.shields > 0 && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeIcon}>🛡️</Text>
-            <Text style={styles.badgeText}>{state.shields}</Text>
-          </View>
-        )}
       </View>
 
       {/* History Button */}
@@ -47,7 +38,7 @@ export function TopStatsHeader({ onOpenHistory }: TopStatsHeaderProps) {
         style={styles.historyButton}
         activeOpacity={0.8}
         onPress={onOpenHistory}>
-        <Text style={styles.historyIcon}>📖</Text>
+        <Ionicons name="book-outline" size={18} color="#334155" accessibilityLabel="기록장" />
       </TouchableOpacity>
     </View>
   );
@@ -76,20 +67,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-    elevation: 2,
     gap: 4,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#E5E5E5',
   },
-  badgeIcon: {
-    fontSize: 13,
+  sep: {
+    width: 1,
+    height: 12,
+    marginHorizontal: 4,
+    backgroundColor: '#E2E8F0',
   },
   badgeText: {
     fontSize: 12,
-    fontWeight: '700',
     color: '#2D3748',
+    fontWeight: '800',
   },
   historyButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -98,14 +90,9 @@ const styles = StyleSheet.create({
     borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
     marginLeft: 8,
-  },
-  historyIcon: {
-    fontSize: 18,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#E5E5E5',
   },
 });

@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
     color: '#2D3748',
+    fontWeight: '900',
   },
   closeBtn: {
     padding: 6,
@@ -113,13 +113,14 @@ const styles = StyleSheet.create({
   closeBtnText: {
     fontSize: 18,
     color: '#A0AEC0',
-    fontWeight: '700',
+    fontWeight: '800',
   },
   subtitle: {
     fontSize: 14,
     color: '#718096',
     marginBottom: 16,
     lineHeight: 20,
+    fontWeight: '600',
   },
   targetBanner: {
     backgroundColor: '#EDE9FE',
@@ -131,9 +132,10 @@ const styles = StyleSheet.create({
   targetBannerText: {
     fontSize: 14,
     color: '#6D28D9',
+    fontWeight: '600',
   },
   bold: {
-    fontWeight: '800',
+    fontWeight: '900',
   },
   grid: {
     flexDirection: 'row',
@@ -158,21 +160,21 @@ const styles = StyleSheet.create({
   },
   hourText: {
     fontSize: 15,
-    fontWeight: '700',
     color: '#334155',
+    fontWeight: '800',
   },
   hourTextSelected: {
     color: '#7C3AED',
   },
   targetPill: {
     fontSize: 9,
-    fontWeight: '700',
     color: '#7C3AED',
     backgroundColor: '#DDD6FE',
     paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 4,
     marginTop: 2,
+    fontWeight: '800',
   },
   primaryBtn: {
     backgroundColor: '#8B5CF6',
@@ -183,6 +185,6 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

@@ -232,12 +232,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
   },
   tabBtnActive: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#1B7F66',
   },
   tabText: {
     fontSize: 15,
-    fontWeight: '700',
     color: '#64748B',
+    fontWeight: '800',
   },
   tabTextActive: {
     color: '#FFFFFF',
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   closeBtnText: {
     fontSize: 18,
     color: '#A0AEC0',
-    fontWeight: '700',
+    fontWeight: '800',
   },
   jellyBanner: {
     backgroundColor: '#FEF3C7',
@@ -260,9 +260,10 @@ const styles = StyleSheet.create({
   jellyBannerText: {
     fontSize: 14,
     color: '#92400E',
+    fontWeight: '600',
   },
   jellyBold: {
-    fontWeight: '800',
+    fontWeight: '900',
   },
   scroll: {
     marginBottom: 10,
@@ -272,9 +273,9 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '800',
     color: '#1E293B',
     marginBottom: 10,
+    fontWeight: '900',
   },
   itemRow: {
     flexDirection: 'row',
@@ -288,29 +289,32 @@ const styles = StyleSheet.create({
   itemEmoji: {
     fontSize: 28,
     marginRight: 12,
+    fontWeight: '600',
   },
   itemInfo: {
     flex: 1,
   },
   itemName: {
     fontSize: 15,
-    fontWeight: '700',
     color: '#1E293B',
+    fontWeight: '800',
   },
   itemDesc: {
     fontSize: 12,
     color: '#64748B',
+    fontWeight: '600',
   },
   itemCount: {
     fontSize: 14,
-    fontWeight: '800',
-    color: '#3B82F6',
+    color: '#1B7F66',
+    fontWeight: '900',
   },
   emptyText: {
     fontSize: 13,
     color: '#94A3B8',
     textAlign: 'center',
     paddingVertical: 14,
+    fontWeight: '600',
   },
   grid: {
     flexDirection: 'row',
@@ -328,37 +332,38 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
   },
   gridCardEquipped: {
-    borderColor: '#3B82F6',
-    backgroundColor: '#EFF6FF',
+    borderColor: '#1B7F66',
+    backgroundColor: '#E3F6EF',
   },
   cardEmoji: {
     fontSize: 34,
     marginBottom: 6,
+    fontWeight: '600',
   },
   cardName: {
     fontSize: 14,
-    fontWeight: '700',
     color: '#1E293B',
     marginBottom: 4,
+    fontWeight: '800',
   },
   priceText: {
     fontSize: 13,
-    fontWeight: '800',
     color: '#D97706',
     marginBottom: 8,
+    fontWeight: '900',
   },
   statusTag: {
     fontSize: 12,
-    fontWeight: '700',
     color: '#64748B',
     backgroundColor: '#E2E8F0',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,
+    fontWeight: '800',
   },
   statusTagActive: {
     color: '#FFFFFF',
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#1B7F66',
   },
   buyBtn: {
     backgroundColor: '#F59E0B',
@@ -369,7 +374,7 @@ const styles = StyleSheet.create({
   buyBtnText: {
     color: '#FFFFFF',
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: '900',
   },
   ownedBtn: {
     backgroundColor: '#E2E8F0',
@@ -380,6 +385,6 @@ const styles = StyleSheet.create({
   ownedBtnText: {
     color: '#64748B',
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

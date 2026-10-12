@@ -183,19 +183,17 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 16,
     maxWidth: '85%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
     alignItems: 'center',
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#E5E5E5',
   },
   dialogueText: {
     fontSize: 14,
-    fontWeight: '600',
     color: '#2D3748',
     textAlign: 'center',
     lineHeight: 20,
+    fontWeight: '700',
   },
   speechArrow: {
     position: 'absolute',
@@ -225,6 +223,7 @@ const styles = StyleSheet.create({
   },
   costumeEmoji: {
     fontSize: 42,
+    fontWeight: '600',
   },
   particle: {
     position: 'absolute',
@@ -234,6 +233,7 @@ const styles = StyleSheet.create({
   },
   particleEmoji: {
     fontSize: 36,
+    fontWeight: '600',
   },
   shadow: {
     width: 120,
@@ -248,11 +248,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.85)',
     padding: 12,
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 2,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#E5E5E5',
   },
   scoreHeader: {
     flexDirection: 'row',
@@ -261,13 +259,13 @@ const styles = StyleSheet.create({
   },
   scoreLabel: {
     fontSize: 12,
-    fontWeight: '600',
     color: '#718096',
+    fontWeight: '700',
   },
   scoreValue: {
     fontSize: 13,
-    fontWeight: '700',
     color: '#4A5568',
+    fontWeight: '800',
   },
   progressBarTrack: {
     height: 10,

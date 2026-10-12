@@ -20,7 +20,7 @@ export function HistoryModal({ visible, onClose }: HistoryModalProps) {
   const getTagColor = (type: string) => {
     switch (type) {
       case 'meal':
-        return { bg: '#FFEDD5', text: '#C2410C', label: '식사' };
+        return { bg: '#E3F6EF', text: '#17765D', label: '식사' };
       case 'sleep':
         return { bg: '#EDE9FE', text: '#6D28D9', label: '수면' };
       case 'emotion':
@@ -101,8 +101,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
     color: '#2D3748',
+    fontWeight: '900',
   },
   closeBtn: {
     padding: 6,
@@ -110,12 +110,13 @@ const styles = StyleSheet.create({
   closeBtnText: {
     fontSize: 18,
     color: '#A0AEC0',
-    fontWeight: '700',
+    fontWeight: '800',
   },
   subtitle: {
     fontSize: 14,
     color: '#718096',
     marginBottom: 16,
+    fontWeight: '600',
   },
   scroll: {
     marginBottom: 10,
@@ -129,6 +130,7 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     textAlign: 'center',
     lineHeight: 20,
+    fontWeight: '600',
   },
   logCard: {
     backgroundColor: '#F8FAFC',
@@ -151,16 +153,17 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   logTime: {
     fontSize: 12,
     color: '#94A3B8',
+    fontWeight: '600',
   },
   logContent: {
     fontSize: 14,
-    fontWeight: '600',
     color: '#1E293B',
     lineHeight: 20,
+    fontWeight: '700',
   },
 });

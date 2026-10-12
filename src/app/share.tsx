@@ -58,7 +58,7 @@ export default function ShareScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF9F0',
+    backgroundColor: '#FDF5F5',
   },
   content: {
     alignItems: 'center',
@@ -70,14 +70,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#334155',
     textAlign: 'center',
+    fontWeight: '600',
   },
   shareBtn: {
     width: '100%',
     maxWidth: 320,
-    backgroundColor: '#F97316',
+    backgroundColor: '#1B7F66',
     borderRadius: 18,
     paddingVertical: 15,
     alignItems: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: '#125A48',
   },
   shareBtnDisabled: {
     opacity: 0.6,
@@ -85,11 +88,12 @@ const styles = StyleSheet.create({
   shareText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '900',
   },
   hint: {
     fontSize: 12,
     color: '#94A3B8',
     textAlign: 'center',
+    fontWeight: '600',
   },
 });

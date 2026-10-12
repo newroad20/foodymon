@@ -144,8 +144,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
     color: '#2D3748',
+    fontWeight: '900',
   },
   closeBtn: {
     padding: 6,
@@ -153,19 +153,20 @@ const styles = StyleSheet.create({
   closeBtnText: {
     fontSize: 18,
     color: '#A0AEC0',
-    fontWeight: '700',
+    fontWeight: '800',
   },
   subtitle: {
     fontSize: 14,
     color: '#718096',
     marginBottom: 16,
     lineHeight: 20,
+    fontWeight: '600',
   },
   label: {
     fontSize: 14,
-    fontWeight: '800',
     color: '#334155',
     marginBottom: 8,
+    fontWeight: '900',
   },
   chipRow: {
     flexDirection: 'row',
@@ -182,29 +183,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   chipActive: {
-    borderColor: '#F97316',
-    backgroundColor: '#FFF7ED',
+    borderColor: '#1B7F66',
+    backgroundColor: '#E3F6EF',
   },
   chipText: {
     fontSize: 13,
-    fontWeight: '700',
     color: '#475569',
+    fontWeight: '800',
   },
   chipTextActive: {
-    color: '#EA580C',
+    color: '#17765D',
   },
   cost: {
     marginTop: 8,
     textAlign: 'center',
     fontSize: 13,
     color: '#64748B',
+    fontWeight: '600',
   },
   submitBtn: {
     marginTop: 10,
-    backgroundColor: '#F97316',
+    backgroundColor: '#1B7F66',
     borderRadius: 16,
     paddingVertical: 14,
     alignItems: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: '#125A48',
   },
   submitBtnDisabled: {
     opacity: 0.4,
@@ -212,6 +216,6 @@ const styles = StyleSheet.create({
   submitText: {
     color: '#FFFFFF',
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: '900',
   },
 });

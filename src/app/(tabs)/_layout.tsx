@@ -1,10 +1,13 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { ColorValue } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router/js-tabs';
 
-const tabIcon = (emoji: string) =>
-  function TabIcon({ focused }: { focused: boolean }) {
-    return <Text style={{ fontSize: 22, opacity: focused ? 1 : 0.45 }}>{emoji}</Text>;
+type IconName = React.ComponentProps<typeof Ionicons>['name'];
+
+const tabIcon = (name: IconName) =>
+  function TabIcon({ color, focused }: { color: ColorValue; focused: boolean }) {
+    return <Ionicons name={focused ? name : (`${name}-outline` as IconName)} size={26} color={color} />;
   };
 
 export default function TabLayout() {
@@ -12,14 +15,14 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#F97316',
+        tabBarActiveTintColor: '#1B7F66',
         tabBarInactiveTintColor: '#A8A29E',
-        tabBarStyle: { backgroundColor: '#FFFBF5', borderTopColor: '#F5E6D3' },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarStyle: { backgroundColor: '#FFFFFF', borderTopColor: '#E5E5E5', borderTopWidth: 2 },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '800' },
       }}>
-      <Tabs.Screen name="index" options={{ title: '홈', tabBarIcon: tabIcon('🏠') }} />
-      <Tabs.Screen name="summary" options={{ title: '요약', tabBarIcon: tabIcon('📊') }} />
-      <Tabs.Screen name="mypage" options={{ title: '마이', tabBarIcon: tabIcon('👤') }} />
+      <Tabs.Screen name="index" options={{ title: '홈', tabBarIcon: tabIcon('home') }} />
+      <Tabs.Screen name="summary" options={{ title: '요약', tabBarIcon: tabIcon('bar-chart') }} />
+      <Tabs.Screen name="mypage" options={{ title: '마이', tabBarIcon: tabIcon('person') }} />
     </Tabs>
   );
 }

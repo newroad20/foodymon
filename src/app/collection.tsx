@@ -80,7 +80,7 @@ export default function CollectionScreen() {
 
         {section === 'evolution' &&
           (loading ? (
-            <ActivityIndicator style={styles.loader} color="#EA580C" />
+            <ActivityIndicator style={styles.loader} color="#17765D" />
           ) : (
             <>
               <Text style={styles.progress}>
@@ -146,7 +146,7 @@ export default function CollectionScreen() {
 
         {section === 'badges' &&
           (loading ? (
-            <ActivityIndicator style={styles.loader} color="#EA580C" />
+            <ActivityIndicator style={styles.loader} color="#17765D" />
           ) : (
             <>
               <View style={styles.shieldCard}>
@@ -209,7 +209,7 @@ function Summary({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF9F0',
+    backgroundColor: '#FDF5F5',
   },
   segment: {
     flexDirection: 'row',
@@ -230,8 +230,8 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     fontSize: 13,
-    fontWeight: '700',
     color: '#94A3B8',
+    fontWeight: '800',
   },
   segmentTextActive: {
     color: '#1E293B',
@@ -248,12 +248,13 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontSize: 13,
     marginBottom: 12,
+    fontWeight: '600',
   },
   progress: {
     fontSize: 15,
-    fontWeight: '800',
     color: '#1E293B',
     marginBottom: 12,
+    fontWeight: '900',
   },
   progressGap: {
     marginTop: 20,
@@ -279,23 +280,25 @@ const styles = StyleSheet.create({
   },
   levelNo: {
     fontSize: 11,
-    fontWeight: '700',
-    color: '#EA580C',
+    color: '#17765D',
+    fontWeight: '800',
   },
   levelName: {
     fontSize: 14,
-    fontWeight: '800',
     color: '#1E293B',
+    fontWeight: '900',
   },
   levelMeta: {
     fontSize: 11,
     color: '#94A3B8',
+    fontWeight: '600',
   },
   hint: {
     marginTop: 16,
     fontSize: 12,
     color: '#94A3B8',
     textAlign: 'center',
+    fontWeight: '600',
   },
   itemCard: {
     width: '31%',
@@ -308,15 +311,17 @@ const styles = StyleSheet.create({
   },
   itemIcon: {
     fontSize: 32,
+    fontWeight: '600',
   },
   itemName: {
     fontSize: 13,
-    fontWeight: '700',
     color: '#334155',
+    fontWeight: '800',
   },
   itemMeta: {
     fontSize: 11,
     color: '#94A3B8',
+    fontWeight: '600',
   },
   locked: {
     backgroundColor: '#F8FAFC',
@@ -335,6 +340,7 @@ const styles = StyleSheet.create({
   },
   shieldIcon: {
     fontSize: 34,
+    fontWeight: '600',
   },
   shieldText: {
     flex: 1,
@@ -342,13 +348,14 @@ const styles = StyleSheet.create({
   },
   shieldTitle: {
     fontSize: 15,
-    fontWeight: '800',
     color: '#1E293B',
+    fontWeight: '900',
   },
   shieldSub: {
     fontSize: 12,
     lineHeight: 17,
     color: '#64748B',
+    fontWeight: '600',
   },
   summaryRow: {
     flexDirection: 'row',
@@ -364,12 +371,13 @@ const styles = StyleSheet.create({
   },
   summaryValue: {
     fontSize: 16,
-    fontWeight: '800',
     color: '#334155',
+    fontWeight: '900',
   },
   summaryLabel: {
     fontSize: 11,
     color: '#94A3B8',
+    fontWeight: '600',
   },
   badgeCard: {
     width: '31%',
@@ -382,17 +390,19 @@ const styles = StyleSheet.create({
   },
   badgeIcon: {
     fontSize: 30,
+    fontWeight: '600',
   },
   badgeName: {
     fontSize: 12,
-    fontWeight: '800',
     color: '#334155',
     textAlign: 'center',
+    fontWeight: '900',
   },
   badgeDesc: {
     fontSize: 10,
     lineHeight: 14,
     color: '#94A3B8',
     textAlign: 'center',
+    fontWeight: '600',
   },
 });

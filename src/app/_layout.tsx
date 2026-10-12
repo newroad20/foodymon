@@ -22,7 +22,7 @@ function AppContent() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3B82F6" />
+        <ActivityIndicator size="large" color="#1B7F66" />
       </View>
     );
   }
@@ -47,7 +47,7 @@ function AppContent() {
             headerShown: true,
             title: '컬렉션 도감',
             headerBackTitle: '마이',
-            headerStyle: { backgroundColor: '#FFF9F0' },
+            headerStyle: { backgroundColor: '#FDF5F5' },
             headerShadowVisible: false,
           }}
         />
@@ -57,7 +57,7 @@ function AppContent() {
             headerShown: true,
             title: '자랑하기',
             headerBackTitle: '요약',
-            headerStyle: { backgroundColor: '#FFF9F0' },
+            headerStyle: { backgroundColor: '#FDF5F5' },
             headerShadowVisible: false,
           }}
         />
@@ -79,6 +79,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFF9F0',
+    backgroundColor: '#FDF5F5',
   },
 });

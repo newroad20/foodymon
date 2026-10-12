@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
@@ -83,19 +84,19 @@ export default function SummaryScreen() {
           </View>
 
           <View style={styles.partsRow}>
-            <PartTile icon="🌙" label="수면" weight="35%" value={sleepValue} score={state.today.sleepDiff === null ? null : parts.sleepScore} />
-            <PartTile icon="🍚" label="식사" weight="35%" value={mealValue} score={state.today.mealCount === 0 ? null : parts.mealScore} />
-            <PartTile icon="😊" label="감정" weight="30%" value={emotionValue} score={state.today.emotion === null ? null : parts.emotionScore} />
+            <PartTile icon="moon" color="#8E7CF0" label="수면" weight="35%" value={sleepValue} score={state.today.sleepDiff === null ? null : parts.sleepScore} />
+            <PartTile icon="restaurant" color="#FF9600" label="식사" weight="35%" value={mealValue} score={state.today.mealCount === 0 ? null : parts.mealScore} />
+            <PartTile icon="happy" color="#FF6FA8" label="감정" weight="30%" value={emotionValue} score={state.today.emotion === null ? null : parts.emotionScore} />
           </View>
 
           {parts.multiplier > 1 && (
             <Text style={styles.bonus}>
-              🔥 {state.streak}일 연속 기록 보너스 ×{parts.multiplier.toFixed(2)} 적용 중
+              {state.streak}일 연속 기록 보너스 ×{parts.multiplier.toFixed(2)} 적용 중
             </Text>
           )}
 
           <TouchableOpacity style={styles.shareBtn} activeOpacity={0.85} onPress={() => router.push('/share')}>
-            <Text style={styles.shareText}>📸 내 푸디몬 자랑하기</Text>
+            <Text style={styles.shareText}>내 푸디몬 자랑하기</Text>
           </TouchableOpacity>
         </View>
 
@@ -123,7 +124,7 @@ export default function SummaryScreen() {
           </View>
 
           {loading && rows.length === 0 ? (
-            <ActivityIndicator style={styles.loader} color="#EA580C" />
+            <ActivityIndicator style={styles.loader} color="#17765D" />
           ) : error ? (
             <Text style={styles.errorText}>기록을 불러오지 못했어요. 탭을 다시 열어 주세요.</Text>
           ) : (
@@ -137,12 +138,14 @@ export default function SummaryScreen() {
 
 function PartTile({
   icon,
+  color,
   label,
   weight,
   value,
   score,
 }: {
-  icon: string;
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  color: string;
   label: string;
   weight: string;
   value: string;
@@ -150,7 +153,7 @@ function PartTile({
 }) {
   return (
     <View style={styles.partTile}>
-      <Text style={styles.partIcon}>{icon}</Text>
+      <Ionicons name={icon} size={22} color={color} />
       <Text style={styles.partScore}>{score === null ? '–' : Math.round(score)}</Text>
       <Text style={styles.partLabel}>
         {label} <Text style={styles.partWeight}>{weight}</Text>
@@ -172,7 +175,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF9F0',
+    backgroundColor: '#FDF5F5',
   },
   content: {
     padding: 16,
@@ -181,19 +184,17 @@ const styles = StyleSheet.create({
   },
   screenTitle: {
     fontSize: 22,
-    fontWeight: '800',
     color: '#1E293B',
     marginTop: 4,
+    fontWeight: '900',
   },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 2,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#E5E5E5',
   },
   reportHeader: {
     flexDirection: 'row',
@@ -205,24 +206,25 @@ const styles = StyleSheet.create({
   },
   cardLabel: {
     fontSize: 13,
-    fontWeight: '700',
     color: '#64748B',
+    fontWeight: '800',
   },
   hero: {
     fontSize: 52,
-    fontWeight: '800',
     color: '#1E293B',
     marginVertical: 2,
+    fontWeight: '900',
   },
   heroUnit: {
     fontSize: 20,
-    fontWeight: '700',
     color: '#64748B',
+    fontWeight: '800',
   },
   greeting: {
     fontSize: 14,
     lineHeight: 20,
     color: '#334155',
+    fontWeight: '600',
   },
   pet: {
     width: 96,
@@ -238,49 +240,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderRadius: 16,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#E3F6EF',
     gap: 2,
-  },
-  partIcon: {
-    fontSize: 20,
   },
   partScore: {
     fontSize: 20,
-    fontWeight: '800',
     color: '#1E293B',
+    fontWeight: '900',
   },
   partLabel: {
     fontSize: 12,
-    fontWeight: '700',
     color: '#475569',
+    fontWeight: '800',
   },
   partWeight: {
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#94A3B8',
   },
   partValue: {
     fontSize: 11,
     color: '#64748B',
+    fontWeight: '600',
   },
   bonus: {
     marginTop: 12,
     fontSize: 12,
     color: '#64748B',
     textAlign: 'center',
+    fontWeight: '600',
   },
   shareBtn: {
     marginTop: 16,
     borderRadius: 16,
     paddingVertical: 13,
     alignItems: 'center',
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#E3F6EF',
     borderWidth: 1.5,
-    borderColor: '#FED7AA',
+    borderColor: '#B5E6D4',
   },
   shareText: {
     fontSize: 15,
-    fontWeight: '800',
-    color: '#C2410C',
+    color: '#17765D',
+    fontWeight: '900',
   },
   trendHeader: {
     flexDirection: 'row',
@@ -290,8 +291,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '800',
     color: '#1E293B',
+    fontWeight: '900',
   },
   segment: {
     flexDirection: 'row',
@@ -309,8 +310,8 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     fontSize: 12,
-    fontWeight: '700',
     color: '#94A3B8',
+    fontWeight: '800',
   },
   segmentTextActive: {
     color: '#1E293B',
@@ -326,12 +327,13 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 16,
-    fontWeight: '800',
     color: '#334155',
+    fontWeight: '900',
   },
   statLabel: {
     fontSize: 11,
     color: '#94A3B8',
+    fontWeight: '600',
   },
   loader: {
     marginVertical: 48,
@@ -341,5 +343,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#64748B',
     fontSize: 13,
+    fontWeight: '600',
   },
 });

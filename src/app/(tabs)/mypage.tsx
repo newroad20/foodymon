@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -80,9 +81,9 @@ export default function MyPageScreen() {
           </View>
 
           <View style={styles.statsRow}>
-            <Stat label="연속 기록" value={`🔥 ${state.streak}일`} />
-            <Stat label="젤리" value={`✨ ${state.currency}`} />
-            <Stat label="방패" value={`🛡️ ${state.shields}`} />
+            <Stat label="연속 기록" value={`${state.streak}일`} />
+            <Stat label="젤리" value={`${state.currency}`} />
+            <Stat label="방패" value={`${state.shields}`} />
             <Stat label="오늘 지수" value={`${state.currentDailyScore}점`} />
           </View>
         </View>
@@ -143,12 +144,12 @@ export default function MyPageScreen() {
           style={[styles.card, styles.linkCard]}
           activeOpacity={0.8}
           onPress={() => router.push('/collection')}>
-          <Text style={styles.linkIcon}>📖</Text>
+          <Ionicons name="library" size={26} color="#1B7F66" />
           <View style={styles.linkText}>
             <Text style={styles.sectionTitleInline}>컬렉션 도감</Text>
             <Text style={styles.linkSub}>진화 도감 · 의상/소품 · 배지와 방패</Text>
           </View>
-          <Text style={styles.chevron}>›</Text>
+          <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
         </TouchableOpacity>
 
         {/* Account */}
@@ -188,7 +189,7 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF9F0',
+    backgroundColor: '#FDF5F5',
   },
   content: {
     padding: 16,
@@ -197,19 +198,17 @@ const styles = StyleSheet.create({
   },
   screenTitle: {
     fontSize: 22,
-    fontWeight: '800',
     color: '#1E293B',
     marginTop: 4,
+    fontWeight: '900',
   },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 2,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#E5E5E5',
   },
   profileRow: {
     flexDirection: 'row',
@@ -226,12 +225,13 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 18,
-    fontWeight: '800',
     color: '#1E293B',
+    fontWeight: '900',
   },
   email: {
     fontSize: 13,
     color: '#94A3B8',
+    fontWeight: '600',
   },
   levelBadge: {
     alignSelf: 'flex-start',
@@ -240,10 +240,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 999,
     overflow: 'hidden',
-    backgroundColor: '#FFEDD5',
-    color: '#C2410C',
+    backgroundColor: '#E3F6EF',
+    color: '#17765D',
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   statsRow: {
     flexDirection: 'row',
@@ -259,24 +259,25 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 15,
-    fontWeight: '800',
     color: '#334155',
+    fontWeight: '900',
   },
   statLabel: {
     fontSize: 11,
     color: '#94A3B8',
+    fontWeight: '600',
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '800',
     color: '#1E293B',
     marginBottom: 12,
+    fontWeight: '900',
   },
   label: {
     fontSize: 13,
-    fontWeight: '700',
     color: '#64748B',
     marginBottom: 8,
+    fontWeight: '800',
   },
   input: {
     borderWidth: 1.5,
@@ -287,6 +288,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#1E293B',
     marginBottom: 16,
+    fontWeight: '600',
   },
   chipRow: {
     flexDirection: 'row',
@@ -303,23 +305,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   chipActive: {
-    borderColor: '#F97316',
-    backgroundColor: '#FFF7ED',
+    borderColor: '#1B7F66',
+    backgroundColor: '#E3F6EF',
   },
   chipText: {
     fontSize: 14,
-    fontWeight: '700',
     color: '#475569',
+    fontWeight: '800',
   },
   chipTextActive: {
-    color: '#EA580C',
+    color: '#17765D',
   },
   primaryBtn: {
     marginTop: 4,
-    backgroundColor: '#F97316',
+    backgroundColor: '#1B7F66',
     borderRadius: 16,
     paddingVertical: 14,
     alignItems: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: '#125A48',
   },
   primaryBtnDisabled: {
     opacity: 0.4,
@@ -327,15 +331,12 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     color: '#FFFFFF',
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: '900',
   },
   linkCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-  },
-  linkIcon: {
-    fontSize: 28,
   },
   linkText: {
     flex: 1,
@@ -343,28 +344,26 @@ const styles = StyleSheet.create({
   },
   sectionTitleInline: {
     fontSize: 16,
-    fontWeight: '800',
     color: '#1E293B',
+    fontWeight: '900',
   },
   linkSub: {
     fontSize: 12,
     color: '#94A3B8',
-  },
-  chevron: {
-    fontSize: 24,
-    color: '#CBD5E1',
+    fontWeight: '600',
   },
   rowBtn: {
     paddingVertical: 12,
   },
   signOutText: {
     fontSize: 15,
-    fontWeight: '700',
     color: '#DC2626',
+    fontWeight: '800',
   },
   version: {
     textAlign: 'center',
     fontSize: 12,
     color: '#CBD5E1',
+    fontWeight: '600',
   },
 });

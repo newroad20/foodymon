@@ -155,7 +155,7 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF9F0',
+    backgroundColor: '#FDF5F5',
   },
   scroll: {
     flexGrow: 1,
@@ -173,37 +173,36 @@ const styles = StyleSheet.create({
   },
   appTitle: {
     fontSize: 26,
-    fontWeight: '800',
-    color: '#3B82F6',
+    color: '#1B7F66',
     marginTop: 8,
+    fontWeight: '900',
   },
   appSubtitle: {
     fontSize: 14,
     color: '#64748B',
     marginTop: 4,
+    fontWeight: '600',
   },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#E5E5E5',
   },
   cardTitle: {
     fontSize: 22,
-    fontWeight: '800',
     color: '#1E293B',
     marginBottom: 20,
     textAlign: 'center',
+    fontWeight: '900',
   },
   label: {
     fontSize: 13,
-    fontWeight: '700',
     color: '#64748B',
     marginBottom: 6,
+    fontWeight: '800',
   },
   input: {
     borderWidth: 1.5,
@@ -214,9 +213,10 @@ const styles = StyleSheet.create({
     color: '#1E293B',
     marginBottom: 14,
     backgroundColor: '#F8FAFC',
+    fontWeight: '600',
   },
   primaryBtn: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#1B7F66',
     padding: 16,
     borderRadius: 16,
     alignItems: 'center',
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   secondaryBtn: {
     alignItems: 'center',
@@ -238,9 +238,10 @@ const styles = StyleSheet.create({
   secondaryBtnText: {
     fontSize: 14,
     color: '#64748B',
+    fontWeight: '600',
   },
   linkText: {
-    color: '#3B82F6',
-    fontWeight: '700',
+    color: '#1B7F66',
+    fontWeight: '800',
   },
 });

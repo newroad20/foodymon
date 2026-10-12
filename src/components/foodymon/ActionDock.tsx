@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 interface ActionDockProps {
   onOpenMeal: () => void;
@@ -24,51 +25,34 @@ export function ActionDock({
           style={styles.testButton}
           activeOpacity={0.8}
           onPress={onNextDay}>
-          <Text style={styles.testButtonText}>🗓️ [테스트] 다음 날로 시뮬레이션</Text>
+          <Text style={styles.testButtonText}>[테스트] 다음 날로 시뮬레이션</Text>
         </TouchableOpacity>
       )}
 
-      {/* Main 4 Action Buttons */}
+      {/* Main 4 Action Buttons: chunky Pou/Duolingo-style round buttons */}
       <View style={styles.dock}>
-        <TouchableOpacity
-          style={styles.actionBtn}
-          activeOpacity={0.8}
-          onPress={onOpenMeal}>
-          <View style={[styles.iconCircle, { backgroundColor: '#FFEDD5' }]}>
-            <Text style={styles.actionIcon}>🍚</Text>
-          </View>
-          <Text style={styles.actionLabel}>식사</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.actionBtn}
-          activeOpacity={0.8}
-          onPress={onOpenSleep}>
-          <View style={[styles.iconCircle, { backgroundColor: '#EDE9FE' }]}>
-            <Text style={styles.actionIcon}>🌙</Text>
-          </View>
-          <Text style={styles.actionLabel}>수면</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.actionBtn}
-          activeOpacity={0.8}
-          onPress={onOpenEmotion}>
-          <View style={[styles.iconCircle, { backgroundColor: '#FCE7F3' }]}>
-            <Text style={styles.actionIcon}>😊</Text>
-          </View>
-          <Text style={styles.actionLabel}>감정</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.actionBtn}
-          activeOpacity={0.8}
-          onPress={onOpenBag}>
-          <View style={[styles.iconCircle, { backgroundColor: '#E0F2FE' }]}>
-            <Text style={styles.actionIcon}>🎒</Text>
-          </View>
-          <Text style={styles.actionLabel}>가방</Text>
-        </TouchableOpacity>
+        {[
+          { label: '식사', icon: 'restaurant', color: '#FF9600', edge: '#CC7800', onPress: onOpenMeal },
+          { label: '수면', icon: 'moon', color: '#8E7CF0', edge: '#6F5ED0', onPress: onOpenSleep },
+          { label: '감정', icon: 'happy', color: '#FF6FA8', edge: '#D94E86', onPress: onOpenEmotion },
+          { label: '가방', icon: 'bag-handle', color: '#1CB0F6', edge: '#1899D6', onPress: onOpenBag },
+        ].map((a) => (
+          <Pressable key={a.label} style={styles.actionBtn} onPress={a.onPress} accessibilityRole="button" accessibilityLabel={a.label}>
+            {({ pressed }) => (
+              <>
+                <View
+                  style={[
+                    styles.iconCircle,
+                    { backgroundColor: a.color, borderBottomColor: a.edge },
+                    pressed && styles.iconCirclePressed,
+                  ]}>
+                  <Ionicons name={a.icon as React.ComponentProps<typeof Ionicons>['name']} size={28} color="#FFFFFF" />
+                </View>
+                <Text style={styles.actionLabel}>{a.label}</Text>
+              </>
+            )}
+          </Pressable>
+        ))}
       </View>
     </View>
   );
@@ -89,54 +73,45 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
   },
   testButtonText: {
     fontSize: 12,
-    fontWeight: '600',
     color: '#718096',
+    fontWeight: '700',
   },
   dock: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 28,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#E5E5E5',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
     width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
   },
   actionBtn: {
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   iconCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderBottomWidth: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
   },
-  actionIcon: {
-    fontSize: 24,
+  // Duolingo-style press: the button sinks onto its edge.
+  iconCirclePressed: {
+    borderBottomWidth: 1,
+    marginTop: 4,
   },
   actionLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#4A5568',
+    fontSize: 13,
+    color: '#4B4B4B',
+    fontWeight: '900',
   },
 });

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, LayoutChangeEvent } from 'react-nati
 import { TrendPoint } from '@/lib/trend';
 
 // Single series: one validated hue (contrast >= 3:1 on white); text stays in ink tokens.
-const BAR_COLOR = '#EA580C';
+const BAR_COLOR = '#17765D';
 const MISSING_COLOR = '#E2E8F0';
 const GRID_COLOR = '#F1F5F9';
 const INK_PRIMARY = '#1E293B';
@@ -133,12 +133,13 @@ const styles = StyleSheet.create({
   },
   tooltip: {
     fontSize: 13,
-    fontWeight: '700',
     color: INK_PRIMARY,
+    fontWeight: '800',
   },
   tooltipHint: {
     fontSize: 12,
     color: INK_MUTED,
+    fontWeight: '600',
   },
   chartRow: {
     flexDirection: 'row',
@@ -177,12 +178,13 @@ const styles = StyleSheet.create({
   valueLabel: {
     position: 'absolute',
     fontSize: 11,
-    fontWeight: '700',
     color: INK_PRIMARY,
+    fontWeight: '800',
   },
   axisText: {
     fontSize: 10,
     color: INK_MUTED,
+    fontWeight: '600',
   },
   xAxis: {
     height: 14,

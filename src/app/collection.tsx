@@ -140,7 +140,7 @@ export default function CollectionScreen() {
                 />
               ))}
             </View>
-            <Text style={styles.hint}>아이템은 홈의 🎒 가방 → 상점에서 젤리로 살 수 있어요.</Text>
+            <Text style={styles.hint}>아이템은 홈의 꾸미기에서 입어 보고 젤리로 살 수 있어요.</Text>
           </>
         )}
 

@@ -35,7 +35,7 @@ export function ActionDock({
           { label: '식사', icon: 'restaurant', color: '#FF9600', edge: '#CC7800', onPress: onOpenMeal },
           { label: '수면', icon: 'moon', color: '#8E7CF0', edge: '#6F5ED0', onPress: onOpenSleep },
           { label: '감정', icon: 'happy', color: '#FF6FA8', edge: '#D94E86', onPress: onOpenEmotion },
-          { label: '가방', icon: 'bag-handle', color: '#1CB0F6', edge: '#1899D6', onPress: onOpenBag },
+          { label: '꾸미기', icon: 'shirt', color: '#1CB0F6', edge: '#1899D6', onPress: onOpenBag },
         ].map((a) => (
           <Pressable key={a.label} style={styles.actionBtn} onPress={a.onPress} accessibilityRole="button" accessibilityLabel={a.label}>
             {({ pressed }) => (

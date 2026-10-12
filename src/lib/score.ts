@@ -35,6 +35,9 @@ export function calcScoreParts(state: Pick<UserState, 'today' | 'targetMeals' | 
   return { sleepScore, mealScore, emotionScore, multiplier };
 }
 
+/** Score shown before any check-in today (level 3, the neutral look); matches closeDay's reset. */
+export const DAY_START_SCORE = 40;
+
 /** Daily health index: sleep 35% + meals 35% + emotion 30%, boosted by streak. */
 export function calcDailyScore(
   state: Pick<UserState, 'today' | 'targetMeals' | 'streak'>,
@@ -43,7 +46,10 @@ export function calcDailyScore(
   const { sleepScore, mealScore, emotionScore, multiplier } = calcScoreParts(state);
   const baseScore = sleepScore * 0.35 + mealScore * 0.35 + emotionScore * 0.3;
 
-  const score = Math.min(100, Math.round(baseScore * multiplier));
+  // Before the first check-in of the day the pet starts at the neutral look, not the sickest one.
+  const nothingLogged =
+    state.today.sleepDiff === null && state.today.mealCount === 0 && state.today.emotion === null;
+  const score = nothingLogged ? DAY_START_SCORE : Math.min(100, Math.round(baseScore * multiplier));
 
   let level = 3;
   for (const l of levels) {

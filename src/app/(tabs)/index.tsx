@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { useAuth } from '@/context/AuthContext';
 import { RoomBackground } from '@/components/foodymon/RoomBackground';
@@ -17,7 +18,6 @@ import { ActionDock } from '@/components/foodymon/ActionDock';
 import { MealModal } from '@/components/foodymon/MealModal';
 import { SleepModal } from '@/components/foodymon/SleepModal';
 import { EmotionModal } from '@/components/foodymon/EmotionModal';
-import { BagShopModal } from '@/components/foodymon/BagShopModal';
 import { HistoryModal } from '@/components/foodymon/HistoryModal';
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 import { BackfillModal } from '@/components/foodymon/BackfillModal';
@@ -56,7 +56,6 @@ export default function FoodyMonHomeScreen() {
   const [showMealModal, setShowMealModal] = useState(false);
   const [showSleepModal, setShowSleepModal] = useState(false);
   const [showEmotionModal, setShowEmotionModal] = useState(false);
-  const [showBagModal, setShowBagModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showBackfillModal, setShowBackfillModal] = useState(false);
   // "나중에" hides the offer until the app restarts.
@@ -141,7 +140,7 @@ export default function FoodyMonHomeScreen() {
           onOpenMeal={() => setShowMealModal(true)}
           onOpenSleep={() => setShowSleepModal(true)}
           onOpenEmotion={() => setShowEmotionModal(true)}
-          onOpenBag={() => setShowBagModal(true)}
+          onOpenBag={() => router.push('/dressroom')}
           onNextDay={handleNextDaySimulation}
         />
       </SafeAreaView>
@@ -158,10 +157,6 @@ export default function FoodyMonHomeScreen() {
       <EmotionModal
         visible={showEmotionModal}
         onClose={() => setShowEmotionModal(false)}
-      />
-      <BagShopModal
-        visible={showBagModal}
-        onClose={() => setShowBagModal(false)}
       />
       <HistoryModal
         visible={showHistoryModal}

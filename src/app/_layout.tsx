@@ -52,6 +52,16 @@ function AppContent() {
           }}
         />
         <Stack.Screen
+          name="dressroom"
+          options={{
+            headerShown: true,
+            title: '꾸미기',
+            headerBackTitle: '홈',
+            headerStyle: { backgroundColor: '#FFFFFF' },
+            headerShadowVisible: false,
+          }}
+        />
+        <Stack.Screen
           name="share"
           options={{
             headerShown: true,

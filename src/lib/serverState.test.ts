@@ -104,3 +104,10 @@ test('buildUserState exposes a backfillable yesterday', () => {
   );
   assert.deepEqual(s.backfill, { date: '2026-10-10', prevStreak: 4 });
 });
+
+test('calcDailyScore starts an unlogged day at the neutral level', () => {
+  const empty = { sleepDiff: null, sleepHours: null, mealCount: 0, badMealCount: 0, emotion: null };
+  assert.deepEqual(calcDailyScore({ today: empty, targetMeals: 3, streak: 10 }, levels), { score: 40, level: 3 });
+  // One low check-in still counts as a real score.
+  assert.equal(calcDailyScore({ today: { ...empty, emotion: 20 }, targetMeals: 3, streak: 0 }, levels).score, 6);
+});

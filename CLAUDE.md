@@ -41,10 +41,11 @@ npx expo export --platform ios --output-dir <tmp>   # bundle check
 ## Status and next steps
 
 Done: auth (email confirmation deep link), onboarding, check-ins, daily rollover, server sync,
-shop, tabs, My Page, daily summary + trend chart, collection (C1–C3), share card (S5-3).
+shop, tabs, My Page, daily summary + trend chart, collection (C1–C3), share card (S5-3),
+S25 backfill (20 jelly, yesterday only: restores the streak and refunds a shield used that day;
+`backfill_yesterday` RPC, `BACKFILL_COST` must match it).
 
 Open items:
-- S25 소급 입력 (backfill a missed day) — rules not decided yet.
 - S70 퀘스트 — not specified in the flow doc.
 - Before launch: connect custom SMTP (e.g. Resend) in Supabase and turn "Confirm email" back on
   (it is off for development because the default mailer only sends to team members, 2/hour).

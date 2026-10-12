@@ -137,6 +137,39 @@ const grants = await q(`select column_name from information_schema.column_privil
   where table_name='profiles' and grantee='authenticated' and privilege_type='UPDATE'`);
 assert.ok(!grants.some((g) => g.column_name.startsWith('missed_')));
 
+// ---------- daily quests (S70) ----------
+const quests = () => rpc(`select public.get_daily_quests($1::date) r`, [today]);
+const claim = (id) => rpc(`select public.claim_quest($1::date, $2) r`, [today, id]);
+await q(`delete from public.daily_logs`);
+await setProfile(`jelly_balance=0, target_meals=3, last_checkin_date='${today}'`);
+
+let qs = await quests();
+assert.deepEqual(qs.map((x) => x.tier), [1, 2, 3]);
+assert.ok(qs.every((x) => x.progress === 0 && !x.claimed));
+// rotates daily: tomorrow's set differs from today's
+const tomorrowIds = (await q(`select public.daily_quest_ids($1::date + 1) r`, [today]))[0].r;
+assert.notDeepEqual(tomorrowIds, qs.map((x) => x.id));
+
+await assert.rejects(claim(qs[0].id), /quest not complete/);
+await assert.rejects(claim('no_such_quest'), /not today's quest/);
+
+// a day that completes every quest in the pool
+await q(`insert into public.daily_logs(user_id,log_date,sleep_hours,sleep_diff,meal_count,bad_meal_count,emotion,daily_score)
+         values ($1,$2::date,7,0,3,0,80,90)`, [U, today]);
+qs = await quests();
+assert.ok(qs.every((x) => x.progress === x.target));
+r = await claim(qs[0].id);
+assert.deepEqual(r, { reward: 5, jelly_balance: 5 });
+await assert.rejects(claim(qs[0].id), /already claimed/);
+r = await claim(qs[1].id); assert.equal(r.jelly_balance, 15);
+r = await claim(qs[2].id); assert.equal(r.jelly_balance, 30);
+assert.ok((await quests()).every((x) => x.claimed));
+
+// every quest in the pool has a progress rule
+for (const { id } of await q(`select id from public.quest_defs`)) {
+  await q(`select * from public.quest_progress($1, $2::date, $3)`, [U, today, id]);
+}
+
 // unauthenticated
 await asUser('');
 await assert.rejects(close(), /not authenticated/);

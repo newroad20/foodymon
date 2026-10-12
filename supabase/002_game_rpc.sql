@@ -9,6 +9,7 @@
 --   4) close_days(p_today) : 지난 날짜 마감 -> 스트릭/젤리/방패 계산
 --   5) buy_item(p_type, p_id) : 젤리 차감 + 아이템 지급
 --   6) backfill_yesterday(...) : 젤리 20개로 어제 기록 복구 (S25)
+--   7) get_daily_quests / claim_quest : 오늘의 퀘스트 3개 (S70, 듀오링고식 쉬움·보통·어려움)
 -- 규칙은 앱의 src/lib/dayRollover.ts 와 동일하게 유지할 것
 -- =====================================================================
 
@@ -346,7 +347,179 @@ begin
   );
 end; $$;
 
--- ---------- 7. 실행 권한 ----------
+-- ---------- 7. 오늘의 퀘스트 (S70) ----------
+-- 매일 난이도별(1 쉬움 · 2 보통 · 3 어려움) 1개씩 3개. 날짜로 돌아가며 정해져 모두에게 같다.
+-- 달성 여부는 오늘 daily_logs 로 서버가 판정하고, 보상 젤리도 서버만 지급한다.
+create table if not exists public.quest_defs (
+  id     text primary key,
+  tier   smallint not null check (tier between 1 and 3),
+  title  text not null,
+  reward integer not null check (reward >= 0)
+);
+
+insert into public.quest_defs (id, tier, title, reward) values
+  ('log_meal',     1, '식사 1번 기록하기',              5),
+  ('log_sleep',    1, '수면 기록하기',                  5),
+  ('log_emotion',  1, '오늘 기분 체크하기',             5),
+  ('meals_2',      2, '식사 2번 기록하기',             10),
+  ('all_three',    2, '수면·식사·감정 모두 기록하기',  10),
+  ('sleep_goal',   2, '목표 수면 시간 ±1시간 지키기',  10),
+  ('meals_target', 3, '목표 끼니 모두 기록하기',       15),
+  ('good_meals_2', 3, '적당한 양으로 식사 2번 하기',   15),
+  ('score_70',     3, '건강 지수 70점 넘기기',         15)
+on conflict (id) do update set tier = excluded.tier, title = excluded.title, reward = excluded.reward;
+
+create table if not exists public.quest_claims (
+  user_id    uuid not null references public.profiles(id) on delete cascade,
+  quest_date date not null,
+  quest_id   text not null references public.quest_defs(id),
+  reward     integer not null,
+  claimed_at timestamptz not null default now(),
+  primary key (user_id, quest_date, quest_id)
+);
+
+alter table public.quest_defs   enable row level security;
+alter table public.quest_claims enable row level security;
+drop policy if exists "quest_defs_read_all" on public.quest_defs;
+create policy "quest_defs_read_all" on public.quest_defs for select to authenticated using (true);
+drop policy if exists "quest_claims_select_own" on public.quest_claims;
+create policy "quest_claims_select_own" on public.quest_claims
+  for select to authenticated using (user_id = auth.uid());
+revoke all on public.quest_defs, public.quest_claims from anon, authenticated;
+grant select on public.quest_defs, public.quest_claims to authenticated;
+
+-- 오늘의 퀘스트 id 3개 (난이도 순)
+create or replace function public.daily_quest_ids(p_day date)
+returns text[]
+language sql
+stable
+set search_path = public
+as $$
+  select array_agg(id order by tier)
+  from (
+    select distinct on (tier) id, tier
+    from (
+      select id, tier,
+             row_number() over (partition by tier order by id) - 1 as idx,
+             count(*) over (partition by tier) as n
+      from public.quest_defs
+    ) q
+    where idx = (p_day - date '2026-01-01') % n
+    order by tier
+  ) picked;
+$$;
+
+-- 진행도 (progress / target). 오늘 기록이 없으면 0.
+create or replace function public.quest_progress(p_uid uuid, p_day date, p_quest text)
+returns table (progress integer, target integer)
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  d  public.daily_logs%rowtype;
+  tm integer;
+begin
+  select * into d from public.daily_logs where user_id = p_uid and log_date = p_day;
+  select target_meals into tm from public.profiles where id = p_uid;
+  d.meal_count := coalesce(d.meal_count, 0);
+  d.bad_meal_count := coalesce(d.bad_meal_count, 0);
+
+  case p_quest
+    when 'log_meal'     then return query select least(d.meal_count, 1), 1;
+    when 'log_sleep'    then return query select (d.sleep_hours is not null)::int, 1;
+    when 'log_emotion'  then return query select (d.emotion is not null)::int, 1;
+    when 'meals_2'      then return query select least(d.meal_count, 2), 2;
+    when 'all_three'    then return query select (d.sleep_hours is not null)::int
+                                               + (d.meal_count > 0)::int
+                                               + (d.emotion is not null)::int, 3;
+    when 'sleep_goal'   then return query select coalesce((d.sleep_diff <= 1)::int, 0), 1;
+    when 'meals_target' then return query select least(d.meal_count, greatest(tm, 1)), greatest(tm, 1);
+    when 'good_meals_2' then return query select least(greatest(d.meal_count - d.bad_meal_count, 0), 2), 2;
+    when 'score_70'     then return query select least(coalesce(d.daily_score, 0)::int, 70), 70;
+    else raise exception 'unknown quest %', p_quest;
+  end case;
+end; $$;
+
+create or replace function public.get_daily_quests(p_today date)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  uid          uuid := auth.uid();
+  server_today date := (now() at time zone 'utc')::date;
+begin
+  if uid is null then
+    raise exception 'not authenticated';
+  end if;
+  if p_today is null or p_today < server_today - 1 or p_today > server_today + 1 then
+    raise exception 'invalid date %', p_today;
+  end if;
+
+  return (
+    select coalesce(jsonb_agg(jsonb_build_object(
+             'id', q.id, 'tier', q.tier, 'title', q.title, 'reward', q.reward,
+             'progress', pr.progress, 'target', pr.target,
+             'claimed', c.quest_id is not null
+           ) order by q.tier), '[]'::jsonb)
+    from unnest(public.daily_quest_ids(p_today)) as t(id)
+    join public.quest_defs q on q.id = t.id
+    cross join lateral public.quest_progress(uid, p_today, q.id) pr
+    left join public.quest_claims c
+      on c.user_id = uid and c.quest_date = p_today and c.quest_id = q.id
+  );
+end; $$;
+
+create or replace function public.claim_quest(p_today date, p_quest text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid          uuid := auth.uid();
+  server_today date := (now() at time zone 'utc')::date;
+  v_reward     integer;
+  pr           record;
+  balance      integer;
+begin
+  if uid is null then
+    raise exception 'not authenticated';
+  end if;
+  if p_today is null or p_today < server_today - 1 or p_today > server_today + 1 then
+    raise exception 'invalid date %', p_today;
+  end if;
+  if not (p_quest = any (public.daily_quest_ids(p_today))) then
+    raise exception 'not today''s quest';
+  end if;
+
+  select reward into v_reward from public.quest_defs where id = p_quest;
+  select * into pr from public.quest_progress(uid, p_today, p_quest);
+  if pr.progress < pr.target then
+    raise exception 'quest not complete';
+  end if;
+
+  perform 1 from public.profiles where id = uid for update;
+  insert into public.quest_claims (user_id, quest_date, quest_id, reward)
+  values (uid, p_today, p_quest, v_reward)
+  on conflict do nothing;
+  if not found then
+    raise exception 'already claimed';
+  end if;
+
+  update public.profiles
+     set jelly_balance = jelly_balance + v_reward
+   where id = uid
+  returning jelly_balance into balance;
+
+  return jsonb_build_object('reward', v_reward, 'jelly_balance', balance);
+end; $$;
+
+-- ---------- 8. 실행 권한 ----------
 revoke all on function public.ensure_profile()         from public, anon;
 revoke all on function public.close_days(date)         from public, anon;
 revoke all on function public.buy_item(text, text)     from public, anon;
@@ -355,3 +528,10 @@ grant execute on function public.ensure_profile()      to authenticated;
 grant execute on function public.close_days(date)      to authenticated;
 grant execute on function public.buy_item(text, text)  to authenticated;
 grant execute on function public.backfill_yesterday(date, numeric, numeric, smallint, smallint, smallint, smallint) to authenticated;
+revoke all on function public.daily_quest_ids(date)              from public, anon;
+revoke all on function public.quest_progress(uuid, date, text)   from public, anon, authenticated;
+revoke all on function public.get_daily_quests(date)             from public, anon;
+revoke all on function public.claim_quest(date, text)            from public, anon;
+grant execute on function public.daily_quest_ids(date)           to authenticated;
+grant execute on function public.get_daily_quests(date)          to authenticated;
+grant execute on function public.claim_quest(date, text)         to authenticated;

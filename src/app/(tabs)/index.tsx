@@ -21,6 +21,7 @@ import { BagShopModal } from '@/components/foodymon/BagShopModal';
 import { HistoryModal } from '@/components/foodymon/HistoryModal';
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 import { BackfillModal } from '@/components/foodymon/BackfillModal';
+import { QuestCard } from '@/components/foodymon/QuestCard';
 import { BACKFILL_COST } from '@/constants/foodymonData';
 import { RolloverResult } from '@/lib/dayRollover';
 
@@ -111,6 +112,7 @@ export default function FoodyMonHomeScreen() {
 
         {/* Top Badges & History */}
         <TopStatsHeader onOpenHistory={() => setShowHistoryModal(true)} />
+        {state.onboarded && <QuestCard />}
 
         {/* S25: offer to fill in a missed yesterday */}
         {backfillOffer && (

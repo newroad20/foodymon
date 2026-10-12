@@ -236,3 +236,26 @@ export async function backfillYesterday(
   }
   return { ok: true };
 }
+
+export interface DailyQuest {
+  id: string;
+  tier: 1 | 2 | 3;
+  title: string;
+  reward: number;
+  progress: number;
+  target: number;
+  claimed: boolean;
+}
+
+/** Today's three quests (S70) with progress judged by the server from today's daily log. */
+export async function fetchDailyQuests(todayKey: string): Promise<DailyQuest[]> {
+  const res = await supabase.rpc('get_daily_quests', { p_today: todayKey });
+  if (res.error) throw res.error;
+  return (res.data ?? []) as DailyQuest[];
+}
+
+export async function claimQuest(todayKey: string, questId: string): Promise<{ jellyBalance: number }> {
+  const res = await supabase.rpc('claim_quest', { p_today: todayKey, p_quest: questId });
+  if (res.error) throw res.error;
+  return { jellyBalance: (res.data as { jelly_balance: number }).jelly_balance };
+}

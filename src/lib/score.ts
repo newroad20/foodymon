@@ -19,10 +19,8 @@ export function calcScoreParts(state: Pick<UserState, 'today' | 'targetMeals' | 
 
   let mealScore = 0;
   if (state.today.mealCount > 0) {
-    let base = (state.today.mealCount / state.targetMeals) * 100;
-    if (base > 100) base = 100;
-    base -= state.today.badMealCount * 20;
-    mealScore = Math.max(0, base);
+    // Portion size never lowers the score: the app notices meals, it doesn't judge them.
+    mealScore = Math.min(100, (state.today.mealCount / state.targetMeals) * 100);
   }
 
   const emotionScore = state.today.emotion !== null ? state.today.emotion : 50;

@@ -1,8 +1,8 @@
 import { CostumeItem, BackgroundItem, QuizQuestion, LevelInfo } from '@/types/foodymon';
 
 export const levelsData: LevelInfo[] = [
-  { level: 1, maxScore: 19, name: '겁나 아픈 푸디몬', image: require('@/assets/images/level1.png') },
-  { level: 2, maxScore: 39, name: '아픈 푸디몬', image: require('@/assets/images/level2.png') },
+  { level: 1, maxScore: 19, name: '푹 쉬는 푸디몬', image: require('@/assets/images/level1.png') },
+  { level: 2, maxScore: 39, name: '졸린 푸디몬', image: require('@/assets/images/level2.png') },
   { level: 3, maxScore: 59, name: '기본 푸디몬', image: require('@/assets/images/level3.png') },
   { level: 4, maxScore: 79, name: '건강한 푸디몬', image: require('@/assets/images/level4.png') },
   { level: 5, maxScore: 94, name: '생기발랄 푸디몬', image: require('@/assets/images/level5.png') },
@@ -23,6 +23,59 @@ export const emotionOptions = [
 
 // Jelly cost to fill in a missed yesterday (must match backfill_yesterday in supabase/002_game_rpc.sql).
 export const BACKFILL_COST = 20;
+
+// The "감각의 숲" world, told on first launch. Nothing here judges how much or how well the user did.
+export const prologuePages = [
+  {
+    title: '감각의 숲',
+    line: '아주 먼 곳에 "감각의 숲"이 있어.\n사람들이 알아차린 맛과 색, 따뜻한 마음이\n그곳에 이슬처럼 맺혀.',
+  },
+  {
+    title: '나는 푸디몬이야',
+    line: '나는 그 숲에서 왔어.\n누군가 자기 하루를 다정하게 알아차려 줄 때,\n그 마음을 먹고 자라.',
+  },
+  {
+    title: '잘하지 않아도 괜찮아',
+    line: '많이 먹었는지, 적게 먹었는지는 중요하지 않아.\n느낀 걸 그대로 알려주기만 하면 돼.\n힘든 날엔 나도 옆에서 같이 쉴게.',
+  },
+  {
+    title: '함께해 줄래?',
+    line: '숲 밖은 처음이라 조금 떨려.\n오늘부터 나랑 같이 지내 줄래?',
+  },
+];
+
+export const tutorialPages = [
+  {
+    icon: 'restaurant',
+    color: '#FF9600',
+    title: '식사 = 감각 나누기',
+    line: '먹고 나서 "식사"를 눌러 줘.\n어떤 색이었는지, 어떤 식감이었는지\n작은 질문에 답하면 그 감각이 내 먹이가 돼.',
+  },
+  {
+    icon: 'moon',
+    color: '#8E7CF0',
+    title: '수면 = 숲의 밤',
+    line: '일어나면 "수면"에 몇 시간 잤는지 알려 줘.\n네가 푹 쉬면 숲에도 고요한 밤이 와.',
+  },
+  {
+    icon: 'happy',
+    color: '#FF6FA8',
+    title: '감정 = 마음 날씨',
+    line: '"감정"에서 오늘 마음 날씨를 골라 줘.\n흐린 날도 소중한 기록이야.\n어떤 날씨든 나는 곁에 있을게.',
+  },
+  {
+    icon: 'water',
+    color: '#1B7F66',
+    title: '이슬방울과 퀘스트',
+    line: '매일 작은 퀘스트를 하고 꾸준히 기록하면\n숲의 이슬방울(젤리)이 맺혀.\n하루쯤 쉬어도 방패가 우리 기록을 지켜 줘.',
+  },
+  {
+    icon: 'shirt',
+    color: '#1CB0F6',
+    title: '우리만의 방',
+    line: '모은 이슬방울로 "꾸미기"에서\n옷과 소품을 골라 봐.\n자, 이제 숲 생활을 시작하자!',
+  },
+] as const;
 
 export const costumesData: CostumeItem[] = [
   { id: 'crown', icon: '👑', name: '왕관', price: 50 },
@@ -54,10 +107,10 @@ export const quizzesData: QuizQuestion[] = [
 
 export const dialoguesData = {
   bad: [
-    '마스터... 기운이 하나도 없어...',
-    '나도 아프고 너도 아프면 어떡해 😢',
-    '조금만 푹 쉬고 맛있는 거 먹자...',
-    '마스터의 몸이 보내는 신호를 들어줘.',
+    '오늘은 나도 조금 지쳤어. 같이 쉬어 가자.',
+    '천천히 해도 괜찮아. 나는 여기 있을게.',
+    '흐린 날도 알려줘서 고마워.',
+    '따뜻한 거 한 모금 어때? 같이 쉬자.',
   ],
   normal: [
     '오늘 하루는 어땠어?',

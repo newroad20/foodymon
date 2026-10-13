@@ -10,7 +10,21 @@ import {
   Alert,
 } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
-import { mealTargetOptions, sleepTargetOptions } from '@/constants/foodymonData';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import {
+  mealTargetOptions,
+  prologuePages,
+  sleepTargetOptions,
+  tutorialPages,
+} from '@/constants/foodymonData';
+
+// Step order: prologue story → name → sleep → meals → usual portion → tutorial pages.
+const NAME = prologuePages.length;
+const SLEEP = NAME + 1;
+const MEALS = NAME + 2;
+const SIZE = NAME + 3;
+const TUTORIAL = NAME + 4;
+const LAST = TUTORIAL + tutorialPages.length - 1;
 
 interface OnboardingModalProps {
   visible: boolean;
@@ -26,11 +40,11 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
   const [mealSize, setMealSize] = useState(1.0);
 
   const handleNext = () => {
-    if (step === 3 && name.trim().length === 0) {
-      Alert.alert('알림', '이름을 한 글자 이상 적어주세요! 🥺');
+    if (step === NAME && name.trim().length === 0) {
+      Alert.alert('알림', '이름을 한 글자 이상 적어 주세요.');
       return;
     }
-    if (step === 6) {
+    if (step === LAST) {
       completeOnboarding(name.trim(), targetSleep, targetMeals, mealSize);
       return;
     }
@@ -57,54 +71,28 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
 
         {/* Story Card */}
         <View style={styles.card}>
-          {step > 0 && step < 6 && (
+          {step > 0 && (
             <TouchableOpacity onPress={handlePrev} style={styles.backBtn}>
               <Text style={styles.backBtnText}>← 이전</Text>
             </TouchableOpacity>
           )}
 
-          {step === 0 && (
+          {step < NAME && (
             <View style={styles.stepContent}>
-              <Text style={styles.storyTitle}>푸디몬과의 첫 만남 🌱</Text>
-              <Text style={styles.dialogueText}>
-                "안녕! 나는 사람의 감각과 감정을 먹고 자라는 푸디몬이야."
-              </Text>
+              <Text style={styles.storyTitle}>{prologuePages[step].title}</Text>
+              <Text style={styles.dialogueText}>{prologuePages[step].line}</Text>
+              <Dots count={prologuePages.length} active={step} />
               <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>
-                <Text style={styles.primaryBtnText}>터치해서 계속하기 ✨</Text>
+                <Text style={styles.primaryBtnText}>{step === NAME - 1 ? '함께하기' : '계속 듣기'}</Text>
               </TouchableOpacity>
             </View>
           )}
 
-          {step === 1 && (
+          {step === NAME && (
             <View style={styles.stepContent}>
-              <Text style={styles.storyTitle}>함께하는 일상 💖</Text>
+              <Text style={styles.storyTitle}>너의 이름은?</Text>
               <Text style={styles.dialogueText}>
-                "네가 잘 자고 편안하게 먹으면 나는 튼튼해지지만,{'\n'}
-                불안이 쌓이거나 몸의 신호를 무시하면 시들어버려..."
-              </Text>
-              <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>
-                <Text style={styles.primaryBtnText}>다음 이야기 듣기 💬</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {step === 2 && (
-            <View style={styles.stepContent}>
-              <Text style={styles.storyTitle}>마스터가 되어줄래? 🤝</Text>
-              <Text style={styles.dialogueText}>
-                "나의 마스터가 되어 나와 함께 건강한 매일을 만들어갈래?"
-              </Text>
-              <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>
-                <Text style={styles.primaryBtnText}>입양하기! 🥰</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {step === 3 && (
-            <View style={styles.stepContent}>
-              <Text style={styles.storyTitle}>마스터의 이름은? 🏷️</Text>
-              <Text style={styles.dialogueText}>
-                "고마워! 먼저, 내가 마스터를 뭐라고 부르면 될까?"
+                "고마워! 내가 너를 뭐라고 부르면 될까?"
               </Text>
               <TextInput
                 style={styles.input}
@@ -119,11 +107,11 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
             </View>
           )}
 
-          {step === 4 && (
+          {step === SLEEP && (
             <View style={styles.stepContent}>
-              <Text style={styles.storyTitle}>목표 수면 시간 🌙</Text>
+              <Text style={styles.storyTitle}>개운한 잠</Text>
               <Text style={styles.dialogueText}>
-                "{name} 마스터, 반가워!{'\n'}평소 목표 수면 시간은 어느 정도야?"
+                "{name} 마스터, 반가워!{'\n'}보통 몇 시간 자면 개운해?"
               </Text>
               <View style={styles.optionsRow}>
                 {sleepTargetOptions.map((hrs) => (
@@ -150,11 +138,11 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
             </View>
           )}
 
-          {step === 5 && (
+          {step === MEALS && (
             <View style={styles.stepContent}>
-              <Text style={styles.storyTitle}>목표 식사 끼니 🍱</Text>
+              <Text style={styles.storyTitle}>편안한 끼니</Text>
               <Text style={styles.dialogueText}>
-                "하루 목표 식사 횟수는 몇 끼야?"
+                "하루에 몇 번 먹는 게 편해?"
               </Text>
               <View style={styles.optionsRow}>
                 {mealTargetOptions.map((m) => (
@@ -181,11 +169,11 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
             </View>
           )}
 
-          {step === 6 && (
+          {step === SIZE && (
             <View style={styles.stepContent}>
-              <Text style={styles.storyTitle}>평소 식사량 기준 🥣</Text>
+              <Text style={styles.storyTitle}>평소의 양</Text>
               <Text style={styles.dialogueText}>
-                "일반적인 1인분 기준으로 평소에 얼만큼 먹어? (기준점 설정)"
+                "평소에 먹는 양은 어느 정도야?{'\n'}너의 평소와만 비교하고, 다른 사람과는 비교하지 않아."
               </Text>
               <View style={styles.optionsCol}>
                 {[
@@ -213,7 +201,21 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
                 ))}
               </View>
               <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>
-                <Text style={styles.primaryBtnText}>푸디몬과 함께 시작하기! 🚀</Text>
+                <Text style={styles.primaryBtnText}>다음 →</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {step >= TUTORIAL && (
+            <View style={styles.stepContent}>
+              <View style={[styles.tutorialIcon, { backgroundColor: tutorialPages[step - TUTORIAL].color }]}>
+                <Ionicons name={tutorialPages[step - TUTORIAL].icon} size={34} color="#FFFFFF" />
+              </View>
+              <Text style={styles.storyTitle}>{tutorialPages[step - TUTORIAL].title}</Text>
+              <Text style={styles.dialogueText}>{tutorialPages[step - TUTORIAL].line}</Text>
+              <Dots count={tutorialPages.length} active={step - TUTORIAL} />
+              <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>
+                <Text style={styles.primaryBtnText}>{step === LAST ? '숲 생활 시작하기' : '다음 →'}</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -223,7 +225,40 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
   );
 }
 
+function Dots({ count, active }: { count: number; active: number }) {
+  return (
+    <View style={styles.dots}>
+      {Array.from({ length: count }, (_, i) => (
+        <View key={i} style={[styles.dot, i === active && styles.dotActive]} />
+      ))}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  dots: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 18,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E5E5E5',
+  },
+  dotActive: {
+    width: 20,
+    backgroundColor: '#1B7F66',
+  },
+  tutorialIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
   container: {
     flex: 1,
     backgroundColor: '#FDF5F5',

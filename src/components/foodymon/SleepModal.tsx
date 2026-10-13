@@ -23,11 +23,11 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
   const handleSave = async () => {
     await logSleep(selectedHours);
     const diff = Math.abs(state.targetSleep - selectedHours);
-    let msg = '수면 기록이 완료되었습니다! ✨';
-    if (diff <= 1) msg = '푹 주무셨네요! 푸디몬도 활력이 넘쳐요! ✨';
-    else if (diff >= 3) msg = '수면이 불규칙해요. 푸디몬이 조금 피곤해해요 🥱';
+    let msg = '잠을 알려 줘서 고마워. 숲에도 밤이 찾아왔어.';
+    if (diff <= 1) msg = '푹 잤구나! 숲에 고요한 밤이 깊게 내려앉았어.';
+    else if (diff >= 3) msg = '잠이 들쭉날쭉했구나. 오늘은 같이 천천히 가자.';
 
-    Alert.alert('수면 체크인', msg);
+    Alert.alert('숲의 밤', msg);
     onClose();
   };
 
@@ -37,7 +37,7 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
         <View style={styles.modalContent}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>수면 체크인 🌙</Text>
+            <Text style={styles.title}>수면 · 숲의 밤</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
               <Text style={styles.closeBtnText}>✕</Text>
             </TouchableOpacity>

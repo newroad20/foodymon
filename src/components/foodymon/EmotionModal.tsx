@@ -22,9 +22,9 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
 
   const handleSelect = async (score: number, label: string) => {
     await logEmotion(score);
-    let msg = '감정 체크인이 완료되었습니다! 💖';
-    if (score >= 80) msg = '좋은 기운이 푸디몬에게도 전해졌어요! 🎶';
-    else if (score <= 40) msg = '푸디몬이 꼭 안아드릴게요. 힘내세요 🫂';
+    let msg = '오늘의 마음 날씨를 기록했어. 알려 줘서 고마워.';
+    if (score >= 80) msg = '맑은 마음 날씨가 숲까지 전해졌어!';
+    else if (score <= 40) msg = '흐린 날도 알려 줘서 고마워. 힘내지 않아도 돼, 내가 옆에 있을게.';
 
     Alert.alert(label, msg);
     onClose();
@@ -36,7 +36,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
         <View style={styles.modalContent}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>감정 체크인 😊</Text>
+            <Text style={styles.title}>감정 · 마음 날씨</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
               <Text style={styles.closeBtnText}>✕</Text>
             </TouchableOpacity>

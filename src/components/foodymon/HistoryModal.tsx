@@ -26,7 +26,7 @@ export function HistoryModal({ visible, onClose }: HistoryModalProps) {
       case 'emotion':
         return { bg: '#FCE7F3', text: '#BE185D', label: '감정' };
       case 'skip':
-        return { bg: '#FEE2E2', text: '#B91C1C', label: '결식' };
+        return { bg: '#F1F5F9', text: '#475569', label: '못 먹음' };
       default:
         return { bg: '#E2E8F0', text: '#475569', label: '기록' };
     }

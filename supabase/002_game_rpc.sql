@@ -365,7 +365,7 @@ insert into public.quest_defs (id, tier, title, reward) values
   ('all_three',    2, '수면·식사·감정 모두 기록하기',  10),
   ('sleep_goal',   2, '목표 수면 시간 ±1시간 지키기',  10),
   ('meals_target', 3, '목표 끼니 모두 기록하기',       15),
-  ('good_meals_2', 3, '적당한 양으로 식사 2번 하기',   15),
+  ('good_meals_2', 3, '식사 3번 기록하기',             15),  -- id 유지: quest_claims 가 참조
   ('score_70',     3, '건강 지수 70점 넘기기',         15)
 on conflict (id) do update set tier = excluded.tier, title = excluded.title, reward = excluded.reward;
 
@@ -436,7 +436,7 @@ begin
                                                + (d.emotion is not null)::int, 3;
     when 'sleep_goal'   then return query select coalesce((d.sleep_diff <= 1)::int, 0), 1;
     when 'meals_target' then return query select least(d.meal_count, greatest(tm, 1)), greatest(tm, 1);
-    when 'good_meals_2' then return query select least(greatest(d.meal_count - d.bad_meal_count, 0), 2), 2;
+    when 'good_meals_2' then return query select least(d.meal_count, 3), 3;
     when 'score_70'     then return query select least(coalesce(d.daily_score, 0)::int, 70), 70;
     else raise exception 'unknown quest %', p_quest;
   end case;

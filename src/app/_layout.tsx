@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { FoodyMonProvider } from '@/context/FoodyMonContext';
+import { MusicProvider } from '@/context/MusicContext';
 import { LoginScreen } from '@/components/auth/LoginScreen';
 import { RegisterScreen } from '@/components/auth/RegisterScreen';
 
@@ -39,39 +40,41 @@ function AppContent() {
   return (
     // key: start fresh when a different account logs in
     <FoodyMonProvider key={session.user.id} userId={session.user.id}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="collection"
-          options={{
-            headerShown: true,
-            title: '컬렉션 도감',
-            headerBackTitle: '마이',
-            headerStyle: { backgroundColor: '#FDF5F5' },
-            headerShadowVisible: false,
-          }}
-        />
-        <Stack.Screen
-          name="dressroom"
-          options={{
-            headerShown: true,
-            title: '꾸미기',
-            headerBackTitle: '홈',
-            headerStyle: { backgroundColor: '#FFFFFF' },
-            headerShadowVisible: false,
-          }}
-        />
-        <Stack.Screen
-          name="share"
-          options={{
-            headerShown: true,
-            title: '자랑하기',
-            headerBackTitle: '요약',
-            headerStyle: { backgroundColor: '#FDF5F5' },
-            headerShadowVisible: false,
-          }}
-        />
-      </Stack>
+      <MusicProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="collection"
+            options={{
+              headerShown: true,
+              title: '컬렉션 도감',
+              headerBackTitle: '마이',
+              headerStyle: { backgroundColor: '#FDF5F5' },
+              headerShadowVisible: false,
+            }}
+          />
+          <Stack.Screen
+            name="dressroom"
+            options={{
+              headerShown: true,
+              title: '꾸미기',
+              headerBackTitle: '홈',
+              headerStyle: { backgroundColor: '#FFFFFF' },
+              headerShadowVisible: false,
+            }}
+          />
+          <Stack.Screen
+            name="share"
+            options={{
+              headerShown: true,
+              title: '자랑하기',
+              headerBackTitle: '요약',
+              headerStyle: { backgroundColor: '#FDF5F5' },
+              headerShadowVisible: false,
+            }}
+          />
+        </Stack>
+      </MusicProvider>
     </FoodyMonProvider>
   );
 }

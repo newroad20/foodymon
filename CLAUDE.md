@@ -51,13 +51,12 @@ Product direction (keep consistent):
   sleep, mood); jelly = forest dew. Story and tutorial copy live in `src/constants/foodymonData.ts`.
 - It is an emotional-support app: never blame, grade or compare the user in copy
   (no "과식/결식/잘 못했어요/슬퍼할 거예요"). Low days get company, not warnings.
+  Meal score counts logged meals only; portion size never lowers it (PR #24).
 - Look: Duolingo / Pou / Roblox game feel — mint `#1B7F66` accent (white text 4.9:1), pink
   `#FDF5F5` background, cards with a 2px border + 4px bottom edge, Ionicons instead of emoji in
   UI chrome, system font one weight heavier (Nunito was dropped: no Hangul).
 
 Open items:
-- Team decision: scoring still takes 20 points off meals ≤1/3 or ≥2 portions; may conflict with
-  the no-judgement direction.
 - Pet art for levels 1–6 is in mixed styles; new art needed to unify.
 - Before launch: custom SMTP (e.g. Resend) in Supabase, turn "Confirm email" back on; iOS needs an
   Apple Developer account for test builds.

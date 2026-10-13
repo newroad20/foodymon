@@ -279,7 +279,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
   const skipMeal = () =>
     recordCheckin((s) => ({ ...s.today, badMealCount: s.today.badMealCount + 1 }), {
       type: 'skip',
-      content: '식사를 건너뛰었어요 😢',
+      content: '이번 끼니는 못 먹었어',
     });
 
   const logSleep = (hours: number) => {

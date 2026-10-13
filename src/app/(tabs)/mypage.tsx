@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Switch,
 } from 'react-native';
 import { Image } from 'expo-image';
 import Constants from 'expo-constants';
@@ -16,11 +17,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { useAuth } from '@/context/AuthContext';
+import { useMusic } from '@/context/MusicContext';
 import { levelsData, mealTargetOptions, sleepTargetOptions } from '@/constants/foodymonData';
 
 export default function MyPageScreen() {
   const { state, updateSettings } = useFoodyMon();
   const { user, signOut } = useAuth();
+  const { musicOn, setMusicOn } = useMusic();
 
   const [nickname, setNickname] = useState(state.masterName);
   const [targetSleep, setTargetSleep] = useState(state.targetSleep);
@@ -47,11 +50,17 @@ export default function MyPageScreen() {
       return;
     }
     setSaving(true);
-    const ok = await updateSettings({ nickname: trimmedName, targetSleep, targetMeals });
+    const ok = await updateSettings({
+      nickname: trimmedName,
+      targetSleep,
+      targetMeals,
+    });
     setSaving(false);
     Alert.alert(
       ok ? '저장했어요 ✨' : '저장하지 못했어요',
-      ok ? '새 목표로 오늘의 건강 지수를 다시 계산했어요.' : '네트워크를 확인하고 다시 시도해 주세요.'
+      ok
+        ? '새 목표로 오늘의 건강 지수를 다시 계산했어요.'
+        : '네트워크를 확인하고 다시 시도해 주세요.'
     );
   };
 
@@ -151,6 +160,21 @@ export default function MyPageScreen() {
           </View>
           <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
         </TouchableOpacity>
+
+        {/* Sound */}
+        <View style={[styles.card, styles.linkCard]}>
+          <Ionicons name={musicOn ? 'musical-notes' : 'volume-mute'} size={26} color="#1B7F66" />
+          <View style={styles.linkText}>
+            <Text style={styles.sectionTitleInline}>배경음악</Text>
+            <Text style={styles.linkSub}>숲의 노래를 켜고 꺼요</Text>
+          </View>
+          <Switch
+            value={musicOn}
+            onValueChange={setMusicOn}
+            trackColor={{ true: '#1B7F66' }}
+            accessibilityLabel="배경음악"
+          />
+        </View>
 
         {/* Account */}
         <View style={styles.card}>

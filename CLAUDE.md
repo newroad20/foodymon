@@ -41,12 +41,26 @@ npx expo export --platform ios --output-dir <tmp>   # bundle check
 ## Status and next steps
 
 Done: auth (email confirmation deep link), onboarding, check-ins, daily rollover, server sync,
-shop, tabs, My Page, daily summary + trend chart, collection (C1–C3), share card (S5-3),
-S25 backfill (20 jelly, yesterday only: restores the streak and refunds a shield used that day;
-`backfill_yesterday` RPC, `BACKFILL_COST` must match it).
+tabs (홈 / 요약 / 마이), My Page, daily summary + trend chart, collection (C1–C3), share card (S5-3),
+S25 backfill (20 jelly, yesterday only; `BACKFILL_COST` must match `backfill_yesterday`),
+S70 daily quests (Duolingo-style, 3 a day, 5/10/15 jelly; `get_daily_quests` / `claim_quest`),
+Roblox-style dressroom (`src/app/dressroom.tsx`), app icon/splash, EAS Android preview builds.
+
+Product direction (keep consistent):
+- World: "감각의 숲". FoodyMon grows on what the user notices (food colour/texture/gratitude,
+  sleep, mood); jelly = forest dew. Story and tutorial copy live in `src/constants/foodymonData.ts`.
+- It is an emotional-support app: never blame, grade or compare the user in copy
+  (no "과식/결식/잘 못했어요/슬퍼할 거예요"). Low days get company, not warnings.
+- Look: Duolingo / Pou / Roblox game feel — mint `#1B7F66` accent (white text 4.9:1), pink
+  `#FDF5F5` background, cards with a 2px border + 4px bottom edge, Ionicons instead of emoji in
+  UI chrome, system font one weight heavier (Nunito was dropped: no Hangul).
 
 Open items:
-- S70 퀘스트 — not specified in the flow doc.
-- Before launch: connect custom SMTP (e.g. Resend) in Supabase and turn "Confirm email" back on
-  (it is off for development because the default mailer only sends to team members, 2/hour).
+- Team decision: scoring still takes 20 points off meals ≤1/3 or ≥2 portions; may conflict with
+  the no-judgement direction.
+- Pet art for levels 1–6 is in mixed styles; new art needed to unify.
+- Before launch: custom SMTP (e.g. Resend) in Supabase, turn "Confirm email" back on; iOS needs an
+  Apple Developer account for test builds.
+- When copying SQL with Korean to the clipboard use `LANG=en_US.UTF-8 pbcopy` (bare pbcopy
+  garbled the quest titles once).
 - App flow reference: `../푸디몬 플로우 정리.png` and `../SETUP_foodymon.md` (outside this repo).

@@ -125,6 +125,26 @@ export const dialoguesData = {
     '우리 이대로 계속 건강하게 지내자 ✨',
     '마스터의 좋은 기운이 뿜뿜 느껴져!',
   ],
+  // Time of day (morning 5–11, afternoon 11–17, evening 17–22, night 22–5).
+  morning: ['좋은 아침! 숲에 이슬이 반짝여.', '창밖 공기 한 번 마셔볼까?', '아침 햇살이 간지러워 ☀️'],
+  afternoon: ['오후의 숲은 나른하다~', '잠깐 기지개 켜고 가자!', '점심엔 어떤 색깔을 만났어?'],
+  evening: ['노을이 숲을 물들이고 있어 🌇', '오늘 하루 수고했어.', '저녁 바람이 선선하다~'],
+  night: ['별이 많이 떴어 🌙', '이제 슬슬 쉴 준비 해볼까?', '오늘도 곁에 있어줘서 고마워.'],
+  // Gentle invitations for what isn't logged yet — never a reminder of what was missed.
+  askSleep: ['어젯밤 잠은 어땠어? 들려줘!', '꿈속 숲 이야기 궁금해 💤'],
+  askMeal: ['오늘 숲에서 어떤 맛을 만났어?', '먹은 음식의 색깔을 알려줄래? 🍃'],
+  askEmotion: ['지금 마음 날씨는 어때?', '마음 한 조각 나눠줄래? ☁️'],
+  // When the user said they feel low: company, not cheering.
+  lowMood: ['오늘은 그냥 같이 있자.', '마음이 무거운 날엔 나한테 기대도 돼.', '괜찮아지지 않아도 괜찮아.'],
+  // {n} = streak days.
+  streak: ['벌써 {n}일째 함께야! 🌱', '{n}일 동안 숲을 찾아와 줘서 고마워.'],
+  // Right after a check-in.
+  reaction: {
+    sleep: ['잠 이야기 고마워! 이슬처럼 맑아졌어.', '푹 쉰 만큼 숲도 쉬었어 💤'],
+    meal: ['냠! 그 맛 나도 느껴졌어 😋', '알아차려줘서 고마워. 배가 든든해!'],
+    skip: ['그럴 때도 있지. 알려줘서 고마워.', '다음 끼니 때 또 만나자!'],
+    emotion: ['마음 알려줘서 고마워 💖', '어떤 마음이든 다 소중해.'],
+  },
 };
 
 export const interactionEmojis = ['💖', '✨', '🎵', '⭐', '🎈', '🥰'];

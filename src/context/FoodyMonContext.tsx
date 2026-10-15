@@ -5,6 +5,7 @@ import { UserState, LogItem } from '@/types/foodymon';
 import { BACKFILL_COST, costumesData, backgroundsData, dialoguesData, levelsData } from '@/constants/foodymonData';
 import { closeDay, toDateKey, RolloverResult } from '@/lib/dayRollover';
 import { calcDailyScore } from '@/lib/score';
+import { pickDialogue } from '@/lib/dialogue';
 import { formatLogTime } from '@/lib/serverState';
 import * as gameApi from '@/lib/gameApi';
 
@@ -185,19 +186,19 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     return msg;
   };
 
-  // Periodic dialogue update
+  // FoodyMon speaks from today's check-ins, the time of day and the streak; a fresh line every 15s.
   useEffect(() => {
-    const interval = setInterval(() => {
-      let pool = dialoguesData.normal;
-      if (state.currentDailyScore >= 80) pool = dialoguesData.good;
-      else if (state.currentDailyScore < 40) pool = dialoguesData.bad;
-
-      const randomText = pool[Math.floor(Math.random() * pool.length)];
-      const prefix = state.masterName && Math.random() > 0.5 ? `${state.masterName} 마스터, ` : '';
-      setCurrentDialogue(prefix + randomText);
-    }, 15000);
+    if (loading) return;
+    const speak = () => {
+      const s = stateRef.current;
+      const line = pickDialogue(s, dialoguesData, new Date().getHours());
+      const prefix = s.masterName && Math.random() > 0.5 ? `${s.masterName} 마스터, ` : '';
+      setCurrentDialogue(prefix + line);
+    };
+    speak();
+    const interval = setInterval(speak, 15000);
     return () => clearInterval(interval);
-  }, [state.currentDailyScore, state.masterName]);
+  }, [loading]);
 
   const newLog = (type: LogItem['type'], content: string): LogItem => ({
     id: String(Date.now()),
@@ -219,6 +220,8 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
       logs: [newLog(log.type, log.content), ...current.logs],
     });
     applyState(next);
+    const reactions = dialoguesData.reaction[log.type];
+    setCurrentDialogue(reactions[Math.floor(Math.random() * reactions.length)]);
     try {
       await gameApi.saveCheckin(userId, next, log);
       setSyncError(null);

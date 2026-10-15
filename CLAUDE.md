@@ -29,7 +29,7 @@ npx expo export --platform ios --output-dir <tmp>   # bundle check
 - `src/context/FoodyMonContext.tsx` holds the game state. The server is the source of truth;
   AsyncStorage is only a per-account cache. UI updates first, then saves.
 - `src/lib/gameApi.ts` = all Supabase calls. Pure logic (testable with plain Node) lives in
-  `src/lib/{score,dayRollover,serverState,trend,collection,authLink}.ts`; those files use explicit
+  `src/lib/{score,dayRollover,serverState,trend,collection,authLink,dialogue}.ts`; those files use explicit
   `.ts` relative imports so `node --test` can load them.
 - Anti-cheat: jelly, streak, shields and purchases change only through security-definer RPCs in
   `supabase/002_game_rpc.sql` (`ensure_profile`, `close_days`, `buy_item`). Clients may write

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserState, LogItem } from '@/types/foodymon';
-import { BACKFILL_COST, costumesData, backgroundsData, dialoguesData, levelsData } from '@/constants/foodymonData';
+import { BACKFILL_COST, GIFT_BOX_COST, costumesData, backgroundsData, dialoguesData, levelsData } from '@/constants/foodymonData';
 import { closeDay, toDateKey, RolloverResult } from '@/lib/dayRollover';
 import { calcDailyScore } from '@/lib/score';
 import { pickDialogue } from '@/lib/dialogue';
@@ -71,6 +71,10 @@ interface FoodyMonContextType {
   }) => Promise<{ success: boolean; message: string }>;
   updateSettings: (values: { nickname: string; targetSleep: number; targetMeals: number }) => Promise<boolean>;
   buyItem: (type: 'costume' | 'background', id: string) => Promise<{ success: boolean; message: string }>;
+  /** Opens a gift box (S44); on success returns the item that came out. */
+  openGiftBox: () => Promise<
+    { success: true; type: 'costume' | 'background'; id: string } | { success: false; message: string }
+  >;
   /** Claims a completed daily quest; the server pays the jelly. */
   claimQuest: (questId: string) => Promise<boolean>;
   toggleCostume: (id: string) => void;
@@ -397,6 +401,30 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     return { success: true, message: `${item.name}을(를) 구매했습니다! 🎒` };
   };
 
+  const openGiftBox = async () => {
+    if (stateRef.current.currency < GIFT_BOX_COST) {
+      return { success: false as const, message: `선물 상자에는 젤리 ${GIFT_BOX_COST}개가 필요해요 ✨` };
+    }
+    const res = await gameApi.openGiftBox();
+    if (!res.ok) {
+      const messages: Record<gameApi.GiftBoxError, string> = {
+        all_owned: '숲의 선물을 모두 모았어요! 새 선물이 곧 찾아올 거예요.',
+        insufficient_jelly: `선물 상자에는 젤리 ${GIFT_BOX_COST}개가 필요해요 ✨`,
+        network: '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.',
+      };
+      return { success: false as const, message: messages[res.error] };
+    }
+    const current = stateRef.current;
+    applyState({
+      ...current,
+      currency: res.jellyBalance,
+      ownedCostumes: res.type === 'costume' ? [...current.ownedCostumes, res.id] : current.ownedCostumes,
+      ownedBackgrounds:
+        res.type === 'background' ? [...current.ownedBackgrounds, res.id] : current.ownedBackgrounds,
+    });
+    return { success: true as const, type: res.type, id: res.id };
+  };
+
   const claimQuest = async (questId: string) => {
     try {
       const { jellyBalance } = await gameApi.claimQuest(toDateKey(new Date()), questId);
@@ -460,6 +488,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         backfillYesterday,
         updateSettings,
         buyItem,
+        openGiftBox,
         claimQuest,
         toggleCostume,
         toggleBackground,

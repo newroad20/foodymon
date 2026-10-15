@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Image, Pressable, StyleSheet, View } from 'react-native';
+import { successFeel } from '@/lib/haptics';
 
 export const HATCH_TAPS = 3;
 
@@ -56,6 +57,7 @@ export function HatchEgg({ taps, hatched, onTap }: HatchEggProps) {
 
   useEffect(() => {
     if (!hatched) return;
+    successFeel();
     Animated.spring(pop, { toValue: 1, friction: 4, tension: 80, useNativeDriver: true }).start();
   }, [hatched, pop]);
 

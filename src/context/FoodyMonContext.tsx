@@ -7,6 +7,7 @@ import { closeDay, toDateKey, RolloverResult } from '@/lib/dayRollover';
 import { calcDailyScore } from '@/lib/score';
 import { pickDialogue } from '@/lib/dialogue';
 import type { MealType } from '@/lib/mealType';
+import { successFeel, tapFeel } from '@/lib/haptics';
 import { formatLogTime } from '@/lib/serverState';
 import * as gameApi from '@/lib/gameApi';
 
@@ -184,6 +185,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
   }, [ensureCurrentDay]);
 
   const triggerPetInteraction = () => {
+    tapFeel();
     const pool = ['앗, 간지러워!', '에헤헤 🎵', '마스터 손길 최고야 🥰', '기분 좋아!', '오늘도 힘낼게! ✨'];
     const chosen = pool[Math.floor(Math.random() * pool.length)];
     const msg = state.masterName ? `${state.masterName} 마스터, ${chosen}` : chosen;
@@ -225,6 +227,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
       logs: [newLog(log.type, log.content), ...current.logs],
     });
     applyState(next);
+    successFeel();
     const reactions = dialoguesData.reaction[log.type];
     setCurrentDialogue(reactions[Math.floor(Math.random() * reactions.length)]);
     try {
@@ -423,6 +426,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
       ownedBackgrounds:
         res.type === 'background' ? [...current.ownedBackgrounds, res.id] : current.ownedBackgrounds,
     });
+    successFeel();
     return { success: true as const, type: res.type, id: res.id };
   };
 
@@ -430,6 +434,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     try {
       const { jellyBalance } = await gameApi.claimQuest(toDateKey(new Date()), questId);
       applyState({ ...stateRef.current, currency: jellyBalance });
+      successFeel();
       return true;
     } catch (e) {
       console.error('Failed to claim quest:', e);

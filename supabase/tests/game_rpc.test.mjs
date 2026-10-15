@@ -188,8 +188,21 @@ for (const { id } of await q(`select id from public.quest_defs`)) {
   await q(`select * from public.quest_progress($1, $2::date, $3)`, [U, today, id]);
 }
 
+// delete_my_account removes the user and every row that belongs to them, nobody else's
+const V = '22222222-2222-2222-2222-222222222222';
+await db.query(`insert into auth.users values ($1,'v@b.c','{}')`, [V]);
+await q(`insert into public.checkin_logs(user_id,type,content) values ($1,'meal','x')`, [U]);
+await q(`select public.delete_my_account()`);
+assert.equal((await q(`select count(*)::int c from auth.users where id=$1`, [U]))[0].c, 0);
+for (const t of ['profiles', 'daily_logs', 'checkin_logs', 'user_items', 'quest_claims']) {
+  const col = t === 'profiles' ? 'id' : 'user_id';
+  assert.equal((await q(`select count(*)::int c from public.${t} where ${col}=$1`, [U]))[0].c, 0, t);
+}
+assert.equal((await q(`select count(*)::int c from public.profiles where id=$1`, [V]))[0].c, 1);
+
 // unauthenticated
 await asUser('');
+await assert.rejects(q(`select public.delete_my_account()`), /not authenticated/);
 await assert.rejects(close(), /not authenticated/);
 await db.close();
 });

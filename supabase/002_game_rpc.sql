@@ -11,6 +11,7 @@
 --   6) backfill_yesterday(...) : 젤리 20개로 어제 기록 복구 (S25)
 --   7) get_daily_quests / claim_quest : 오늘의 퀘스트 3개 (S70, 듀오링고식 쉬움·보통·어려움)
 --   5b) open_gift_box() : 젤리 30개로 아직 없는 아이템 1개 무작위 지급 (S44 뽑기)
+--   9) delete_my_account() : 회원 탈퇴 — 로그인 계정과 모든 기록 영구 삭제
 -- 규칙은 앱의 src/lib/dayRollover.ts 와 동일하게 유지할 것
 -- =====================================================================
 
@@ -604,3 +605,22 @@ grant execute on function public.get_daily_quests(date)          to authenticate
 grant execute on function public.claim_quest(date, text)         to authenticated;
 revoke all on function public.open_gift_box() from public, anon;
 grant execute on function public.open_gift_box() to authenticated;
+
+-- ---------- 9. 회원 탈퇴 ----------
+-- 로그인한 본인 계정(auth.users)을 지운다. profiles 와 모든 기록 표가 on delete cascade 로 함께 지워진다.
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+begin
+  if uid is null then
+    raise exception 'not authenticated';
+  end if;
+  delete from auth.users where id = uid;
+end; $$;
+revoke all on function public.delete_my_account() from public, anon;
+grant execute on function public.delete_my_account() to authenticated;

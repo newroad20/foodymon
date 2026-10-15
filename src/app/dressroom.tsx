@@ -3,18 +3,21 @@ import { View, Text, StyleSheet, ScrollView, Pressable, Alert, ActivityIndicator
 import { Image } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
-import { backgroundsData, costumesData, levelsData } from '@/constants/foodymonData';
+import { GIFT_BOX_COST, backgroundsData, costumesData, levelsData } from '@/constants/foodymonData';
 
 type Category = 'costume' | 'background';
 type Item = { id: string; icon: string; name: string; price: number };
 
 /** D1 dressroom, Roblox avatar-editor style: big live preview on top, item grid below, try on before buying. */
 export default function DressroomScreen() {
-  const { state, buyItem, toggleCostume, toggleBackground } = useFoodyMon();
+  const { state, buyItem, openGiftBox, toggleCostume, toggleBackground } = useFoodyMon();
   const [category, setCategory] = useState<Category>('costume');
   // An unowned item being tried on; shown in the preview until bought or dismissed.
   const [trying, setTrying] = useState<{ type: Category; item: Item } | null>(null);
   const [buying, setBuying] = useState(false);
+  const [opening, setOpening] = useState(false);
+  const allOwned =
+    state.ownedCostumes.length >= costumesData.length && state.ownedBackgrounds.length >= backgroundsData.length;
 
   const levelInfo = levelsData.find((l) => l.level === state.level) ?? levelsData[2];
   const items: Item[] = category === 'costume' ? costumesData : backgroundsData;
@@ -59,6 +62,24 @@ export default function DressroomScreen() {
     setTrying(null);
   };
 
+  const handleGiftBox = async () => {
+    setTrying(null);
+    setOpening(true);
+    const res = await openGiftBox();
+    setOpening(false);
+    if (!res.success) {
+      Alert.alert('숲의 선물 상자', res.message);
+      return;
+    }
+    const item = (res.type === 'costume' ? costumesData : backgroundsData).find((i) => i.id === res.id);
+    const wear = () => (res.type === 'costume' ? toggleCostume(res.id) : toggleBackground(res.id));
+    setCategory(res.type);
+    Alert.alert('선물이 나왔어요! 🎁', `${item?.icon ?? ''} ${item?.name ?? res.id}을(를) 받았어요.`, [
+      { text: '나중에', style: 'cancel' },
+      { text: '바로 입기', onPress: wear },
+    ]);
+  };
+
   return (
     <View style={styles.container}>
       {/* Live preview */}
@@ -93,6 +114,28 @@ export default function DressroomScreen() {
           </Pressable>
         ))}
       </View>
+
+      {/* Gift box (S44): a random item the user doesn't have yet */}
+      <Pressable
+        style={({ pressed }) => [styles.giftBox, pressed && styles.giftBoxPressed, allOwned && styles.buyBtnOff]}
+        disabled={opening || allOwned}
+        onPress={handleGiftBox}
+        accessibilityRole="button"
+        accessibilityLabel={`숲의 선물 상자, 젤리 ${GIFT_BOX_COST}개`}>
+        <Ionicons name="gift" size={26} color="#FF9600" />
+        <View style={styles.giftText}>
+          <Text style={styles.giftTitle}>숲의 선물 상자</Text>
+          <Text style={styles.giftSub}>{allOwned ? '선물을 모두 모았어요!' : '아직 없는 아이템 하나가 무작위로 나와요'}</Text>
+        </View>
+        {opening ? (
+          <ActivityIndicator color="#1B7F66" />
+        ) : (
+          <View style={styles.price}>
+            <Ionicons name="water" size={11} color="#1B7F66" />
+            <Text style={styles.priceText}>{GIFT_BOX_COST}</Text>
+          </View>
+        )}
+      </Pressable>
 
       {/* Item grid */}
       <ScrollView contentContainerStyle={styles.grid}>
@@ -205,6 +248,37 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
     color: '#17765D',
+  },
+  giftBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginHorizontal: 16,
+    marginTop: 10,
+    padding: 14,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#FFD9A8',
+  },
+  giftBoxPressed: {
+    borderBottomWidth: 2,
+    marginTop: 12,
+  },
+  giftText: {
+    flex: 1,
+    gap: 2,
+  },
+  giftTitle: {
+    fontSize: 15,
+    color: '#1E293B',
+    fontWeight: '900',
+  },
+  giftSub: {
+    fontSize: 12,
+    color: '#94A3B8',
+    fontWeight: '600',
   },
   tabs: {
     flexDirection: 'row',

@@ -179,6 +179,23 @@ export async function buyItem(
   return { ok: true, jellyBalance: (res.data as { jelly_balance: number }).jelly_balance };
 }
 
+export type GiftBoxError = 'all_owned' | 'insufficient_jelly' | 'network';
+
+/** Opens a gift box: the server picks a random unowned item and takes the jelly. */
+export async function openGiftBox(): Promise<
+  { ok: true; type: 'costume' | 'background'; id: string; jellyBalance: number } | { ok: false; error: GiftBoxError }
+> {
+  const res = await supabase.rpc('open_gift_box');
+  if (res.error) {
+    const msg = res.error.message ?? '';
+    if (msg.includes('all owned')) return { ok: false, error: 'all_owned' };
+    if (msg.includes('insufficient jelly')) return { ok: false, error: 'insufficient_jelly' };
+    return { ok: false, error: 'network' };
+  }
+  const d = res.data as { item_type: 'costume' | 'background'; item_id: string; jelly_balance: number };
+  return { ok: true, type: d.item_type, id: d.item_id, jellyBalance: d.jelly_balance };
+}
+
 /** Stored daily health index per day, from `fromDate` (inclusive). */
 export async function fetchScoreHistory(
   userId: string,

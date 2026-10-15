@@ -82,6 +82,22 @@ await assert.rejects(rpc(`select public.buy_item('costume','crown') r`), /insuff
 await assert.rejects(rpc(`select public.buy_item('costume','nope') r`), /item not found/);
 assert.equal((await q(`select count(*)::int c from public.user_items`))[0].c, 1);
 
+// open_gift_box: 30 jelly, only unowned items, until everything is owned
+const box = () => rpc(`select public.open_gift_box() r`);
+await assert.rejects(box(), /insufficient jelly/);
+const shopCount = (await q(`select count(*)::int c from public.shop_items`))[0].c;
+await setProfile(`jelly_balance=1000`);
+const won = new Set();
+for (let i = 1; i < shopCount; i++) {
+  r = await box();
+  assert.ok(!(r.item_type === 'costume' && r.item_id === 'glasses'), 'never an owned item');
+  won.add(`${r.item_type}:${r.item_id}`);
+  assert.equal(r.jelly_balance, 1000 - 30 * i);
+}
+assert.equal(won.size, shopCount - 1);
+await assert.rejects(box(), /all owned/);
+await q(`delete from public.user_items where not (item_type='costume' and item_id='glasses')`);
+
 // ---------- backfill_yesterday (S25) ----------
 const backfill = (score = 80, meals = 2) =>
   rpc(`select public.backfill_yesterday($1::date, 7, 0, $2::smallint, 0::smallint, 80::smallint, $3::smallint) r`,

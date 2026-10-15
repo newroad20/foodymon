@@ -10,6 +10,7 @@
 --   5) buy_item(p_type, p_id) : 젤리 차감 + 아이템 지급
 --   6) backfill_yesterday(...) : 젤리 20개로 어제 기록 복구 (S25)
 --   7) get_daily_quests / claim_quest : 오늘의 퀘스트 3개 (S70, 듀오링고식 쉬움·보통·어려움)
+--   5b) open_gift_box() : 젤리 30개로 아직 없는 아이템 1개 무작위 지급 (S44 뽑기)
 -- 규칙은 앱의 src/lib/dayRollover.ts 와 동일하게 유지할 것
 -- =====================================================================
 
@@ -270,6 +271,54 @@ begin
   returning jelly_balance into balance;
 
   return jsonb_build_object('jelly_balance', balance);
+end; $$;
+
+-- ---------- 5b. 숲의 선물 상자 (S44 뽑기) ----------
+-- 젤리 30개(앱의 GIFT_BOX_COST 와 같아야 함)로 아직 없는 상점 아이템 1개를 무작위로 준다. 중복 없음.
+create or replace function public.open_gift_box()
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid     uuid := auth.uid();
+  cost    constant integer := 30;
+  balance integer;
+  v_type  text;
+  v_id    text;
+begin
+  if uid is null then
+    raise exception 'not authenticated';
+  end if;
+
+  select jelly_balance into balance
+    from public.profiles where id = uid for update;
+  if not found then
+    raise exception 'profile not found';
+  end if;
+
+  select s.item_type, s.item_id into v_type, v_id
+    from public.shop_items s
+   where not exists (select 1 from public.user_items u
+                      where u.user_id = uid and u.item_type = s.item_type and u.item_id = s.item_id)
+   order by random()
+   limit 1;
+  if not found then
+    raise exception 'all owned';
+  end if;
+  if balance < cost then
+    raise exception 'insufficient jelly';
+  end if;
+
+  insert into public.user_items (user_id, item_type, item_id) values (uid, v_type, v_id);
+
+  update public.profiles
+     set jelly_balance = jelly_balance - cost
+   where id = uid
+  returning jelly_balance into balance;
+
+  return jsonb_build_object('item_type', v_type, 'item_id', v_id, 'jelly_balance', balance);
 end; $$;
 
 -- ---------- 6. 어제 기록 복구 (S25) ----------
@@ -553,3 +602,5 @@ revoke all on function public.claim_quest(date, text)            from public, an
 grant execute on function public.daily_quest_ids(date)           to authenticated;
 grant execute on function public.get_daily_quests(date)          to authenticated;
 grant execute on function public.claim_quest(date, text)         to authenticated;
+revoke all on function public.open_gift_box() from public, anon;
+grant execute on function public.open_gift_box() to authenticated;

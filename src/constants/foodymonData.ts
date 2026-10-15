@@ -23,6 +23,8 @@ export const emotionOptions = [
 
 // Jelly cost to fill in a missed yesterday (must match backfill_yesterday in supabase/002_game_rpc.sql).
 export const BACKFILL_COST = 20;
+// Must match `cost` in open_gift_box (supabase/002_game_rpc.sql).
+export const GIFT_BOX_COST = 30;
 
 // The "감각의 숲" world, told on first launch. Nothing here judges how much or how well the user did.
 export const prologuePages = [

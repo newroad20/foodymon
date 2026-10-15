@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { quizzesData } from '@/constants/foodymonData';
+import { MEAL_TYPES, MealType, mealTypeForHour } from '@/lib/mealType';
 
 interface MealModalProps {
   visible: boolean;
@@ -23,6 +24,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
   const [currentQuiz, setCurrentQuiz] = useState(() => quizzesData[0]);
   const [textAnswer, setTextAnswer] = useState('');
   const [yesNoAnswer, setYesNoAnswer] = useState<string | null>(null);
+  const [mealType, setMealType] = useState<MealType>(() => mealTypeForHour(new Date().getHours()));
 
   // Pick new random quiz when opening
   React.useEffect(() => {
@@ -30,6 +32,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
       setStep(1);
       setTextAnswer('');
       setYesNoAnswer(null);
+      setMealType(mealTypeForHour(new Date().getHours()));
       const randomIndex = Math.floor(Math.random() * quizzesData.length);
       setCurrentQuiz(quizzesData[randomIndex]);
     }
@@ -60,7 +63,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
   const handleSelectPortion = async (portion: number) => {
     const finalAnswer =
       currentQuiz.type === 'yesno' ? (yesNoAnswer || '') : textAnswer.trim();
-    await logMeal(portion, finalAnswer);
+    await logMeal(portion, finalAnswer, mealType);
     Alert.alert('감각 나누기', '알아차린 걸 나눠 줘서 고마워! 푸디몬이 냠냠 먹었어.');
     onClose();
   };
@@ -68,14 +71,14 @@ export function MealModal({ visible, onClose }: MealModalProps) {
   const handleSkip = () => {
     Alert.alert(
       '이번 끼니',
-      '못 먹은 것도 소중한 기록이야. 이번 끼니는 못 먹은 걸로 남겨 둘까?',
+      `못 먹은 것도 소중한 기록이야. ${mealType}은 못 먹은 걸로 남겨 둘까?`,
       [
         { text: '취소', style: 'cancel' },
         {
           text: '남기기',
           style: 'destructive',
           onPress: async () => {
-            await skipMeal();
+            await skipMeal(mealType);
             onClose();
           },
         },
@@ -98,6 +101,19 @@ export function MealModal({ visible, onClose }: MealModalProps) {
           {step === 1 ? (
             /* Step 1: Mindful Eating Quiz */
             <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={styles.mealTypeRow} accessibilityRole="radiogroup">
+                {MEAL_TYPES.map((t) => (
+                  <TouchableOpacity
+                    key={t}
+                    style={[styles.mealTypeChip, mealType === t && styles.mealTypeChipActive]}
+                    onPress={() => setMealType(t)}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: mealType === t }}>
+                    <Text style={[styles.mealTypeText, mealType === t && styles.mealTypeTextActive]}>{t}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
               <Text style={styles.subtitle}>
                 음식을 마주하고 내 몸의 감각에 귀 기울여 보세요 ✨
               </Text>
@@ -144,7 +160,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.skipBtn} onPress={handleSkip}>
-                <Text style={styles.skipBtnText}>이번 끼니는 못 먹었어</Text>
+                <Text style={styles.skipBtnText}>{mealType}은 못 먹었어</Text>
               </TouchableOpacity>
             </ScrollView>
           ) : (
@@ -217,6 +233,32 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#A0AEC0',
     fontWeight: '800',
+  },
+  mealTypeRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 14,
+  },
+  mealTypeChip: {
+    flex: 1,
+    paddingVertical: 9,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    backgroundColor: '#F8FAFC',
+    alignItems: 'center',
+  },
+  mealTypeChipActive: {
+    borderColor: '#1B7F66',
+    backgroundColor: '#E3F6EF',
+  },
+  mealTypeText: {
+    fontSize: 14,
+    color: '#475569',
+    fontWeight: '800',
+  },
+  mealTypeTextActive: {
+    color: '#17765D',
   },
   subtitle: {
     fontSize: 14,

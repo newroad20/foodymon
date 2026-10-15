@@ -6,6 +6,7 @@ import { BACKFILL_COST, GIFT_BOX_COST, costumesData, backgroundsData, dialoguesD
 import { closeDay, toDateKey, RolloverResult } from '@/lib/dayRollover';
 import { calcDailyScore } from '@/lib/score';
 import { pickDialogue } from '@/lib/dialogue';
+import type { MealType } from '@/lib/mealType';
 import { formatLogTime } from '@/lib/serverState';
 import * as gameApi from '@/lib/gameApi';
 
@@ -60,8 +61,8 @@ interface FoodyMonContextType {
   currentDialogue: string;
   triggerPetInteraction: () => string;
   completeOnboarding: (name: string, sleep: number, meals: number, mealSize: number) => Promise<void>;
-  logMeal: (size: number, answerText: string) => Promise<void>;
-  skipMeal: () => Promise<void>;
+  logMeal: (size: number, answerText: string, mealType: MealType) => Promise<void>;
+  skipMeal: (mealType: MealType) => Promise<void>;
   logSleep: (hours: number) => Promise<void>;
   logEmotion: (score: number) => Promise<void>;
   backfillYesterday: (day: {
@@ -270,7 +271,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     await syncFromServer();
   };
 
-  const logMeal = (size: number, answerText: string) => {
+  const logMeal = (size: number, answerText: string, mealType: MealType) => {
     const isBad = size <= 0.33 || size >= 2.0;
     const sizeDesc = size === 1.0 ? '정량' : `${Math.round(size * 100)}%`;
     return recordCheckin(
@@ -279,14 +280,14 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         mealCount: s.today.mealCount + 1,
         badMealCount: isBad ? s.today.badMealCount + 1 : s.today.badMealCount,
       }),
-      { type: 'meal', content: `식사 기록 (${sizeDesc}): "${answerText}"` }
+      { type: 'meal', content: `${mealType} 기록 (${sizeDesc}): "${answerText}"` }
     );
   };
 
-  const skipMeal = () =>
+  const skipMeal = (mealType: MealType) =>
     recordCheckin((s) => ({ ...s.today, badMealCount: s.today.badMealCount + 1 }), {
       type: 'skip',
-      content: '이번 끼니는 못 먹었어',
+      content: `${mealType}은 건너뛰었어`,
     });
 
   const logSleep = (hours: number) => {

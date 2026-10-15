@@ -17,6 +17,7 @@ import {
   sleepTargetOptions,
   tutorialPages,
 } from '@/constants/foodymonData';
+import { enableReminders } from '@/lib/reminders';
 
 // Step order: prologue story → name → sleep → meals → usual portion → tutorial pages.
 const NAME = prologuePages.length;
@@ -46,6 +47,8 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
     }
     if (step === LAST) {
       completeOnboarding(name.trim(), targetSleep, targetMeals, mealSize);
+      // Ask for notification permission once the story is over; it can be turned off on My Page.
+      enableReminders().catch(() => {});
       return;
     }
     setStep(step + 1);

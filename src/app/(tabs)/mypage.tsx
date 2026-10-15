@@ -18,12 +18,35 @@ import { router } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { useAuth } from '@/context/AuthContext';
 import { useMusic } from '@/context/MusicContext';
+import {
+  disableReminders,
+  enableReminders,
+  remindersEnabled,
+  remindersSupported,
+} from '@/lib/reminders';
 import { levelsData, mealTargetOptions, sleepTargetOptions } from '@/constants/foodymonData';
 
 export default function MyPageScreen() {
   const { state, updateSettings } = useFoodyMon();
   const { user, signOut } = useAuth();
   const { musicOn, setMusicOn } = useMusic();
+  const [remindersOn, setRemindersOn] = useState(false);
+
+  useEffect(() => {
+    remindersEnabled().then(setRemindersOn).catch(() => {});
+  }, []);
+
+  const toggleReminders = async (on: boolean) => {
+    setRemindersOn(on);
+    try {
+      if (!on) return await disableReminders();
+      if (await enableReminders()) return;
+      setRemindersOn(false);
+      Alert.alert('알림이 꺼져 있어요', '휴대폰 설정 → 푸디몬(또는 Expo Go) → 알림을 허용해 주세요.');
+    } catch {
+      setRemindersOn(!on);
+    }
+  };
 
   const [nickname, setNickname] = useState(state.masterName);
   const [targetSleep, setTargetSleep] = useState(state.targetSleep);
@@ -175,6 +198,26 @@ export default function MyPageScreen() {
             accessibilityLabel="배경음악"
           />
         </View>
+
+        {remindersSupported && (
+          <View style={[styles.card, styles.linkCard]}>
+            <Ionicons
+              name={remindersOn ? 'notifications' : 'notifications-off'}
+              size={26}
+              color="#1B7F66"
+            />
+            <View style={styles.linkText}>
+              <Text style={styles.sectionTitleInline}>알림</Text>
+              <Text style={styles.linkSub}>아침 9시 · 저녁 8시에 푸디몬이 불러요</Text>
+            </View>
+            <Switch
+              value={remindersOn}
+              onValueChange={toggleReminders}
+              trackColor={{ true: '#1B7F66' }}
+              accessibilityLabel="알림"
+            />
+          </View>
+        )}
 
         {/* Account */}
         <View style={styles.card}>

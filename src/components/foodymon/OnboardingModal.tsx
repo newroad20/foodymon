@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Image,
   Alert,
 } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
@@ -18,14 +17,17 @@ import {
   tutorialPages,
 } from '@/constants/foodymonData';
 import { enableReminders } from '@/lib/reminders';
+import { HATCH_TAPS, HatchEgg } from './HatchEgg';
 
-// Step order: prologue story → name → sleep → meals → usual portion → tutorial pages.
+// Step order: prologue story → name → sleep → meals → usual portion → tutorial pages → egg hatch.
+// FoodyMon speaks from inside the egg until it hatches at the end.
 const NAME = prologuePages.length;
 const SLEEP = NAME + 1;
 const MEALS = NAME + 2;
 const SIZE = NAME + 3;
 const TUTORIAL = NAME + 4;
 const LAST = TUTORIAL + tutorialPages.length - 1;
+const HATCH = LAST + 1;
 
 interface OnboardingModalProps {
   visible: boolean;
@@ -39,20 +41,24 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
   const [targetSleep, setTargetSleep] = useState(7);
   const [targetMeals, setTargetMeals] = useState(3);
   const [mealSize, setMealSize] = useState(1.0);
+  const [taps, setTaps] = useState(0);
+  const hatched = taps >= HATCH_TAPS;
 
   const handleNext = () => {
     if (step === NAME && name.trim().length === 0) {
       Alert.alert('알림', '이름을 한 글자 이상 적어 주세요.');
       return;
     }
-    if (step === LAST) {
-      completeOnboarding(name.trim(), targetSleep, targetMeals, mealSize);
-      // Ask for notification permission once the story is over; it can be turned off on My Page.
-      enableReminders().catch(() => {});
-      return;
-    }
     setStep(step + 1);
   };
+
+  const finish = () => {
+    completeOnboarding(name.trim(), targetSleep, targetMeals, mealSize);
+    // Ask for notification permission once the story is over; it can be turned off on My Page.
+    enableReminders().catch(() => {});
+  };
+
+  const tapEgg = () => setTaps((t) => Math.min(t + 1, HATCH_TAPS));
 
   const handlePrev = () => {
     if (step > 0) setStep(step - 1);
@@ -63,18 +69,14 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
   return (
     <Modal visible={visible} animationType="fade" transparent={false}>
       <View style={styles.container}>
-        {/* Cute Mascot Header Image */}
+        {/* FoodyMon's egg; hatches at the end */}
         <View style={styles.petContainer}>
-          <Image
-            source={require('@/assets/images/level3.png')}
-            style={styles.petImage}
-            resizeMode="contain"
-          />
+          <HatchEgg taps={taps} hatched={hatched} onTap={step === HATCH ? tapEgg : undefined} />
         </View>
 
         {/* Story Card */}
         <View style={styles.card}>
-          {step > 0 && (
+          {step > 0 && !hatched && (
             <TouchableOpacity onPress={handlePrev} style={styles.backBtn}>
               <Text style={styles.backBtnText}>← 이전</Text>
             </TouchableOpacity>
@@ -218,7 +220,32 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               <Text style={styles.dialogueText}>{tutorialPages[step - TUTORIAL].line}</Text>
               <Dots count={tutorialPages.length} active={step - TUTORIAL} />
               <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>
-                <Text style={styles.primaryBtnText}>{step === LAST ? '숲 생활 시작하기' : '다음 →'}</Text>
+                <Text style={styles.primaryBtnText}>{step === LAST ? '알 깨우기' : '다음 →'}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {step === HATCH && !hatched && (
+            <View style={styles.stepContent}>
+              <Text style={styles.storyTitle}>알이 움직여!</Text>
+              <Text style={styles.dialogueText}>
+                "똑똑… 나 곧 나갈 것 같아!{'\n'}알을 톡톡 두드려서 깨워 줘."
+              </Text>
+              <Dots count={HATCH_TAPS} active={taps} />
+              <TouchableOpacity style={styles.primaryBtn} onPress={tapEgg}>
+                <Text style={styles.primaryBtnText}>톡! 두드리기</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {step === HATCH && hatched && (
+            <View style={styles.stepContent}>
+              <Text style={styles.storyTitle}>푸디몬이 태어났어요!</Text>
+              <Text style={styles.dialogueText}>
+                "반가워, {name.trim()}! 드디어 만났다.{'\n'}오늘부터 잘 부탁해."
+              </Text>
+              <TouchableOpacity style={styles.primaryBtn} onPress={finish}>
+                <Text style={styles.primaryBtnText}>숲 생활 시작하기</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -272,10 +299,6 @@ const styles = StyleSheet.create({
   petContainer: {
     marginBottom: 20,
     alignItems: 'center',
-  },
-  petImage: {
-    width: 180,
-    height: 180,
   },
   card: {
     width: '100%',

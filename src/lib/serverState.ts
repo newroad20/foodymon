@@ -43,6 +43,7 @@ export interface CloseDaysResponse {
   days_passed: number;
   missed_days: number;
   rewarded_jelly: number;
+  milestone_bonus: number;
   shield_earned: boolean;
   shields_used: number;
   streak_reset: boolean;
@@ -124,6 +125,7 @@ export function toRolloverResult(r: CloseDaysResponse): RolloverResult {
     daysPassed: r.days_passed,
     missedDays: r.missed_days,
     rewardedJelly: r.rewarded_jelly,
+    milestoneBonus: r.milestone_bonus ?? 0,
     shieldEarned: r.shield_earned,
     shieldsUsed: r.shields_used,
     shieldUsed: r.shields_used > 0,

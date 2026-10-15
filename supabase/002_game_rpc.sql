@@ -77,6 +77,21 @@ end; $$;
 -- p_today: 앱 기준 오늘(로컬 날짜). 시간대 차이를 고려해 서버 UTC 날짜 ±1일만 허용.
 -- 마지막 활동일(last_checkin_date)은 기록 여부로 판정하고,
 -- 그 사이 통째로 건너뛴 날은 기록 없는 날로 처리(방패 -> 없으면 스트릭 초기화).
+-- 연속 기록 구간 보너스 (S33): 3·7·14일, 이후 30일마다. src/lib/dayRollover.ts 의 streakMilestoneBonus 와 같아야 함.
+create or replace function public.streak_milestone_bonus(p_streak integer)
+returns integer
+language sql
+immutable
+as $$
+  select case
+    when p_streak = 3  then 20
+    when p_streak = 7  then 50
+    when p_streak = 14 then 100
+    when p_streak >= 30 and p_streak % 30 = 0 then 200
+    else 0
+  end;
+$$;
+
 create or replace function public.close_days(p_today date)
 returns jsonb
 language plpgsql
@@ -91,6 +106,7 @@ declare
   logged         boolean;
   day_score      smallint;
   rewarded_jelly integer := 0;
+  milestone_bonus integer := 0;
   shield_earned  boolean := false;
   shields_used   integer := 0;
   streak_reset   boolean := false;
@@ -139,7 +155,8 @@ begin
 
       if logged then
         p.streak := p.streak + 1;
-        rewarded_jelly := 10 + (p.streak / 3) * 5;
+        milestone_bonus := public.streak_milestone_bonus(p.streak);
+        rewarded_jelly := 10 + (p.streak / 3) * 5 + milestone_bonus;
         p.jelly_balance := p.jelly_balance + rewarded_jelly;
         if p.streak % 7 = 0 then
           p.shields := p.shields + 1;
@@ -195,6 +212,7 @@ begin
     'days_passed',    greatest(days_passed, 0),
     'missed_days',    greatest(days_passed - 1, 0),
     'rewarded_jelly', rewarded_jelly,
+    'milestone_bonus', milestone_bonus,
     'shield_earned',  shield_earned,
     'shields_used',   shields_used,
     'streak_reset',   streak_reset,

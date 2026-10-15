@@ -18,6 +18,7 @@ import {
 } from '@/constants/foodymonData';
 import { enableReminders } from '@/lib/reminders';
 import { HATCH_TAPS, HatchEgg } from './HatchEgg';
+import { bumpFeel } from '@/lib/haptics';
 
 // Step order: prologue story → name → sleep → meals → usual portion → tutorial pages → egg hatch.
 // FoodyMon speaks from inside the egg until it hatches at the end.
@@ -58,7 +59,10 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
     enableReminders().catch(() => {});
   };
 
-  const tapEgg = () => setTaps((t) => Math.min(t + 1, HATCH_TAPS));
+  const tapEgg = () => {
+    bumpFeel();
+    setTaps((t) => Math.min(t + 1, HATCH_TAPS));
+  };
 
   const handlePrev = () => {
     if (step > 0) setStep(step - 1);

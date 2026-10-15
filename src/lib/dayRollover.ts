@@ -2,7 +2,10 @@ import type { UserState } from '../types/foodymon';
 import { DAY_START_SCORE } from './score.ts';
 
 export interface DayCloseResult {
+  /** Includes milestoneBonus. */
   rewardedJelly: number;
+  /** Extra jelly for reaching a streak milestone (S33). */
+  milestoneBonus: number;
   shieldUsed: boolean;
   shieldEarned: boolean;
 }
@@ -25,6 +28,15 @@ export function toDateKey(d: Date): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+/** Bonus for reaching 3, 7 or 14 days in a row, then every 30 days; mirrors streak_milestone_bonus in SQL. */
+export function streakMilestoneBonus(streak: number): number {
+  if (streak === 3) return 20;
+  if (streak === 7) return 50;
+  if (streak === 14) return 100;
+  if (streak >= 30 && streak % 30 === 0) return 200;
+  return 0;
+}
+
 export function hasLoggedToday(state: UserState): boolean {
   return (
     state.today.sleepDiff !== null ||
@@ -43,6 +55,7 @@ export function closeDay(state: UserState): { state: UserState } & DayCloseResul
   let streak = state.streak;
   let shields = state.shields;
   let rewardedJelly = 0;
+  let milestoneBonus = 0;
   let shieldUsed = false;
   let shieldEarned = false;
 
@@ -55,7 +68,8 @@ export function closeDay(state: UserState): { state: UserState } & DayCloseResul
     }
   } else {
     streak += 1;
-    rewardedJelly = 10 + Math.floor(streak / 3) * 5;
+    milestoneBonus = streakMilestoneBonus(streak);
+    rewardedJelly = 10 + Math.floor(streak / 3) * 5 + milestoneBonus;
     if (streak % 7 === 0) {
       shields += 1;
       shieldEarned = true;
@@ -83,6 +97,7 @@ export function closeDay(state: UserState): { state: UserState } & DayCloseResul
       level: 3,
     },
     rewardedJelly,
+    milestoneBonus,
     shieldUsed,
     shieldEarned,
   };

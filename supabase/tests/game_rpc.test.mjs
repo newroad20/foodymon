@@ -47,11 +47,11 @@ assert.equal(r.days_passed, 0); assert.equal(r.last_checkin_date, today);
 // same day again: nothing
 r = await close(); assert.equal(r.days_passed, 0); assert.equal(r.streak, 0);
 
-// logged yesterday -> streak 3, reward 15
+// logged yesterday -> streak 3, reward 15 + 20 milestone bonus
 await setProfile(`streak=2, last_checkin_date='${today}'::date-1`);
 await q(`insert into public.daily_logs(user_id,log_date,meal_count,daily_score) values ($1,'${today}'::date-1,1,77)`, [U]);
 r = await close();
-assert.deepEqual([r.days_passed, r.streak, r.rewarded_jelly, r.jelly_balance], [1, 3, 15, 65]);
+assert.deepEqual([r.days_passed, r.streak, r.rewarded_jelly, r.milestone_bonus, r.jelly_balance], [1, 3, 35, 20, 85]);
 assert.deepEqual(r.history_scores, [50,50,50,77]);
 
 // logged 3 days ago, skipped 2 days, 1 shield -> shield used, then reset
@@ -67,6 +67,8 @@ await q(`delete from public.daily_logs`);
 await setProfile(`streak=6, shields=0, last_checkin_date='${today}'::date-1`);
 await q(`insert into public.daily_logs(user_id,log_date,sleep_hours) values ($1,'${today}'::date-1,7)`, [U]);
 r = await close(); assert.equal(r.streak, 7); assert.equal(r.shield_earned, true); assert.equal(r.shields, 1);
+assert.equal(r.milestone_bonus, 50);
+assert.deepEqual((await q(`select array_agg(s order by s) a from generate_series(1, 90) s where public.streak_milestone_bonus(s) > 0`))[0].a, [3, 7, 14, 30, 60, 90]);
 
 // date out of range rejected
 await assert.rejects(rpc(`select public.close_days($1::date + 5) r`, [today]), /invalid date/);

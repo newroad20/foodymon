@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { UserState } from '../types/foodymon';
-import { closeDay, toDateKey } from './dayRollover.ts';
+import { closeDay, streakMilestoneBonus, toDateKey } from './dayRollover.ts';
 
 function makeState(overrides: Partial<UserState> = {}): UserState {
   return {
@@ -41,11 +41,18 @@ test('toDateKey uses local calendar date', () => {
 test('closeDay rewards a logged day and grants a shield every 7 days', () => {
   const r = closeDay(makeState({ streak: 6, today: logged }));
   assert.equal(r.state.streak, 7);
-  assert.equal(r.rewardedJelly, 10 + Math.floor(7 / 3) * 5);
+  assert.equal(r.milestoneBonus, 50);
+  assert.equal(r.rewardedJelly, 10 + Math.floor(7 / 3) * 5 + 50);
   assert.equal(r.state.currency, 50 + r.rewardedJelly);
   assert.equal(r.shieldEarned, true);
   assert.equal(r.state.shields, 2);
   assert.equal(r.state.today.mealCount, 0);
+});
+
+test('streakMilestoneBonus pays at 3, 7, 14 and every 30 days', () => {
+  const paid = Array.from({ length: 91 }, (_, i) => i).filter((s) => streakMilestoneBonus(s) > 0);
+  assert.deepEqual(paid, [3, 7, 14, 30, 60, 90]);
+  assert.equal(closeDay(makeState({ streak: 3, today: logged })).milestoneBonus, 0);
 });
 
 test('closeDay spends a shield on an empty day, then resets the streak', () => {

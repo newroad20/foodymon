@@ -2,7 +2,9 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { Alert } from 'react-native';
 import * as Linking from 'expo-linking';
 import { Session, User } from '@supabase/supabase-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
+import { disableReminders } from '@/lib/reminders';
 import { describeAuthLinkError, parseAuthLink } from '@/lib/authLink';
 
 // Where the sign-up confirmation email sends the user back: this app's root
@@ -37,6 +39,8 @@ interface AuthContextType {
   ) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
+  /** Permanently deletes the account and all its records, then signs out. */
+  deleteAccount: () => Promise<{ error: string | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -96,8 +100,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const deleteAccount = async () => {
+    const uid = session?.user.id;
+    const { error } = await supabase.rpc('delete_my_account');
+    if (error) return { error: error.message };
+    // Remove this account's cached game state and reminders from the device too.
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      await AsyncStorage.multiRemove(keys.filter((k) => uid && k.endsWith(uid)));
+    } catch {}
+    await disableReminders().catch(() => {});
+    // The user no longer exists on the server, so only clear the local session.
+    await supabase.auth.signOut({ scope: 'local' });
+    return { error: null };
+  };
+
   return (
-    <AuthContext.Provider value={{ session, user, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ session, user, loading, signUp, signIn, signOut, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );

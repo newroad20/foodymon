@@ -28,7 +28,7 @@ import { levelsData, mealTargetOptions, sleepTargetOptions } from '@/constants/f
 
 export default function MyPageScreen() {
   const { state, updateSettings } = useFoodyMon();
-  const { user, signOut } = useAuth();
+  const { user, signOut, deleteAccount } = useAuth();
   const { musicOn, setMusicOn } = useMusic();
   const [remindersOn, setRemindersOn] = useState(false);
 
@@ -92,6 +92,24 @@ export default function MyPageScreen() {
       { text: '취소', style: 'cancel' },
       { text: '로그아웃', style: 'destructive', onPress: () => signOut() },
     ]);
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      '회원 탈퇴',
+      '탈퇴하면 푸디몬, 모든 기록, 젤리와 아이템이 영구히 지워지고 되돌릴 수 없어요. 정말 탈퇴할까요?',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '탈퇴하기',
+          style: 'destructive',
+          onPress: async () => {
+            const { error } = await deleteAccount();
+            if (error) Alert.alert('탈퇴하지 못했어요', '네트워크를 확인하고 다시 시도해 주세요.');
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -224,6 +242,9 @@ export default function MyPageScreen() {
           <Text style={styles.sectionTitle}>계정</Text>
           <TouchableOpacity style={styles.rowBtn} activeOpacity={0.7} onPress={handleSignOut}>
             <Text style={styles.signOutText}>로그아웃</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.rowBtn} activeOpacity={0.7} onPress={handleDeleteAccount}>
+            <Text style={styles.deleteText}>회원 탈퇴</Text>
           </TouchableOpacity>
         </View>
 
@@ -421,6 +442,11 @@ const styles = StyleSheet.create({
   },
   rowBtn: {
     paddingVertical: 12,
+  },
+  deleteText: {
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '700',
   },
   signOutText: {
     fontSize: 15,

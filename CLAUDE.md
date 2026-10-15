@@ -45,6 +45,11 @@ tabs (홈 / 요약 / 마이), My Page, daily summary + trend chart, collection (
 S25 backfill (20 jelly, yesterday only; `BACKFILL_COST` must match `backfill_yesterday`),
 S70 daily quests (Duolingo-style, 3 a day, 5/10/15 jelly; `get_daily_quests` / `claim_quest`),
 Roblox-style dressroom (`src/app/dressroom.tsx`), app icon/splash, EAS Android preview builds.
+Also: background music (`MusicContext`, toggle on My Page), situational pet dialogue
+(`lib/dialogue.ts`), daily local reminders 9:00/20:00 (`lib/reminders.ts`), egg hatch at the end of
+onboarding (`HatchEgg`), streak milestone jelly 3/7/14/every 30 days (`streak_milestone_bonus`, mirrored
+in `dayRollover.ts`), gift box gacha (`open_gift_box`, `GIFT_BOX_COST` = 30, unowned items only),
+meal type 아침/점심/저녁/간식 (stored in the check-in log text only).
 
 Product direction (keep consistent):
 - World: "감각의 숲". FoodyMon grows on what the user notices (food colour/texture/gratitude,

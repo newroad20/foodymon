@@ -54,6 +54,16 @@ function AppContent() {
             }}
           />
           <Stack.Screen
+            name="album"
+            options={{
+              headerShown: true,
+              title: '식사 앨범',
+              headerBackTitle: '마이',
+              headerStyle: { backgroundColor: '#FDF5F5' },
+              headerShadowVisible: false,
+            }}
+          />
+          <Stack.Screen
             name="dressroom"
             options={{
               headerShown: true,

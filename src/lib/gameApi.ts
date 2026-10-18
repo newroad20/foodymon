@@ -189,6 +189,33 @@ export async function mealPhotoUrls(paths: string[]): Promise<Record<string, str
   );
 }
 
+export interface MealPhoto {
+  id: string;
+  content: string;
+  createdAt: string;
+  url: string;
+}
+
+/** Every meal photo of the user, newest first, with short-lived links. */
+export async function fetchMealPhotos(userId: string): Promise<MealPhoto[]> {
+  // shortcut: newest 300 photos; page with .range() once someone has more.
+  const res = await supabase
+    .from('checkin_logs')
+    .select('id, content, created_at, photo_path')
+    .eq('user_id', userId)
+    .not('photo_path', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(300);
+  if (res.error) throw res.error;
+  const rows = res.data ?? [];
+  const urls = await mealPhotoUrls(rows.map((r) => r.photo_path as string));
+  return rows.flatMap((r) =>
+    urls[r.photo_path as string]
+      ? [{ id: r.id, content: r.content, createdAt: r.created_at, url: urls[r.photo_path as string] }]
+      : []
+  );
+}
+
 /** Deletes every meal photo of the user (account deletion; storage doesn't cascade). */
 export async function deleteAllMealPhotos(userId: string): Promise<void> {
   // shortcut: one page of 1000 files; loop with offset if a user can ever have more.

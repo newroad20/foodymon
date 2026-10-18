@@ -5,6 +5,7 @@ import { Session, User } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
 import { disableReminders } from '@/lib/reminders';
+import { deleteAllMealPhotos } from '@/lib/gameApi';
 import { describeAuthLinkError, parseAuthLink } from '@/lib/authLink';
 
 // Where the sign-up confirmation email sends the user back: this app's root
@@ -102,12 +103,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const deleteAccount = async () => {
     const uid = session?.user.id;
+    if (!uid) return { error: 'not signed in' };
+    // Photos live in Storage, which the account delete doesn't cascade to; stop if they can't go.
+    try {
+      await deleteAllMealPhotos(uid);
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'photo delete failed' };
+    }
     const { error } = await supabase.rpc('delete_my_account');
     if (error) return { error: error.message };
     // Remove this account's cached game state and reminders from the device too.
     try {
       const keys = await AsyncStorage.getAllKeys();
-      await AsyncStorage.multiRemove(keys.filter((k) => uid && k.endsWith(uid)));
+      await AsyncStorage.multiRemove(keys.filter((k) => k.endsWith(uid)));
     } catch {}
     await disableReminders().catch(() => {});
     // The user no longer exists on the server, so only clear the local session.

@@ -64,7 +64,7 @@ export async function fetchGameState(
       : Promise.resolve({ data: null, error: null }),
     supabase
       .from('checkin_logs')
-      .select('id, type, content, created_at')
+      .select('id, type, content, created_at, photo_path')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(RECENT_LOG_LIMIT),
@@ -102,7 +102,7 @@ export async function saveDailyLog(userId: string, state: UserState): Promise<vo
 export async function saveCheckin(
   userId: string,
   state: UserState,
-  log: Pick<LogItem, 'type' | 'content'>
+  log: Pick<LogItem, 'type' | 'content' | 'photoPath'>
 ): Promise<void> {
   await saveDailyLog(userId, state);
   await addHistoryLog(userId, state.lastActiveDate!, log);
@@ -143,11 +143,15 @@ export async function saveSettings(
 export async function addHistoryLog(
   userId: string,
   logDate: string,
-  log: Pick<LogItem, 'type' | 'content'>
+  log: Pick<LogItem, 'type' | 'content' | 'photoPath'>
 ): Promise<void> {
-  const res = await supabase
-    .from('checkin_logs')
-    .insert({ user_id: userId, log_date: logDate, type: log.type, content: log.content });
+  const res = await supabase.from('checkin_logs').insert({
+    user_id: userId,
+    log_date: logDate,
+    type: log.type,
+    content: log.content,
+    photo_path: log.photoPath ?? null,
+  });
   if (res.error) throw res.error;
 }
 
@@ -159,6 +163,39 @@ export async function saveEquipped(
     .from('profiles')
     .update({ equipped_costume: equipped.costume, equipped_backgrounds: equipped.backgrounds })
     .eq('id', userId);
+  if (res.error) throw res.error;
+}
+
+const MEAL_PHOTOS = 'meal-photos';
+
+/** Uploads a picked/taken meal photo into the user's own folder; returns its storage path. */
+export async function uploadMealPhoto(userId: string, uri: string): Promise<string> {
+  const body = await (await fetch(uri)).arrayBuffer();
+  const path = `${userId}/${Date.now()}.jpg`;
+  const { error } = await supabase.storage
+    .from(MEAL_PHOTOS)
+    .upload(path, body, { contentType: 'image/jpeg' });
+  if (error) throw error;
+  return path;
+}
+
+/** Short-lived URLs for private meal photos, keyed by path. */
+export async function mealPhotoUrls(paths: string[]): Promise<Record<string, string>> {
+  if (paths.length === 0) return {};
+  const { data, error } = await supabase.storage.from(MEAL_PHOTOS).createSignedUrls(paths, 3600);
+  if (error) throw error;
+  return Object.fromEntries(
+    (data ?? []).flatMap((d) => (d.path && d.signedUrl ? [[d.path, d.signedUrl]] : []))
+  );
+}
+
+/** Deletes every meal photo of the user (account deletion; storage doesn't cascade). */
+export async function deleteAllMealPhotos(userId: string): Promise<void> {
+  // shortcut: one page of 1000 files; loop with offset if a user can ever have more.
+  const { data, error } = await supabase.storage.from(MEAL_PHOTOS).list(userId, { limit: 1000 });
+  if (error) throw error;
+  if (!data?.length) return;
+  const res = await supabase.storage.from(MEAL_PHOTOS).remove(data.map((f) => `${userId}/${f.name}`));
   if (res.error) throw res.error;
 }
 

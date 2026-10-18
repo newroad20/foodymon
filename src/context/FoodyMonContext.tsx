@@ -62,7 +62,13 @@ interface FoodyMonContextType {
   currentDialogue: string;
   triggerPetInteraction: () => string;
   completeOnboarding: (name: string, sleep: number, meals: number, mealSize: number) => Promise<void>;
-  logMeal: (size: number, answerText: string, mealType: MealType) => Promise<void>;
+  /** photoUri: a picked/taken photo; photoFailed is true when the meal was saved without it. */
+  logMeal: (
+    size: number,
+    answerText: string,
+    mealType: MealType,
+    photoUri?: string | null
+  ) => Promise<{ photoFailed: boolean }>;
   skipMeal: (mealType: MealType) => Promise<void>;
   logSleep: (hours: number) => Promise<void>;
   logEmotion: (score: number) => Promise<void>;
@@ -207,24 +213,23 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     return () => clearInterval(interval);
   }, [loading]);
 
-  const newLog = (type: LogItem['type'], content: string): LogItem => ({
+  const newLog = (log: Pick<LogItem, 'type' | 'content' | 'photoPath'>): LogItem => ({
     id: String(Date.now()),
     time: formatLogTime(new Date()),
-    type,
-    content,
+    ...log,
   });
 
   /** Applies a check-in locally right away, then saves it to the server. */
   const recordCheckin = async (
     update: (s: UserState) => UserState['today'],
-    log: Pick<LogItem, 'type' | 'content'>
+    log: Pick<LogItem, 'type' | 'content' | 'photoPath'>
   ) => {
     await ensureCurrentDay();
     const current = stateRef.current;
     const next = withScore({
       ...current,
       today: update(current),
-      logs: [newLog(log.type, log.content), ...current.logs],
+      logs: [newLog(log), ...current.logs],
     });
     applyState(next);
     successFeel();
@@ -255,7 +260,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         usualMealSize: mealSize,
         onboarded: true,
         lastActiveDate: toDateKey(new Date()),
-        logs: [newLog(firstLog.type, firstLog.content)],
+        logs: [newLog(firstLog)],
       })
     );
     try {
@@ -274,17 +279,34 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     await syncFromServer();
   };
 
-  const logMeal = (size: number, answerText: string, mealType: MealType) => {
+  const logMeal = async (
+    size: number,
+    answerText: string,
+    mealType: MealType,
+    photoUri?: string | null
+  ) => {
     const isBad = size <= 0.33 || size >= 2.0;
     const sizeDesc = size === 1.0 ? '정량' : `${Math.round(size * 100)}%`;
-    return recordCheckin(
+    // A failed photo upload must not lose the meal itself.
+    let photoPath: string | null = null;
+    let photoFailed = false;
+    if (photoUri) {
+      try {
+        photoPath = await gameApi.uploadMealPhoto(userId, photoUri);
+      } catch (e) {
+        console.error('Failed to upload meal photo:', e);
+        photoFailed = true;
+      }
+    }
+    await recordCheckin(
       (s) => ({
         ...s.today,
         mealCount: s.today.mealCount + 1,
         badMealCount: isBad ? s.today.badMealCount + 1 : s.today.badMealCount,
       }),
-      { type: 'meal', content: `${mealType} 기록 (${sizeDesc}): "${answerText}"` }
+      { type: 'meal', content: `${mealType} 기록 (${sizeDesc}): "${answerText}"`, photoPath }
     );
+    return { photoFailed };
   };
 
   const skipMeal = (mealType: MealType) =>

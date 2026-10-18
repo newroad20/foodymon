@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   View,
@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useFoodyMon } from '@/context/FoodyMonContext';
+import { mealPhotoUrls } from '@/lib/gameApi';
 
 interface HistoryModalProps {
   visible: boolean;
@@ -16,6 +18,14 @@ interface HistoryModalProps {
 
 export function HistoryModal({ visible, onClose }: HistoryModalProps) {
   const { state } = useFoodyMon();
+  const [photoUrls, setPhotoUrls] = useState<Record<string, string>>({});
+
+  // Meal photos are private; fetch short-lived links when the diary opens.
+  useEffect(() => {
+    if (!visible) return;
+    const paths = state.logs.flatMap((l) => (l.photoPath ? [l.photoPath] : []));
+    mealPhotoUrls(paths).then(setPhotoUrls).catch(() => {});
+  }, [visible, state.logs]);
 
   const getTagColor = (type: string) => {
     switch (type) {
@@ -69,6 +79,14 @@ export function HistoryModal({ visible, onClose }: HistoryModalProps) {
                       <Text style={styles.logTime}>{log.time}</Text>
                     </View>
                     <Text style={styles.logContent}>{log.content}</Text>
+                    {log.photoPath && photoUrls[log.photoPath] ? (
+                      <Image
+                        source={{ uri: photoUrls[log.photoPath] }}
+                        style={styles.logPhoto}
+                        contentFit="cover"
+                        accessibilityLabel="식사 사진"
+                      />
+                    ) : null}
                   </View>
                 );
               })
@@ -165,5 +183,11 @@ const styles = StyleSheet.create({
     color: '#1E293B',
     lineHeight: 20,
     fontWeight: '700',
+  },
+  logPhoto: {
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: 14,
+    marginTop: 10,
   },
 });

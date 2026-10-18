@@ -32,6 +32,7 @@ export interface CheckinLogRow {
   type: LogItem['type'];
   content: string;
   created_at: string;
+  photo_path?: string | null;
 }
 
 export interface UserItemRow {
@@ -107,6 +108,7 @@ export function buildUserState(
       time: formatLogTime(new Date(l.created_at)),
       type: l.type,
       content: l.content,
+      photoPath: l.photo_path ?? null,
     })),
     lastActiveDate: profile.last_checkin_date,
     backfill: profile.missed_date

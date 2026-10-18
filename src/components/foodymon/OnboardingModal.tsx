@@ -215,7 +215,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
             </View>
           )}
 
-          {step >= TUTORIAL && (
+          {step >= TUTORIAL && step <= LAST && (
             <View style={styles.stepContent}>
               <View style={[styles.tutorialIcon, { backgroundColor: tutorialPages[step - TUTORIAL].color }]}>
                 <Ionicons name={tutorialPages[step - TUTORIAL].icon} size={34} color="#FFFFFF" />

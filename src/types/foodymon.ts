@@ -24,6 +24,8 @@ export interface LogItem {
   time: string;
   type: 'meal' | 'sleep' | 'emotion' | 'skip';
   content: string;
+  /** Storage path of a meal photo (private bucket meal-photos). */
+  photoPath?: string | null;
 }
 
 export interface LevelInfo {

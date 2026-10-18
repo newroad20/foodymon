@@ -202,6 +202,19 @@ export default function MyPageScreen() {
           <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
         </TouchableOpacity>
 
+        {/* Meal photo album */}
+        <TouchableOpacity
+          style={[styles.card, styles.linkCard]}
+          activeOpacity={0.8}
+          onPress={() => router.push('/album')}>
+          <Ionicons name="images" size={26} color="#1B7F66" />
+          <View style={styles.linkText}>
+            <Text style={styles.sectionTitleInline}>식사 앨범</Text>
+            <Text style={styles.linkSub}>사진으로 남긴 식사를 모아 봐요</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
+        </TouchableOpacity>
+
         {/* Sound */}
         <View style={[styles.card, styles.linkCard]}>
           <Ionicons name={musicOn ? 'musical-notes' : 'volume-mute'} size={26} color="#1B7F66" />

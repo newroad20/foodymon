@@ -8,7 +8,11 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { quizzesData } from '@/constants/foodymonData';
 import { MEAL_TYPES, MealType, mealTypeForHour } from '@/lib/mealType';
@@ -25,6 +29,8 @@ export function MealModal({ visible, onClose }: MealModalProps) {
   const [textAnswer, setTextAnswer] = useState('');
   const [yesNoAnswer, setYesNoAnswer] = useState<string | null>(null);
   const [mealType, setMealType] = useState<MealType>(() => mealTypeForHour(new Date().getHours()));
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   // Pick new random quiz when opening
   React.useEffect(() => {
@@ -33,6 +39,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
       setTextAnswer('');
       setYesNoAnswer(null);
       setMealType(mealTypeForHour(new Date().getHours()));
+      setPhotoUri(null);
       const randomIndex = Math.floor(Math.random() * quizzesData.length);
       setCurrentQuiz(quizzesData[randomIndex]);
     }
@@ -60,11 +67,40 @@ export function MealModal({ visible, onClose }: MealModalProps) {
     setStep(2);
   };
 
+  const pickPhoto = async (fromCamera: boolean) => {
+    try {
+      if (fromCamera && !(await ImagePicker.requestCameraPermissionsAsync()).granted) {
+        Alert.alert('카메라를 쓸 수 없어요', '휴대폰 설정에서 카메라 접근을 허용해 주세요.');
+        return;
+      }
+      const options: ImagePicker.ImagePickerOptions = {
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+      };
+      const res = fromCamera
+        ? await ImagePicker.launchCameraAsync(options)
+        : await ImagePicker.launchImageLibraryAsync(options);
+      if (!res.canceled) setPhotoUri(res.assets[0].uri);
+    } catch {
+      Alert.alert('사진을 가져오지 못했어요', '잠시 후 다시 시도해 주세요.');
+    }
+  };
+
   const handleSelectPortion = async (portion: number) => {
+    if (saving) return;
     const finalAnswer =
       currentQuiz.type === 'yesno' ? (yesNoAnswer || '') : textAnswer.trim();
-    await logMeal(portion, finalAnswer, mealType);
-    Alert.alert('감각 나누기', '알아차린 걸 나눠 줘서 고마워! 푸디몬이 냠냠 먹었어.');
+    setSaving(true);
+    const { photoFailed } = await logMeal(portion, finalAnswer, mealType, photoUri);
+    setSaving(false);
+    Alert.alert(
+      '감각 나누기',
+      photoFailed
+        ? '기록은 남겼는데 사진은 올리지 못했어. 인터넷을 확인해 줘!'
+        : '알아차린 걸 나눠 줘서 고마워! 푸디몬이 냠냠 먹었어.'
+    );
     onClose();
   };
 
@@ -155,6 +191,30 @@ export function MealModal({ visible, onClose }: MealModalProps) {
                 />
               )}
 
+              {/* Optional meal photo */}
+              {photoUri ? (
+                <View style={styles.photoPreview}>
+                  <Image source={{ uri: photoUri }} style={styles.photo} contentFit="cover" />
+                  <TouchableOpacity
+                    style={styles.photoRemove}
+                    onPress={() => setPhotoUri(null)}
+                    accessibilityLabel="사진 빼기">
+                    <Ionicons name="close" size={16} color="#FFFFFF" />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.photoRow}>
+                  <TouchableOpacity style={styles.photoBtn} onPress={() => pickPhoto(true)}>
+                    <Ionicons name="camera" size={18} color="#1B7F66" />
+                    <Text style={styles.photoBtnText}>지금 찍기</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.photoBtn} onPress={() => pickPhoto(false)}>
+                    <Ionicons name="images" size={18} color="#1B7F66" />
+                    <Text style={styles.photoBtnText}>갤러리</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
               <TouchableOpacity style={styles.primaryBtn} onPress={handleNextStep}>
                 <Text style={styles.primaryBtnText}>다음 (먹은 양) →</Text>
               </TouchableOpacity>
@@ -181,13 +241,16 @@ export function MealModal({ visible, onClose }: MealModalProps) {
                 ].map((item) => (
                   <TouchableOpacity
                     key={item.val}
-                    style={styles.portionCard}
+                    style={[styles.portionCard, saving && styles.portionCardBusy]}
+                    disabled={saving}
                     onPress={() => handleSelectPortion(item.val)}>
                     <Text style={styles.portionEmoji}>{item.emoji}</Text>
                     <Text style={styles.portionLabel}>{item.label}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
+
+              {saving && <ActivityIndicator color="#1B7F66" style={styles.saving} />}
 
               <TouchableOpacity
                 style={styles.secondaryBtn}
@@ -233,6 +296,55 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#A0AEC0',
     fontWeight: '800',
+  },
+  photoRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  photoBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 11,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: '#9FD8C5',
+    backgroundColor: '#F4FBF8',
+  },
+  photoBtnText: {
+    fontSize: 14,
+    color: '#17765D',
+    fontWeight: '800',
+  },
+  photoPreview: {
+    alignSelf: 'center',
+    marginBottom: 12,
+  },
+  photo: {
+    width: 140,
+    height: 140,
+    borderRadius: 16,
+  },
+  photoRemove: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  portionCardBusy: {
+    opacity: 0.5,
+  },
+  saving: {
+    marginBottom: 8,
   },
   mealTypeRow: {
     flexDirection: 'row',

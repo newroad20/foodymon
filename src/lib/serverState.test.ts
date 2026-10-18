@@ -33,7 +33,7 @@ test('buildUserState maps rows and converts numeric strings', () => {
     {
       profile,
       today: { sleep_hours: '6.5', sleep_diff: '0.5', meal_count: 2, bad_meal_count: 0, emotion: 80 },
-      logs: [{ id: 'a', type: 'meal', content: '식사', created_at: '2026-10-11T03:05:00Z' }],
+      logs: [{ id: 'a', type: 'meal', content: '식사', created_at: '2026-10-11T03:05:00Z', photo_path: 'u1/1.jpg' }],
       items: [
         { item_type: 'costume', item_id: 'crown' },
         { item_type: 'background', item_id: 'plant' },
@@ -50,6 +50,7 @@ test('buildUserState maps rows and converts numeric strings', () => {
   assert.deepEqual(s.ownedBackgrounds, ['plant']);
   assert.equal(s.lastActiveDate, '2026-10-11');
   assert.equal(s.logs[0].id, 'a');
+  assert.equal(s.logs[0].photoPath, 'u1/1.jpg');
   assert.equal(s.currentDailyScore, calcDailyScore(s, levels).score);
 });
 

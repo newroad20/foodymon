@@ -80,7 +80,8 @@ export function MealModal({ visible, onClose }: MealModalProps) {
         quality: 0.5,
       };
       const res = fromCamera
-        ? await ImagePicker.launchCameraAsync(options)
+        ? // On the web, back camera sets capture="environment", which phones open as the camera.
+          await ImagePicker.launchCameraAsync({ ...options, cameraType: ImagePicker.CameraType.back })
         : await ImagePicker.launchImageLibraryAsync(options);
       if (!res.canceled) setPhotoUri(res.assets[0].uri);
     } catch {

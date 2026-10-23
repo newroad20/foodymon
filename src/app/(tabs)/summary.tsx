@@ -6,7 +6,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData } from '@/constants/foodymonData';
-import { calcScoreParts } from '@/lib/score';
+import { sleepMinutes } from '@/lib/growth';
 import { toDateKey, hasLoggedToday } from '@/lib/dayRollover';
 import { addDays, buildTrend, summarizeTrend } from '@/lib/trend';
 import { fetchScoreHistory } from '@/lib/gameApi';
@@ -15,12 +15,11 @@ import { ScoreTrendChart } from '@/components/foodymon/ScoreTrendChart';
 const RANGES = [7, 14, 30] as const;
 type Range = (typeof RANGES)[number];
 
-function greeting(score: number, logged: boolean) {
-  if (!logged) return '아직 오늘 기록이 없어요. 하나만 체크인해 볼까요?';
-  if (score >= 80) return '오늘 정말 최고였어요! 푸디몬이 쌩쌩해요 ✨';
-  if (score >= 60) return '오늘도 수고했어요! 꾸준함이 멋져요 💪';
-  if (score >= 40) return '무난한 하루였어요. 내일은 조금만 더 챙겨봐요!';
-  return '조금 지친 하루였죠? 푹 쉬고 맛있는 거 먹어요 🍚';
+// Points measure how much was shared, never how "good" the day was.
+function greeting(logged: boolean) {
+  return logged
+    ? '오늘 나눠 준 기록이 푸디몬의 성장점으로 쌓였어요. 고마워요 🌱'
+    : '아직 오늘 기록이 없어요. 하나만 나눠 볼까요?';
 }
 
 export default function SummaryScreen() {
@@ -57,12 +56,14 @@ export default function SummaryScreen() {
 
   const points = buildTrend(rows, todayKey, range, logged ? state.currentDailyScore : null);
   const summary = summarizeTrend(points);
-  const parts = calcScoreParts(state);
   const levelInfo = levelsData.find((l) => l.level === state.level) ?? levelsData[2];
 
-  const sleepValue = state.today.sleepHours === null ? '미기록' : `${state.today.sleepHours}시간`;
-  const mealValue = state.today.mealCount === 0 ? '미기록' : `${state.today.mealCount}/${state.targetMeals}끼`;
-  const emotionValue = state.today.emotion === null ? '미기록' : `${state.today.emotion}점`;
+  const { records, todayPoints: pts } = state;
+  const sleepMin = records.sleep ? sleepMinutes(records.sleep) : null;
+  const sleepValue = sleepMin === null ? '미기록' : `${Math.floor(sleepMin / 60)}시간${sleepMin % 60 ? ` ${sleepMin % 60}분` : ''}`;
+  const mealValue = records.meals.length === 0 ? '미기록' : `${records.meals.length}칸`;
+  const mindValue = records.minds.length === 0 ? '미기록' : `${records.minds.length}번`;
+  const areas = [records.sleep, records.meals.length, records.minds.length].filter(Boolean).length;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -73,27 +74,22 @@ export default function SummaryScreen() {
         <View style={styles.card}>
           <View style={styles.reportHeader}>
             <View style={styles.reportText}>
-              <Text style={styles.cardLabel}>오늘의 건강 지수</Text>
+              <Text style={styles.cardLabel}>오늘의 성장점</Text>
               <Text style={styles.hero}>
                 {logged ? state.currentDailyScore : '–'}
                 {logged && <Text style={styles.heroUnit}>점</Text>}
               </Text>
-              <Text style={styles.greeting}>{greeting(state.currentDailyScore, logged)}</Text>
+              <Text style={styles.greeting}>{greeting(logged)}</Text>
             </View>
             <Image source={levelInfo.image} style={styles.pet} contentFit="contain" />
           </View>
 
           <View style={styles.partsRow}>
-            <PartTile icon="moon" color="#8E7CF0" label="수면" weight="35%" value={sleepValue} score={state.today.sleepDiff === null ? null : parts.sleepScore} />
-            <PartTile icon="restaurant" color="#FF9600" label="식사" weight="35%" value={mealValue} score={state.today.mealCount === 0 ? null : parts.mealScore} />
-            <PartTile icon="happy" color="#FF6FA8" label="감정" weight="30%" value={emotionValue} score={state.today.emotion === null ? null : parts.emotionScore} />
+            <PartTile icon="moon" color="#8E7CF0" label="수면" weight="/30" value={sleepValue} score={records.sleep ? pts.sleep : null} />
+            <PartTile icon="restaurant" color="#FF9600" label="식사" weight="/40" value={mealValue} score={records.meals.length ? pts.meal : null} />
+            <PartTile icon="happy" color="#FF6FA8" label="마음" weight="/10" value={mindValue} score={records.minds.length ? pts.mind : null} />
+            <PartTile icon="flag" color="#1B7F66" label="목표" weight="/20" value={`영역 ${areas}개`} score={areas ? pts.goal : null} />
           </View>
-
-          {parts.multiplier > 1 && (
-            <Text style={styles.bonus}>
-              {state.streak}일 연속 기록 보너스 ×{parts.multiplier.toFixed(2)} 적용 중
-            </Text>
-          )}
 
           <TouchableOpacity style={styles.shareBtn} activeOpacity={0.85} onPress={() => router.push('/share')}>
             <Text style={styles.shareText}>내 푸디몬 자랑하기</Text>
@@ -103,7 +99,7 @@ export default function SummaryScreen() {
         {/* S5-2 Trend */}
         <View style={styles.card}>
           <View style={styles.trendHeader}>
-            <Text style={styles.sectionTitle}>건강 지수 추이</Text>
+            <Text style={styles.sectionTitle}>성장점 추이</Text>
             <View style={styles.segment}>
               {RANGES.map((r) => (
                 <TouchableOpacity
@@ -260,13 +256,6 @@ const styles = StyleSheet.create({
   partValue: {
     fontSize: 11,
     color: '#64748B',
-    fontWeight: '600',
-  },
-  bonus: {
-    marginTop: 12,
-    fontSize: 12,
-    color: '#64748B',
-    textAlign: 'center',
     fontWeight: '600',
   },
   shareBtn: {

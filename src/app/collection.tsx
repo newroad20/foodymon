@@ -7,6 +7,10 @@ import { backgroundsData, costumesData, levelsData } from '@/constants/foodymonD
 import { hasLoggedToday, toDateKey } from '@/lib/dayRollover';
 import { badgeDefs, computeCollection, DailyRecordRow, earnedBadges } from '@/lib/collection';
 import { fetchDailyRecords } from '@/lib/gameApi';
+import { STAGE_POINTS } from '@/lib/growth';
+
+// FoodyMon hatches at stage 3 and grows to 6 on cumulative points; it never goes back.
+const STAGES = levelsData.filter((l) => l.level >= 3);
 
 type Section = 'evolution' | 'items' | 'badges';
 
@@ -17,11 +21,6 @@ const SECTIONS: { id: Section; label: string }[] = [
 ];
 
 const SILHOUETTE = '#CBD5E1';
-
-const formatDate = (key: string) => {
-  const [y, m, d] = key.split('-').map(Number);
-  return `${y}.${m}.${d}`;
-};
 
 export default function CollectionScreen() {
   const { userId, state } = useFoodyMon();
@@ -84,11 +83,11 @@ export default function CollectionScreen() {
           ) : (
             <>
               <Text style={styles.progress}>
-                만난 모습 {stats.seenLevels.size}/{levelsData.length}
+                만난 모습 {STAGES.filter((l) => l.level <= state.level).length}/{STAGES.length}
               </Text>
               <View style={styles.grid}>
-                {levelsData.map((l) => {
-                  const seenOn = stats.seenLevels.get(l.level);
+                {STAGES.map((l) => {
+                  const seenOn = l.level <= state.level;
                   return (
                     <View key={l.level} style={styles.levelCard}>
                       <Image
@@ -100,13 +99,13 @@ export default function CollectionScreen() {
                       <Text style={styles.levelNo}>{l.level}단계</Text>
                       <Text style={styles.levelName}>{seenOn ? l.name : '???'}</Text>
                       <Text style={styles.levelMeta}>
-                        {seenOn ? `${formatDate(seenOn)} 첫 만남` : `${l.maxScore}점 이하에서 만나요`}
+                        {seenOn ? '함께 자랐어요' : `누적 ${STAGE_POINTS[l.level]}점에 만나요`}
                       </Text>
                     </View>
                   );
                 })}
               </View>
-              <Text style={styles.hint}>그날의 건강 지수에 따라 푸디몬의 모습이 바뀌어요.</Text>
+              <Text style={styles.hint}>기록이 쌓일수록 푸디몬이 한 단계씩 자라요.</Text>
             </>
           ))}
 

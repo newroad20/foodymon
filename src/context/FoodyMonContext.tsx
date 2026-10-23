@@ -1,14 +1,33 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from 'react';
-import { AppState } from 'react-native';
+import { Alert, AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserState, LogItem } from '@/types/foodymon';
-import { BACKFILL_COST, GIFT_BOX_COST, costumesData, backgroundsData, dialoguesData, levelsData } from '@/constants/foodymonData';
+import {
+  BACKFILL_COST,
+  GIFT_BOX_COST,
+  costumesData,
+  backgroundsData,
+  dialoguesData,
+  levelsData,
+  mealStatuses,
+  mindEmotions,
+  mindSituations,
+} from '@/constants/foodymonData';
 import { closeDay, toDateKey, RolloverResult } from '@/lib/dayRollover';
 import { calcDailyScore } from '@/lib/score';
+import {
+  EMPTY_DAY,
+  MAX_MIND_RECORDS,
+  MEAL_SLOTS,
+  ZERO_POINTS,
+  sleepMinutes,
+  type DayRecords,
+  type MealRecord,
+  type MindRecord,
+} from '@/lib/growth';
 import { pickDialogue } from '@/lib/dialogue';
-import type { MealType } from '@/lib/mealType';
 import { successFeel, tapFeel } from '@/lib/haptics';
-import { formatLogTime } from '@/lib/serverState';
+import { formatLogTime, withDayPoints } from '@/lib/serverState';
 import * as gameApi from '@/lib/gameApi';
 
 // How often to check whether the calendar day changed while the app stays open.
@@ -44,7 +63,11 @@ const defaultState: UserState = {
     emotion: null,
   },
 
-  currentDailyScore: 50,
+  records: EMPTY_DAY,
+  todayPoints: ZERO_POINTS,
+  growthTotal: 0,
+
+  currentDailyScore: 0,
   averageScore: 50,
   level: 3,
   logs: [],
@@ -69,16 +92,12 @@ interface FoodyMonContextType {
     meals: number,
     mealSize: number
   ) => Promise<void>;
-  /** photoUri: a picked/taken photo; photoFailed is true when the meal was saved without it. */
-  logMeal: (
-    size: number,
-    answerText: string,
-    mealType: MealType,
-    photoUri?: string | null
-  ) => Promise<{ photoFailed: boolean }>;
-  skipMeal: (mealType: MealType) => Promise<void>;
-  logSleep: (hours: number) => Promise<void>;
-  logEmotion: (score: number) => Promise<void>;
+  /** Saves (or replaces) today's sleep; growth points count once a day. */
+  saveSleep: (bedTime: string, wakeTime: string) => Promise<void>;
+  /** Saves (or replaces) one meal slot. photoFailed: the meal was saved without the picked photo. */
+  saveMeal: (record: Omit<MealRecord, 'photoPath'>, photoUri?: string | null) => Promise<{ photoFailed: boolean }>;
+  /** Adds a mind record; false when today's three are used up. */
+  addMind: (record: MindRecord) => Promise<boolean>;
   backfillYesterday: (day: {
     sleepHours: number | null;
     mealCount: number;
@@ -103,6 +122,15 @@ interface FoodyMonContextType {
   /** Result of the most recent automatic day change, until dismissed. */
   pendingRollover: RolloverResult | null;
   dismissRollover: () => void;
+}
+
+/** Diary line for a mind record. */
+function describeMind(r: MindRecord): string {
+  const e = mindEmotions.find((m) => m.id === r.emotion);
+  const situation = mindSituations.find((m) => m.id === r.situation);
+  return [`마음 · ${e?.emoji ?? ''} ${e?.label ?? ''}`, situation?.label, r.note && `"${r.note}"`]
+    .filter(Boolean)
+    .join(' · ');
 }
 
 const FoodyMonContext = createContext<FoodyMonContextType | undefined>(undefined);
@@ -131,9 +159,17 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     [userId]
   );
 
-  const withScore = (next: UserState): UserState => {
-    const { score, level } = calcDailyScore(next, levelsData);
-    return { ...next, currentDailyScore: score, level };
+  const withScore = (next: UserState): UserState => withDayPoints(next);
+
+  /** Recounts growth on the server; celebrates when FoodyMon grows a stage. */
+  const refreshGrowth = async () => {
+    const g = await gameApi.syncGrowth(toDateKey(new Date()));
+    applyState({ ...stateRef.current, growthTotal: g.total, level: g.level });
+    if (g.evolved) {
+      const info = levelsData.find((l) => l.level === g.level);
+      successFeel();
+      Alert.alert('🎉 푸디몬이 자랐어요!', `Lv.${g.level} ${info?.name ?? ''}이(가) 되었어요. 함께 쌓은 기록 덕분이야!`);
+    }
   };
 
   /** Reloads everything from the server; the server also closes out ended days. */
@@ -141,11 +177,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     if (syncingRef.current) return syncingRef.current;
     const run = (async () => {
       try {
-        const { state: next, rollover } = await gameApi.fetchGameState(
-          userId,
-          toDateKey(new Date()),
-          levelsData
-        );
+        const { state: next, rollover } = await gameApi.fetchGameState(userId, toDateKey(new Date()));
         applyState(next);
         setSyncError(null);
         if (rollover) setPendingRollover(rollover);
@@ -231,16 +263,20 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     ...log,
   });
 
-  /** Applies a check-in locally right away, then saves it to the server. */
+  /**
+   * Applies a record locally right away, then saves it, the day's totals and the diary line,
+   * and recounts growth on the server.
+   */
   const recordCheckin = async (
-    update: (s: UserState) => UserState['today'],
+    update: (r: DayRecords) => DayRecords,
+    save: (logDate: string) => Promise<void>,
     log: Pick<LogItem, 'type' | 'content' | 'photoPath'>
   ) => {
     await ensureCurrentDay();
     const current = stateRef.current;
     const next = withScore({
       ...current,
-      today: update(current),
+      records: update(current.records),
       logs: [newLog(log), ...current.logs],
     });
     applyState(next);
@@ -248,7 +284,10 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     const reactions = dialoguesData.reaction[log.type];
     setCurrentDialogue(reactions[Math.floor(Math.random() * reactions.length)]);
     try {
+      const logDate = next.lastActiveDate ?? toDateKey(new Date());
+      await save(logDate);
       await gameApi.saveCheckin(userId, next, log);
+      await refreshGrowth();
       setSyncError(null);
     } catch (e) {
       console.error('Failed to save check-in:', e);
@@ -294,16 +333,22 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     await syncFromServer();
   };
 
-  const logMeal = async (
-    size: number,
-    answerText: string,
-    mealType: MealType,
-    photoUri?: string | null
-  ) => {
-    const isBad = size <= 0.33 || size >= 2.0;
-    const sizeDesc = size === 1.0 ? '정량' : `${Math.round(size * 100)}%`;
-    // A failed photo upload must not lose the meal itself.
-    let photoPath: string | null = null;
+  const saveSleep = (bedTime: string, wakeTime: string) => {
+    const sleep = { bedTime, wakeTime };
+    const minutes = sleepMinutes(sleep);
+    return recordCheckin(
+      (r) => ({ ...r, sleep }),
+      (d) => gameApi.saveSleepRecord(userId, d, sleep),
+      {
+        type: 'sleep',
+        content: `수면 ${bedTime} → ${wakeTime} (${Math.floor(minutes / 60)}시간${minutes % 60 ? ` ${minutes % 60}분` : ''})`,
+      }
+    );
+  };
+
+  const saveMeal = async (record: Omit<MealRecord, 'photoPath'>, photoUri?: string | null) => {
+    // A failed photo upload must not lose the meal itself; an edit keeps the earlier photo.
+    let photoPath = stateRef.current.records.meals.find((m) => m.slot === record.slot)?.photoPath ?? null;
     let photoFailed = false;
     if (photoUri) {
       try {
@@ -313,39 +358,28 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         photoFailed = true;
       }
     }
+    const full: MealRecord = { ...record, photoPath };
+    const details = [record.menu, record.feeling && `"${record.feeling}"`, record.memo].filter(Boolean).join(' · ');
     await recordCheckin(
-      (s) => ({
-        ...s.today,
-        mealCount: s.today.mealCount + 1,
-        badMealCount: isBad ? s.today.badMealCount + 1 : s.today.badMealCount,
-      }),
-      { type: 'meal', content: `${mealType} 기록 (${sizeDesc}): "${answerText}"`, photoPath }
+      (r) => ({ ...r, meals: [...r.meals.filter((m) => m.slot !== full.slot), full].sort((a, b) => a.slot - b.slot) }),
+      (d) => gameApi.saveMealRecord(userId, d, full),
+      {
+        type: record.status === 'skipped' ? 'skip' : 'meal',
+        content: `${MEAL_SLOTS[record.slot]} · ${mealStatuses.find((m) => m.id === record.status)?.label}${details ? ` · ${details}` : ''}`,
+        photoPath,
+      }
     );
     return { photoFailed };
   };
 
-  const skipMeal = (mealType: MealType) =>
-    recordCheckin((s) => ({ ...s.today, badMealCount: s.today.badMealCount + 1 }), {
-      type: 'skip',
-      content: `${mealType}은 건너뛰었어`,
-    });
-
-  const logSleep = (hours: number) => {
-    const diff = Math.abs(stateRef.current.targetSleep - hours);
-    return recordCheckin((s) => ({ ...s.today, sleepHours: hours, sleepDiff: diff }), {
-      type: 'sleep',
-      content: `수면 ${hours}시간 기록 (목표 대비 ${diff === 0 ? '완벽 일치' : `${diff}시간 차이`})`,
-    });
-  };
-
-  const logEmotion = (score: number) => {
-    let feel = '보통';
-    if (score >= 80) feel = '좋음/매우 좋음 😊';
-    else if (score <= 40) feel = '나쁨/매우 나쁨 🥺';
-    return recordCheckin((s) => ({ ...s.today, emotion: score }), {
-      type: 'emotion',
-      content: `오늘의 기분 체크: ${feel}`,
-    });
+  const addMind = async (record: MindRecord) => {
+    if (stateRef.current.records.minds.length >= MAX_MIND_RECORDS) return false;
+    await recordCheckin(
+      (r) => ({ ...r, minds: [...r.minds, record] }),
+      (d) => gameApi.addMindRecord(userId, d, record),
+      { type: 'emotion', content: describeMind(record) }
+    );
+    return true;
   };
 
   /** Fills in yesterday for jelly; the server restores the streak and any shield used (S25). */
@@ -530,10 +564,9 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         currentDialogue,
         triggerPetInteraction,
         completeOnboarding,
-        logMeal,
-        skipMeal,
-        logSleep,
-        logEmotion,
+        saveSleep,
+        saveMeal,
+        addMind,
         backfillYesterday,
         updateSettings,
         buyItem,

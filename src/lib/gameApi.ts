@@ -2,12 +2,17 @@ import { supabase } from '@/lib/supabase';
 import { LogItem, UserState } from '@/types/foodymon';
 import { RolloverResult } from '@/lib/dayRollover';
 import { DailyRecordRow } from '@/lib/collection';
+import type { DayPoints, MealRecord, MindRecord, SleepRecord } from '@/lib/growth';
 import {
   buildUserState,
   CheckinLogRow,
   CloseDaysResponse,
   DailyLogRow,
+  MealRecordRow,
+  MindRecordRow,
   ProfileRow,
+  SleepRecordRow,
+  toDayRecords,
   toDailyLogRow,
   toRolloverResult,
   UserItemRow,
@@ -15,16 +20,13 @@ import {
 
 const RECENT_LOG_LIMIT = 50;
 
-type Levels = readonly { level: number; maxScore: number }[];
-
 /**
  * Loads the user's game state from Supabase. When the user is onboarded, first
  * asks the server to close out any days that ended (streak/jelly/shields).
  */
 export async function fetchGameState(
   userId: string,
-  todayKey: string,
-  levels: Levels
+  todayKey: string
 ): Promise<{ state: UserState; rollover: RolloverResult | null }> {
   const ensured = await supabase.rpc('ensure_profile');
   if (ensured.error) throw ensured.error;
@@ -42,18 +44,19 @@ export async function fetchGameState(
     if (closed.error) throw closed.error;
     rollover = toRolloverResult(closed.data as CloseDaysResponse);
   }
+  const growth = first.data.onboarded ? await syncGrowth(todayKey) : null;
 
   const profileRes = await supabase
     .from('profiles')
     .select(
-      'nickname, onboarded, birth_year, target_sleep, target_meals, usual_meal_size, jelly_balance, streak, shields, equipped_costume, equipped_backgrounds, history_scores, last_checkin_date, missed_date, missed_prev_streak'
+      'nickname, onboarded, birth_year, target_sleep, target_meals, usual_meal_size, jelly_balance, streak, shields, equipped_costume, equipped_backgrounds, history_scores, last_checkin_date, missed_date, missed_prev_streak, evolution_stage'
     )
     .eq('id', userId)
     .single();
   if (profileRes.error) throw profileRes.error;
   const profile = profileRes.data as ProfileRow;
 
-  const [todayRes, logsRes, itemsRes] = await Promise.all([
+  const [todayRes, logsRes, itemsRes, sleepRes, mealRes, mindRes] = await Promise.all([
     profile.last_checkin_date
       ? supabase
           .from('daily_logs')
@@ -69,22 +72,96 @@ export async function fetchGameState(
       .order('created_at', { ascending: false })
       .limit(RECENT_LOG_LIMIT),
     supabase.from('user_items').select('item_type, item_id').eq('user_id', userId),
+    supabase
+      .from('sleep_records')
+      .select('bed_time, wake_time')
+      .eq('user_id', userId)
+      .eq('log_date', todayKey)
+      .maybeSingle(),
+    supabase
+      .from('meal_records')
+      .select('slot, status, menu, feeling, memo, photo_path')
+      .eq('user_id', userId)
+      .eq('log_date', todayKey)
+      .order('slot'),
+    supabase
+      .from('mind_records')
+      .select('emotion, situation, note')
+      .eq('user_id', userId)
+      .eq('log_date', todayKey)
+      .order('created_at'),
   ]);
   if (todayRes.error) throw todayRes.error;
   if (logsRes.error) throw logsRes.error;
   if (itemsRes.error) throw itemsRes.error;
+  if (sleepRes.error) throw sleepRes.error;
+  if (mealRes.error) throw mealRes.error;
+  if (mindRes.error) throw mindRes.error;
 
-  const state = buildUserState(
-    {
-      profile,
-      today: todayRes.data as DailyLogRow | null,
-      logs: (logsRes.data ?? []) as CheckinLogRow[],
-      items: (itemsRes.data ?? []) as UserItemRow[],
-    },
-    levels
-  );
+  const state = buildUserState({
+    profile: growth ? { ...profile, evolution_stage: growth.level } : profile,
+    today: todayRes.data as DailyLogRow | null,
+    logs: (logsRes.data ?? []) as CheckinLogRow[],
+    items: (itemsRes.data ?? []) as UserItemRow[],
+    records: toDayRecords({
+      sleep: sleepRes.data as SleepRecordRow | null,
+      meals: (mealRes.data ?? []) as MealRecordRow[],
+      minds: (mindRes.data ?? []) as MindRecordRow[],
+    }),
+    growthTotal: growth?.total ?? 0,
+  });
 
   return { state, rollover: rollover && rollover.daysPassed > 0 ? rollover : null };
+}
+
+export interface GrowthResult {
+  total: number;
+  level: number;
+  evolved: boolean;
+  today: DayPoints;
+}
+
+/** Recounts growth points on the server and evolves the pet at most once a day. */
+export async function syncGrowth(todayKey: string): Promise<GrowthResult> {
+  const res = await supabase.rpc('sync_growth', { p_today: todayKey });
+  if (res.error) throw res.error;
+  return res.data as GrowthResult;
+}
+
+export async function saveSleepRecord(userId: string, logDate: string, r: SleepRecord): Promise<void> {
+  const res = await supabase
+    .from('sleep_records')
+    .upsert(
+      { user_id: userId, log_date: logDate, bed_time: r.bedTime, wake_time: r.wakeTime, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id,log_date' }
+    );
+  if (res.error) throw res.error;
+}
+
+export async function saveMealRecord(userId: string, logDate: string, r: MealRecord): Promise<void> {
+  const res = await supabase.from('meal_records').upsert(
+    {
+      user_id: userId,
+      log_date: logDate,
+      slot: r.slot,
+      status: r.status,
+      menu: r.menu,
+      feeling: r.feeling,
+      memo: r.memo,
+      photo_path: r.photoPath,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id,log_date,slot' }
+  );
+  if (res.error) throw res.error;
+}
+
+/** Adds a mind record; the server allows three a day ('mind limit'). */
+export async function addMindRecord(userId: string, logDate: string, r: MindRecord): Promise<void> {
+  const res = await supabase
+    .from('mind_records')
+    .insert({ user_id: userId, log_date: logDate, emotion: r.emotion, situation: r.situation, note: r.note });
+  if (res.error) throw res.error;
 }
 
 /** Saves the current day's check-in totals and score. */

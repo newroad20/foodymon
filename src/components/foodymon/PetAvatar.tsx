@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData, costumesData } from '@/constants/foodymonData';
+import { growthProgress } from '@/lib/growth';
 
 interface PetAvatarProps {
   onTap?: () => void;
@@ -86,6 +87,8 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
     onTap?.();
   };
 
+  const progress = growthProgress(state.level, state.growthTotal);
+
   const currentLevelInfo =
     levelsData.find((l) => l.level === state.level) || levelsData[2];
 
@@ -151,20 +154,29 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
         <View style={styles.shadow} />
       </TouchableOpacity>
 
-      {/* Daily Score Progress Bar */}
-      <View style={styles.scoreContainer}>
+      {/* Growth card: cumulative points toward the next stage (재형 피드백) */}
+      <View
+        style={styles.scoreContainer}
+        accessibilityLabel={
+          progress.next === null
+            ? `최고 단계, 누적 ${state.growthTotal}점`
+            : `다음 성장까지 ${progress.remaining}점, 누적 ${state.growthTotal}점 중 ${progress.next}점`
+        }>
         <View style={styles.scoreHeader}>
-          <Text style={styles.scoreLabel}>오늘의 건강 지수</Text>
-          <Text style={styles.scoreValue}>{state.currentDailyScore}점</Text>
+          <Text style={styles.scoreLabel}>
+            {progress.next === null ? '최고 단계에 도착했어요!' : `다음 성장까지 ${progress.remaining}점`}
+          </Text>
+          <Text style={styles.scoreValue}>
+            {progress.next === null ? `${state.growthTotal}점` : `${state.growthTotal} / ${progress.next}점`}
+          </Text>
         </View>
         <View style={styles.progressBarTrack}>
-          <View
-            style={[
-              styles.progressBarFill,
-              { width: `${state.currentDailyScore}%` },
-            ]}
-          />
+          <View style={[styles.progressBarFill, { width: `${Math.round(progress.ratio * 100)}%` }]} />
         </View>
+        <Text style={styles.scoreMeta}>
+          오늘 +{state.todayPoints.total}점 · 수면 {state.records.sleep ? 1 : 0} · 식사{' '}
+          {state.records.meals.length} · 마음 {state.records.minds.length}
+        </Text>
       </View>
     </View>
   );
@@ -275,7 +287,13 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#48BB78',
+    backgroundColor: '#1B7F66',
     borderRadius: 5,
+  },
+  scoreMeta: {
+    marginTop: 6,
+    fontSize: 12,
+    color: '#64748B',
+    fontWeight: '700',
   },
 });

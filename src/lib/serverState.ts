@@ -1,6 +1,14 @@
 import type { LogItem, UserState } from '../types/foodymon';
 import type { RolloverResult } from './dayRollover';
-import { calcDailyScore } from './score.ts';
+import {
+  dayPoints,
+  EMPTY_DAY,
+  legacyToday,
+  type DayRecords,
+  type Emotion,
+  type MealStatus,
+  type Situation,
+} from './growth.ts';
 
 export interface ProfileRow {
   nickname: string;
@@ -18,6 +26,7 @@ export interface ProfileRow {
   last_checkin_date: string | null;
   missed_date?: string | null;
   missed_prev_streak?: number | null;
+  evolution_stage?: number;
 }
 
 export interface DailyLogRow {
@@ -34,6 +43,57 @@ export interface CheckinLogRow {
   content: string;
   created_at: string;
   photo_path?: string | null;
+}
+
+export interface SleepRecordRow {
+  bed_time: string; // 'HH:MM:SS'
+  wake_time: string;
+}
+export interface MealRecordRow {
+  slot: number;
+  status: MealStatus;
+  menu: string;
+  feeling: string;
+  memo: string;
+  photo_path: string | null;
+}
+export interface MindRecordRow {
+  emotion: Emotion;
+  situation: Situation | null;
+  note: string;
+}
+
+/** Today's records from their server rows. */
+export function toDayRecords(rows: {
+  sleep: SleepRecordRow | null;
+  meals: MealRecordRow[];
+  minds: MindRecordRow[];
+}): DayRecords {
+  return {
+    sleep: rows.sleep
+      ? { bedTime: rows.sleep.bed_time.slice(0, 5), wakeTime: rows.sleep.wake_time.slice(0, 5) }
+      : null,
+    meals: rows.meals.map((m) => ({
+      slot: m.slot,
+      status: m.status,
+      menu: m.menu,
+      feeling: m.feeling,
+      memo: m.memo,
+      photoPath: m.photo_path,
+    })),
+    minds: rows.minds.map((m) => ({ emotion: m.emotion, situation: m.situation, note: m.note })),
+  };
+}
+
+/** Recomputes today's growth points and the legacy daily totals from the records. */
+export function withDayPoints(state: UserState, year: number = new Date().getFullYear()): UserState {
+  const todayPoints = dayPoints(state.records, state.birthYear, year);
+  return {
+    ...state,
+    today: legacyToday(state.records, state.targetSleep),
+    todayPoints,
+    currentDailyScore: todayPoints.total,
+  };
 }
 
 export interface UserItemRow {
@@ -65,15 +125,14 @@ export function formatLogTime(d: Date): string {
   return `${mm}월 ${dd}일 ${ampm} ${hh}:${min}`;
 }
 
-export function buildUserState(
-  rows: {
-    profile: ProfileRow;
-    today: DailyLogRow | null;
-    logs: CheckinLogRow[];
-    items: UserItemRow[];
-  },
-  levels: readonly { level: number; maxScore: number }[]
-): UserState {
+export function buildUserState(rows: {
+  profile: ProfileRow;
+  today: DailyLogRow | null;
+  logs: CheckinLogRow[];
+  items: UserItemRow[];
+  records?: DayRecords;
+  growthTotal?: number;
+}): UserState {
   const { profile, today, logs, items } = rows;
   const state: UserState = {
     masterName: profile.nickname,
@@ -102,9 +161,13 @@ export function buildUserState(
       emotion: today?.emotion ?? null,
     },
 
-    currentDailyScore: 50,
+    records: rows.records ?? EMPTY_DAY,
+    todayPoints: { sleep: 0, meal: 0, mind: 0, goal: 0, total: 0 },
+    growthTotal: rows.growthTotal ?? 0,
+
+    currentDailyScore: 0,
     averageScore: 50,
-    level: 3,
+    level: profile.evolution_stage ?? 3,
     logs: logs.map((l) => ({
       id: l.id,
       time: formatLogTime(new Date(l.created_at)),
@@ -118,10 +181,9 @@ export function buildUserState(
       : null,
   };
 
-  const { score, level } = calcDailyScore(state, levels);
-  state.currentDailyScore = score;
-  state.level = level;
-  return state;
+  // Days before the record redesign only have daily_logs totals; keep those until records exist.
+  if (!rows.records) return { ...state, currentDailyScore: 0 };
+  return withDayPoints(state);
 }
 
 export function toRolloverResult(r: CloseDaysResponse): RolloverResult {

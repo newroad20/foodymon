@@ -92,7 +92,7 @@ export default function MyPageScreen() {
     Alert.alert(
       ok ? '저장했어요 ✨' : '저장하지 못했어요',
       ok
-        ? '바뀐 내용으로 오늘의 건강 지수를 다시 계산했어요.'
+        ? '저장했어요.'
         : '네트워크를 확인하고 다시 시도해 주세요.'
     );
   };
@@ -144,7 +144,7 @@ export default function MyPageScreen() {
             <Stat label="연속 기록" value={`${state.streak}일`} />
             <Stat label="젤리" value={`${state.currency}`} />
             <Stat label="방패" value={`${state.shields}`} />
-            <Stat label="오늘 지수" value={`${state.currentDailyScore}점`} />
+            <Stat label="누적 성장점" value={`${state.growthTotal}점`} />
           </View>
         </View>
 

@@ -45,7 +45,7 @@ export const ShareCard = forwardRef<View, { state: UserState }>(function ShareCa
       <View style={styles.statsRow}>
         <View style={styles.stat}>
           <Text style={styles.statValue}>{logged ? state.currentDailyScore : '–'}</Text>
-          <Text style={styles.statLabel}>오늘 건강 지수</Text>
+          <Text style={styles.statLabel}>오늘 성장점</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.stat}>

@@ -37,7 +37,8 @@ export function pickDialogue(
   if (state.today.emotion !== null && state.today.emotion <= 40) return pick([...lines.lowMood, ...lines.bad]);
 
   const score = state.currentDailyScore;
-  const pools = [score >= 80 ? lines.good : score < 40 ? lines.bad : lines.normal, timePool(lines, hour)];
+  // Today's points only grow as the user shares, so a low number means "early", not "bad day".
+  const pools = [score >= 80 ? lines.good : lines.normal, timePool(lines, hour)];
   if (state.today.sleepHours === null && hour >= 5 && hour < 14) pools.push(lines.askSleep);
   if (state.today.mealCount === 0 && hour >= 8) pools.push(lines.askMeal);
   if (state.today.emotion === null && hour >= 12) pools.push(lines.askEmotion);

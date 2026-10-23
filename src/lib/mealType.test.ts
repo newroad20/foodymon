@@ -1,11 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mealTypeForHour } from './mealType.ts';
+import { mealSlotForHour } from './mealType.ts';
 
-test('mealTypeForHour guesses the meal from the hour', () => {
-  const byHour = Array.from({ length: 24 }, (_, h) => mealTypeForHour(h));
-  assert.deepEqual(
-    [byHour[4], byHour[5], byHour[9], byHour[10], byHour[14], byHour[15], byHour[17], byHour[21], byHour[22]],
-    ['간식', '아침', '아침', '점심', '점심', '간식', '저녁', '저녁', '간식']
-  );
+test('mealSlotForHour guesses the slot from the hour', () => {
+  const pick = [4, 5, 9, 10, 11, 13, 14, 16, 17, 20, 21, 23].map(mealSlotForHour);
+  assert.deepEqual(pick, [5, 0, 0, 1, 2, 2, 3, 3, 4, 4, 5, 5]);
 });

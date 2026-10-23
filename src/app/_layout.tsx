@@ -8,11 +8,12 @@ import { FoodyMonProvider } from '@/context/FoodyMonContext';
 import { MusicProvider } from '@/context/MusicContext';
 import { LoginScreen } from '@/components/auth/LoginScreen';
 import { RegisterScreen } from '@/components/auth/RegisterScreen';
+import { NewPasswordScreen } from '@/components/auth/NewPasswordScreen';
 
 SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
-  const { session, loading } = useAuth();
+  const { session, loading, recovering } = useAuth();
   const pathname = usePathname();
   const [showRegister, setShowRegister] = useState(false);
 
@@ -32,6 +33,9 @@ function AppContent() {
 
   // The privacy policy must open for everyone (store review, sign-up consent).
   if (pathname === '/privacy') return <Slot />;
+
+  // A password-reset link signed the user in: ask for the new password first.
+  if (session && recovering) return <NewPasswordScreen />;
 
   // Not logged in — show Login or Register screen
   if (!session) {

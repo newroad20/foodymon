@@ -19,7 +19,7 @@ interface LoginScreenProps {
 }
 
 export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
-  const { signIn } = useAuth();
+  const { signIn, requestPasswordReset } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,6 +35,20 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
     if (error) {
       Alert.alert('로그인 실패', '이메일 또는 비밀번호를 확인해 주세요.');
     }
+  };
+
+  const handleForgot = async () => {
+    if (!email.trim()) {
+      Alert.alert('비밀번호 찾기', '위 칸에 가입한 이메일을 먼저 적어 주세요.');
+      return;
+    }
+    const { error } = await requestPasswordReset(email.trim());
+    Alert.alert(
+      '비밀번호 찾기',
+      error
+        ? '메일을 보내지 못했어요. 잠시 후 다시 시도해 주세요.'
+        : '비밀번호를 다시 정하는 링크를 메일로 보냈어요. 이 기기에서 메일의 링크를 눌러 주세요. (스팸함도 확인해 주세요)'
+    );
   };
 
   return (
@@ -89,6 +103,10 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
             )}
           </TouchableOpacity>
 
+          <TouchableOpacity onPress={handleForgot} accessibilityRole="button">
+            <Text style={styles.forgot}>비밀번호를 잊었어요</Text>
+          </TouchableOpacity>
+
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
             <Text style={styles.dividerText}>또는</Text>
@@ -109,6 +127,13 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
 }
 
 const styles = StyleSheet.create({
+  forgot: {
+    textAlign: 'center',
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '700',
+    marginTop: 12,
+  },
   container: {
     flex: 1,
     backgroundColor: '#FDF5F5',

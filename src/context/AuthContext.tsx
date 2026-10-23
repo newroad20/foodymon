@@ -14,8 +14,8 @@ import { describeAuthLinkError, parseAuthLink } from '@/lib/authLink';
 // under Supabase → Authentication → URL Configuration → Redirect URLs.
 const emailRedirectTo = Linking.createURL('/');
 
-/** Signs in with the tokens from a confirmation link that opened the app. */
-async function handleAuthLink(url: string | null) {
+/** Signs in with the tokens from an email link that opened the app; reports password-reset links. */
+async function handleAuthLink(url: string | null, onRecovery: () => void) {
   if (!url) return;
   const result = parseAuthLink(url);
   if (result.kind === 'error') {
@@ -26,6 +26,7 @@ async function handleAuthLink(url: string | null) {
       refresh_token: result.refreshToken,
     });
     if (error) Alert.alert('이메일 인증', describeAuthLinkError(error.message));
+    else if (result.recovery) onRecovery();
   }
 }
 
@@ -37,6 +38,10 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
+  /** True after a password-reset link signed the user in; the app asks for a new password. */
+  recovering: boolean;
+  requestPasswordReset: (email: string) => Promise<{ error: string | null }>;
+  updatePassword: (password: string) => Promise<{ error: string | null }>;
   /** Permanently deletes the account and all its records, then signs out. */
   deleteAccount: () => Promise<{ error: string | null }>;
 }
@@ -47,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recovering, setRecovering] = useState(false);
 
   useEffect(() => {
     // Get initial session
@@ -57,15 +63,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // On the web supabase-js reads the reset link itself and reports it this way.
+      if (event === 'PASSWORD_RECOVERY') setRecovering(true);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
     // Confirmation links can open the app cold or while it is running.
-    Linking.getInitialURL().then(handleAuthLink);
-    const linkSub = Linking.addEventListener('url', ({ url }) => handleAuthLink(url));
+    const onRecovery = () => setRecovering(true);
+    Linking.getInitialURL().then((url) => handleAuthLink(url, onRecovery));
+    const linkSub = Linking.addEventListener('url', ({ url }) => handleAuthLink(url, onRecovery));
 
     return () => {
       subscription.unsubscribe();
@@ -104,6 +113,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const requestPasswordReset = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: emailRedirectTo });
+    return { error: error?.message ?? null };
+  };
+
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (!error) setRecovering(false);
+    return { error: error?.message ?? null };
+  };
+
   const deleteAccount = async () => {
     const uid = session?.user.id;
     if (!uid) return { error: 'not signed in' };
@@ -127,7 +147,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, loading, signUp, signIn, signOut, deleteAccount }}>
+    <AuthContext.Provider value={{
+        session,
+        user,
+        loading,
+        recovering,
+        signUp,
+        signIn,
+        signOut,
+        requestPasswordReset,
+        updatePassword,
+        deleteAccount,
+      }}>
       {children}
     </AuthContext.Provider>
   );

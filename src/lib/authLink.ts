@@ -4,7 +4,7 @@
  * (#access_token=...) and sometimes in the query string.
  */
 export type AuthLinkResult =
-  | { kind: 'session'; accessToken: string; refreshToken: string }
+  | { kind: 'session'; accessToken: string; refreshToken: string; recovery: boolean }
   | { kind: 'error'; message: string }
   | { kind: 'none' };
 
@@ -28,7 +28,9 @@ export function parseAuthLink(url: string): AuthLinkResult {
 
   const accessToken = params.get('access_token');
   const refreshToken = params.get('refresh_token');
-  if (accessToken && refreshToken) return { kind: 'session', accessToken, refreshToken };
+  // type=recovery: the link came from "비밀번호 찾기", so the app should ask for a new password.
+  if (accessToken && refreshToken)
+    return { kind: 'session', accessToken, refreshToken, recovery: params.get('type') === 'recovery' };
   return { kind: 'none' };
 }
 

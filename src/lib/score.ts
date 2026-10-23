@@ -37,7 +37,10 @@ export function calcScoreParts(state: Pick<UserState, 'today' | 'targetMeals' | 
 /** Score shown before any check-in today (level 3, the neutral look); matches closeDay's reset. */
 export const DAY_START_SCORE = 40;
 
-/** Daily health index: sleep 35% + meals 35% + emotion 30%, boosted by streak. */
+/**
+ * Legacy daily health index (sleep 35% + meals 35% + emotion 30%, streak bonus). Growth points
+ * (lib/growth.ts) replaced it; only the yesterday backfill still uses it.
+ */
 export function calcDailyScore(
   state: Pick<UserState, 'today' | 'targetMeals' | 'streak'>,
   levels: readonly { level: number; maxScore: number }[]

@@ -1,4 +1,5 @@
 import { CostumeItem, BackgroundItem, QuizQuestion, LevelInfo } from '@/types/foodymon';
+import type { Emotion, MealStatus, Situation } from '@/lib/growth';
 
 export const levelsData: LevelInfo[] = [
   { level: 1, maxScore: 19, name: '푹 쉬는 푸디몬', image: require('@/assets/images/level1.png') },
@@ -19,6 +20,36 @@ export const emotionOptions = [
   { score: 60, emoji: '😐', label: '보통', desc: '무난하고 평범한 일상이에요.' },
   { score: 40, emoji: '🙁', label: '조금 지침', desc: '스트레스나 피로감이 있어요.' },
   { score: 20, emoji: '😭', label: '매우 힘듦', desc: '지치고 위로가 필요해요...' },
+];
+
+// Mind record (재형 피드백): every feeling counts the same; none of these is better than another.
+export const mindEmotions: { id: Emotion; emoji: string; label: string }[] = [
+  { id: 'very_good', emoji: '🥰', label: '매우 좋음' },
+  { id: 'good', emoji: '🙂', label: '좋음' },
+  { id: 'okay', emoji: '😐', label: '보통' },
+  { id: 'tired', emoji: '🙁', label: '조금 지침' },
+  { id: 'very_hard', emoji: '😭', label: '매우 힘듦' },
+  { id: 'unsure', emoji: '🤔', label: '잘 모르겠음' },
+  { id: 'no_answer', emoji: '🤐', label: '답하고 싶지 않음' },
+];
+
+export const mindSituations: { id: Situation; label: string }[] = [
+  { id: 'meal', label: '식사' },
+  { id: 'body', label: '몸·외모' },
+  { id: 'school', label: '학교·친구' },
+  { id: 'family', label: '가족' },
+  { id: 'sleep_health', label: '수면·건강' },
+  { id: 'unknown', label: '이유를 모르겠음' },
+  { id: 'custom', label: '직접 입력' },
+];
+
+// Meal status per slot; skipping or finding it hard is recorded without judgement.
+export const mealStatuses: { id: MealStatus; label: string }[] = [
+  { id: 'ate', label: '먹었어' },
+  { id: 'little', label: '조금 먹었어' },
+  { id: 'hard', label: '먹기 어려웠어' },
+  { id: 'skipped', label: '건너뛰었어' },
+  { id: 'no_answer', label: '답하고 싶지 않아' },
 ];
 
 // Jelly cost to fill in a missed yesterday (must match backfill_yesterday in supabase/002_game_rpc.sql).

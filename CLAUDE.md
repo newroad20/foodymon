@@ -34,6 +34,11 @@ npx expo export --platform ios --output-dir <tmp>   # bundle check
 - Anti-cheat: jelly, streak, shields and purchases change only through security-definer RPCs in
   `supabase/002_game_rpc.sql` (`ensure_profile`, `close_days`, `buy_item`). Clients may write
   `daily_logs`, `checkin_logs`, and a few `profiles` columns (see grants in `supabase/schema.sql`).
+- Growth (재형 feedback, 2026-10): records live in `sleep_records` / `meal_records` (6 slots) /
+  `mind_records` (3 a day); `day_points` scores a day (sleep 30 + meal 40 + mind 10 + goal 20, max 100;
+  every feeling scores the same) and `sync_growth` evolves `profiles.evolution_stage` 3→6 at 60/140/230
+  cumulative points, once a day, never down (`supabase/005_growth.sql`). `src/lib/growth.ts` mirrors it
+  for the UI — keep both in sync. `daily_logs` is still written (derived totals) for streak/jelly/quests.
 - Day rollover runs on the server (`close_days`), triggered on launch / foreground / every minute.
   Its rules mirror `closeDay` in `src/lib/dayRollover.ts` — keep both in sync.
 - No calorie or weight fields anywhere (product principle noted in `schema.sql`).

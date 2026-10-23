@@ -1,3 +1,5 @@
+import type { DayPoints, DayRecords } from '../lib/growth';
+
 export interface CostumeItem {
   id: string;
   icon: string;
@@ -62,6 +64,13 @@ export interface UserState {
     badMealCount: number;
     emotion: number | null;
   };
+
+  /** Today's sleep, meal and mind records (재형 피드백 기록 개편). */
+  records: DayRecords;
+  /** Today's growth points; `currentDailyScore` is their total. */
+  todayPoints: DayPoints;
+  /** Cumulative growth points; the stage is in `level` (server: evolution_stage). */
+  growthTotal: number;
 
   currentDailyScore: number;
   averageScore: number;

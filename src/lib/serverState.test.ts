@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildUserState, toDailyLogRow, toRolloverResult, type ProfileRow } from './serverState.ts';
+import { buildUserState, toDailyLogRow, toDayRecords, toRolloverResult, type ProfileRow } from './serverState.ts';
 import { calcDailyScore } from './score.ts';
 
 const levels = [
@@ -38,8 +38,7 @@ test('buildUserState maps rows and converts numeric strings', () => {
         { item_type: 'costume', item_id: 'crown' },
         { item_type: 'background', item_id: 'plant' },
       ],
-    },
-    levels
+    }
   );
   assert.equal(s.targetSleep, 7);
   assert.equal(s.usualMealSize, 1);
@@ -51,11 +50,27 @@ test('buildUserState maps rows and converts numeric strings', () => {
   assert.equal(s.lastActiveDate, '2026-10-11');
   assert.equal(s.logs[0].id, 'a');
   assert.equal(s.logs[0].photoPath, 'u1/1.jpg');
-  assert.equal(s.currentDailyScore, calcDailyScore(s, levels).score);
+  assert.equal(s.level, 3); // no evolution_stage yet
+});
+
+test('buildUserState scores today from the records and takes the stage from the server', () => {
+  const records = toDayRecords({
+    sleep: { bed_time: '23:00:00', wake_time: '07:00:00' },
+    meals: [{ slot: 0, status: 'ate', menu: '토스트', feeling: '', memo: '', photo_path: null }],
+    minds: [{ emotion: 'very_hard', situation: 'school', note: '' }],
+  });
+  const s = buildUserState({ profile: { ...profile, evolution_stage: 4 }, today: null, logs: [], items: [], records, growthTotal: 75 });
+  assert.equal(s.level, 4);
+  assert.equal(s.growthTotal, 75);
+  assert.deepEqual(records.sleep, { bedTime: '23:00', wakeTime: '07:00' });
+  // sleep 30 (no birth year -> 13+ band, 8h) + meal 10 + mind 10 + goal 20
+  assert.deepEqual(s.todayPoints, { sleep: 30, meal: 10, mind: 10, goal: 20, total: 70 });
+  assert.equal(s.currentDailyScore, 70);
+  assert.deepEqual(s.today, { sleepHours: 8, sleepDiff: 1, mealCount: 1, badMealCount: 0, emotion: 20 });
 });
 
 test('buildUserState handles a day without check-ins yet', () => {
-  const s = buildUserState({ profile, today: null, logs: [], items: [] }, levels);
+  const s = buildUserState({ profile, today: null, logs: [], items: [] });
   assert.deepEqual(s.today, { sleepDiff: null, sleepHours: null, mealCount: 0, badMealCount: 0, emotion: null });
 });
 
@@ -90,7 +105,7 @@ test('toRolloverResult maps the close_days response', () => {
 });
 
 test('toDailyLogRow writes the current day totals', () => {
-  const s = buildUserState({ profile, today: null, logs: [], items: [] }, levels);
+  const s = buildUserState({ profile, today: null, logs: [], items: [] });
   const row = toDailyLogRow({ ...s, today: { ...s.today, mealCount: 1 } }, 'u1', '2026-10-11');
   assert.equal(row.user_id, 'u1');
   assert.equal(row.log_date, '2026-10-11');
@@ -99,11 +114,10 @@ test('toDailyLogRow writes the current day totals', () => {
 });
 
 test('buildUserState exposes a backfillable yesterday', () => {
-  const none = buildUserState({ profile, today: null, logs: [], items: [] }, levels);
+  const none = buildUserState({ profile, today: null, logs: [], items: [] });
   assert.equal(none.backfill, null);
   const s = buildUserState(
-    { profile: { ...profile, missed_date: '2026-10-10', missed_prev_streak: 4 }, today: null, logs: [], items: [] },
-    levels
+    { profile: { ...profile, missed_date: '2026-10-10', missed_prev_streak: 4 }, today: null, logs: [], items: [] }
   );
   assert.deepEqual(s.backfill, { date: '2026-10-10', prevStreak: 4 });
 });

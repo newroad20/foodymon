@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   View,
@@ -14,58 +14,48 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
-import { quizzesData } from '@/constants/foodymonData';
-import { MEAL_TYPES, MealType, mealTypeForHour } from '@/lib/mealType';
+import { mealStatuses, quizzesData } from '@/constants/foodymonData';
+import { MEAL_SLOTS, type MealStatus } from '@/lib/growth';
+import { mealSlotForHour } from '@/lib/mealType';
 
 interface MealModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
+const EATEN: MealStatus[] = ['ate', 'little', 'hard'];
+
+/** Meal check-in: one of six slots, how it went, and optional menu, feeling, photo and memo. */
 export function MealModal({ visible, onClose }: MealModalProps) {
-  const { logMeal, skipMeal } = useFoodyMon();
-  const [step, setStep] = useState<1 | 2>(1);
-  const [currentQuiz, setCurrentQuiz] = useState(() => quizzesData[0]);
-  const [textAnswer, setTextAnswer] = useState('');
-  const [yesNoAnswer, setYesNoAnswer] = useState<string | null>(null);
-  const [mealType, setMealType] = useState<MealType>(() => mealTypeForHour(new Date().getHours()));
+  const { state, saveMeal } = useFoodyMon();
+  const [slot, setSlot] = useState(() => mealSlotForHour(new Date().getHours()));
+  const [status, setStatus] = useState<MealStatus | null>(null);
+  const [menu, setMenu] = useState('');
+  const [feeling, setFeeling] = useState('');
+  const [memo, setMemo] = useState('');
   const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [quiz, setQuiz] = useState(() => quizzesData[0]);
   const [saving, setSaving] = useState(false);
 
-  // Pick new random quiz when opening
-  React.useEffect(() => {
-    if (visible) {
-      setStep(1);
-      setTextAnswer('');
-      setYesNoAnswer(null);
-      setMealType(mealTypeForHour(new Date().getHours()));
-      setPhotoUri(null);
-      const randomIndex = Math.floor(Math.random() * quizzesData.length);
-      setCurrentQuiz(quizzesData[randomIndex]);
-    }
-  }, [visible]);
+  const saved = state.records.meals.find((m) => m.slot === slot);
 
-  const handleNextStep = () => {
-    if (currentQuiz.type === 'yesno') {
-      if (!yesNoAnswer) {
-        Alert.alert('알림', '편하게 하나 골라 줘.');
-        return;
-      }
-    } else {
-      if (textAnswer.trim().length < 2) {
-        Alert.alert('알림', '두 글자만 더 적어 줄래?');
-        return;
-      }
-      if (currentQuiz.type === 'words3') {
-        const words = textAnswer.trim().split(/\s+/).filter((w) => w.length > 0);
-        if (words.length < 3) {
-          Alert.alert('알림', '단어 세 개로 적어 줘. (띄어쓰기로 구분)');
-          return;
-        }
-      }
-    }
-    setStep(2);
+  // Fill the form from what's already saved for the slot, or start blank.
+  const loadSlot = (s: number) => {
+    const r = state.records.meals.find((m) => m.slot === s);
+    setSlot(s);
+    setStatus(r?.status ?? null);
+    setMenu(r?.menu ?? '');
+    setFeeling(r?.feeling ?? '');
+    setMemo(r?.memo ?? '');
+    setPhotoUri(null);
   };
+
+  useEffect(() => {
+    if (!visible) return;
+    loadSlot(mealSlotForHour(new Date().getHours()));
+    setQuiz(quizzesData[Math.floor(Math.random() * quizzesData.length)]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   const pickPhoto = async (fromCamera: boolean) => {
     try {
@@ -89,177 +79,158 @@ export function MealModal({ visible, onClose }: MealModalProps) {
     }
   };
 
-  const handleSelectPortion = async (portion: number) => {
+  const handleSave = async () => {
+    if (!status) {
+      Alert.alert('알림', '어땠는지 하나만 골라 줘.');
+      return;
+    }
     if (saving) return;
-    const finalAnswer =
-      currentQuiz.type === 'yesno' ? (yesNoAnswer || '') : textAnswer.trim();
     setSaving(true);
-    const { photoFailed } = await logMeal(portion, finalAnswer, mealType, photoUri);
+    const { photoFailed } = await saveMeal(
+      { slot, status, menu: menu.trim(), feeling: feeling.trim(), memo: memo.trim() },
+      photoUri
+    );
     setSaving(false);
     Alert.alert(
       '감각 나누기',
       photoFailed
         ? '기록은 남겼는데 사진은 올리지 못했어. 인터넷을 확인해 줘!'
-        : '알아차린 걸 나눠 줘서 고마워! 푸디몬이 냠냠 먹었어.'
+        : EATEN.includes(status)
+          ? '알아차린 걸 나눠 줘서 고마워! 푸디몬이 냠냠 먹었어.'
+          : '알려 줘서 고마워. 어떤 끼니든 소중한 기록이야.'
     );
     onClose();
   };
 
-  const handleSkip = () => {
-    Alert.alert(
-      '이번 끼니',
-      `못 먹은 것도 소중한 기록이야. ${mealType}은 못 먹은 걸로 남겨 둘까?`,
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '남기기',
-          style: 'destructive',
-          onPress: async () => {
-            await skipMeal(mealType);
-            onClose();
-          },
-        },
-      ]
-    );
-  };
+  const eaten = status !== null && EATEN.includes(status);
 
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
-          {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>식사 · 감각 나누기</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+            <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기">
               <Text style={styles.closeBtnText}>✕</Text>
             </TouchableOpacity>
           </View>
 
-          {step === 1 ? (
-            /* Step 1: Mindful Eating Quiz */
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <View style={styles.mealTypeRow} accessibilityRole="radiogroup">
-                {MEAL_TYPES.map((t) => (
+          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+            <Text style={styles.label}>언제 먹었어?</Text>
+            <View style={styles.chipRow} accessibilityRole="radiogroup">
+              {MEAL_SLOTS.map((name, i) => {
+                const done = state.records.meals.some((m) => m.slot === i);
+                return (
                   <TouchableOpacity
-                    key={t}
-                    style={[styles.mealTypeChip, mealType === t && styles.mealTypeChipActive]}
-                    onPress={() => setMealType(t)}
+                    key={name}
+                    style={[styles.chip, slot === i && styles.chipActive]}
+                    onPress={() => loadSlot(i)}
                     accessibilityRole="radio"
-                    accessibilityState={{ selected: mealType === t }}>
-                    <Text style={[styles.mealTypeText, mealType === t && styles.mealTypeTextActive]}>{t}</Text>
+                    accessibilityState={{ selected: slot === i }}
+                    accessibilityLabel={`${name}${done ? ', 기록함' : ''}`}>
+                    {done && <Ionicons name="checkmark-circle" size={14} color="#1B7F66" />}
+                    <Text style={[styles.chipText, slot === i && styles.chipTextActive]}>{name}</Text>
                   </TouchableOpacity>
-                ))}
-              </View>
+                );
+              })}
+            </View>
 
-              <Text style={styles.subtitle}>
-                음식을 마주하고 내 몸의 감각에 귀 기울여 보세요 ✨
-              </Text>
+            <Text style={styles.label}>어땠어?</Text>
+            <View style={styles.chipRow} accessibilityRole="radiogroup">
+              {mealStatuses.map((s) => (
+                <TouchableOpacity
+                  key={s.id}
+                  style={[styles.chip, status === s.id && styles.chipActive]}
+                  onPress={() => setStatus(s.id)}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: status === s.id }}>
+                  <Text style={[styles.chipText, status === s.id && styles.chipTextActive]}>{s.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
-              <View style={styles.quizBox}>
-                <Text style={styles.quizQuestion}>{currentQuiz.q}</Text>
-              </View>
-
-              {currentQuiz.type === 'yesno' ? (
-                <View style={styles.yesNoContainer}>
-                  <TouchableOpacity
-                    style={[
-                      styles.choiceBtn,
-                      yesNoAnswer === '응, 그랬어' && styles.choiceBtnSelected,
-                    ]}
-                    onPress={() => setYesNoAnswer('응, 그랬어')}>
-                    <Text style={styles.choiceBtnText}>응, 그랬어</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.choiceBtn,
-                      yesNoAnswer === '이번엔 아니었어' && styles.choiceBtnSelected,
-                    ]}
-                    onPress={() => setYesNoAnswer('이번엔 아니었어')}>
-                    <Text style={styles.choiceBtnText}>이번엔 아니었어</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : (
+            {eaten && (
+              <>
+                <Text style={styles.label}>무엇을 먹었어? (선택)</Text>
                 <TextInput
-                  style={styles.textInput}
-                  placeholder={
-                    currentQuiz.type === 'words3'
-                      ? '예: 바삭함 고소함 따뜻함'
-                      : '답변을 편하게 적어주세요'
-                  }
-                  value={textAnswer}
-                  onChangeText={setTextAnswer}
+                  style={styles.input}
+                  placeholder="예: 김밥, 우유"
+                  placeholderTextColor="#94A3B8"
+                  value={menu}
+                  onChangeText={setMenu}
+                  maxLength={100}
+                />
+
+                <Text style={styles.label}>감각 나누기 (선택)</Text>
+                <View style={styles.quizBox}>
+                  <Text style={styles.quizQuestion}>{quiz.q}</Text>
+                </View>
+                <TextInput
+                  style={[styles.input, styles.multiline]}
+                  placeholder="떠오르는 대로 편하게"
+                  placeholderTextColor="#94A3B8"
+                  value={feeling}
+                  onChangeText={setFeeling}
+                  maxLength={300}
                   multiline
                 />
-              )}
 
-              {/* Optional meal photo */}
-              {photoUri ? (
-                <View style={styles.photoPreview}>
-                  <Image source={{ uri: photoUri }} style={styles.photo} contentFit="cover" />
-                  <TouchableOpacity
-                    style={styles.photoRemove}
-                    onPress={() => setPhotoUri(null)}
-                    accessibilityLabel="사진 빼기">
-                    <Ionicons name="close" size={16} color="#FFFFFF" />
-                  </TouchableOpacity>
-                </View>
+                <Text style={styles.label}>사진 (선택)</Text>
+                {photoUri ? (
+                  <View style={styles.photoPreview}>
+                    <Image source={{ uri: photoUri }} style={styles.photo} contentFit="cover" />
+                    <TouchableOpacity
+                      style={styles.photoRemove}
+                      onPress={() => setPhotoUri(null)}
+                      accessibilityLabel="사진 빼기">
+                      <Ionicons name="close" size={16} color="#FFFFFF" />
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View style={styles.photoRow}>
+                    <TouchableOpacity style={styles.photoBtn} onPress={() => pickPhoto(true)}>
+                      <Ionicons name="camera" size={18} color="#1B7F66" />
+                      <Text style={styles.photoBtnText}>{saved?.photoPath ? '다시 찍기' : '지금 찍기'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.photoBtn} onPress={() => pickPhoto(false)}>
+                      <Ionicons name="images" size={18} color="#1B7F66" />
+                      <Text style={styles.photoBtnText}>갤러리</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </>
+            )}
+
+            {status !== null && (
+              <>
+                <Text style={styles.label}>
+                  {status === 'hard' || status === 'skipped' ? '어떤 점이 어려웠어? (선택)' : '남기고 싶은 말 (선택)'}
+                </Text>
+                <TextInput
+                  style={[styles.input, styles.multiline]}
+                  placeholder="적고 싶을 때만 적어도 괜찮아"
+                  placeholderTextColor="#94A3B8"
+                  value={memo}
+                  onChangeText={setMemo}
+                  maxLength={300}
+                  multiline
+                />
+              </>
+            )}
+
+            <TouchableOpacity
+              style={[styles.primaryBtn, (saving || !status) && styles.primaryBtnOff]}
+              onPress={handleSave}
+              disabled={saving}>
+              {saving ? (
+                <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <View style={styles.photoRow}>
-                  <TouchableOpacity style={styles.photoBtn} onPress={() => pickPhoto(true)}>
-                    <Ionicons name="camera" size={18} color="#1B7F66" />
-                    <Text style={styles.photoBtnText}>지금 찍기</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.photoBtn} onPress={() => pickPhoto(false)}>
-                    <Ionicons name="images" size={18} color="#1B7F66" />
-                    <Text style={styles.photoBtnText}>갤러리</Text>
-                  </TouchableOpacity>
-                </View>
+                <Text style={styles.primaryBtnText}>
+                  {saved ? `${MEAL_SLOTS[slot]} 기록 고치기` : `${MEAL_SLOTS[slot]} 기록하기`}
+                </Text>
               )}
-
-              <TouchableOpacity style={styles.primaryBtn} onPress={handleNextStep}>
-                <Text style={styles.primaryBtnText}>다음 (먹은 양) →</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.skipBtn} onPress={handleSkip}>
-                <Text style={styles.skipBtnText}>{mealType}은 못 먹었어</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          ) : (
-            /* Step 2: Portion Selection */
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <Text style={styles.subtitle}>
-                평소 1인분 기준 대비 얼마나 드셨나요?
-              </Text>
-
-              <View style={styles.portionGrid}>
-                {[
-                  { label: '1/3 이하 (아주 조금)', val: 0.33, emoji: '🥣' },
-                  { label: '1/2 (가볍게)', val: 0.5, emoji: '🥗' },
-                  { label: '2/3 (조금 적게)', val: 0.66, emoji: '🥪' },
-                  { label: '1인분 (보통)', val: 1.0, emoji: '🍱' },
-                  { label: '1.5인분 (넉넉히)', val: 1.5, emoji: '🍛' },
-                  { label: '2인분 이상 (아주 많이)', val: 2.0, emoji: '🍕' },
-                ].map((item) => (
-                  <TouchableOpacity
-                    key={item.val}
-                    style={[styles.portionCard, saving && styles.portionCardBusy]}
-                    disabled={saving}
-                    onPress={() => handleSelectPortion(item.val)}>
-                    <Text style={styles.portionEmoji}>{item.emoji}</Text>
-                    <Text style={styles.portionLabel}>{item.label}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              {saving && <ActivityIndicator color="#1B7F66" style={styles.saving} />}
-
-              <TouchableOpacity
-                style={styles.secondaryBtn}
-                onPress={() => setStep(1)}>
-                <Text style={styles.secondaryBtnText}>← 질문 다시 보기</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          )}
+            </TouchableOpacity>
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -277,13 +248,13 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
-    maxHeight: '85%',
+    maxHeight: '88%',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   title: {
     fontSize: 20,
@@ -298,10 +269,71 @@ const styles = StyleSheet.create({
     color: '#A0AEC0',
     fontWeight: '800',
   },
+  label: {
+    fontSize: 13,
+    color: '#475569',
+    fontWeight: '800',
+    marginTop: 14,
+    marginBottom: 8,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    backgroundColor: '#F8FAFC',
+  },
+  chipActive: {
+    borderColor: '#1B7F66',
+    backgroundColor: '#E3F6EF',
+  },
+  chipText: {
+    fontSize: 14,
+    color: '#475569',
+    fontWeight: '800',
+  },
+  chipTextActive: {
+    color: '#17765D',
+  },
+  input: {
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: '#1E293B',
+    fontWeight: '600',
+    backgroundColor: '#F8FAFC',
+  },
+  multiline: {
+    minHeight: 64,
+    textAlignVertical: 'top',
+  },
+  quizBox: {
+    backgroundColor: '#E3F6EF',
+    borderRadius: 14,
+    padding: 12,
+    marginBottom: 8,
+  },
+  quizQuestion: {
+    fontSize: 14,
+    color: '#17765D',
+    fontWeight: '800',
+    lineHeight: 20,
+  },
   photoRow: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 12,
   },
   photoBtn: {
     flex: 1,
@@ -323,7 +355,6 @@ const styles = StyleSheet.create({
   },
   photoPreview: {
     alignSelf: 'center',
-    marginBottom: 12,
   },
   photo: {
     width: 140,
@@ -341,146 +372,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  portionCardBusy: {
-    opacity: 0.5,
-  },
-  saving: {
-    marginBottom: 8,
-  },
-  mealTypeRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 14,
-  },
-  mealTypeChip: {
-    flex: 1,
-    paddingVertical: 9,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#F8FAFC',
-    alignItems: 'center',
-  },
-  mealTypeChipActive: {
-    borderColor: '#1B7F66',
-    backgroundColor: '#E3F6EF',
-  },
-  mealTypeText: {
-    fontSize: 14,
-    color: '#475569',
-    fontWeight: '800',
-  },
-  mealTypeTextActive: {
-    color: '#17765D',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#718096',
-    marginBottom: 16,
-    lineHeight: 20,
-    fontWeight: '600',
-  },
-  quizBox: {
-    backgroundColor: '#E3F6EF',
-    borderLeftWidth: 4,
-    borderLeftColor: '#1B7F66',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  quizQuestion: {
-    fontSize: 16,
-    color: '#17765D',
-    lineHeight: 22,
-    fontWeight: '800',
-  },
-  yesNoContainer: {
-    gap: 10,
-    marginBottom: 20,
-  },
-  choiceBtn: {
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    padding: 16,
-    borderRadius: 14,
-    alignItems: 'center',
-  },
-  choiceBtnSelected: {
-    borderColor: '#1B7F66',
-    backgroundColor: '#E3F6EF',
-  },
-  choiceBtnText: {
-    fontSize: 15,
-    color: '#334155',
-    fontWeight: '800',
-  },
-  textInput: {
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    borderRadius: 14,
-    padding: 14,
-    fontSize: 15,
-    minHeight: 80,
-    textAlignVertical: 'top',
-    marginBottom: 20,
-    color: '#1E293B',
-    fontWeight: '600',
-  },
   primaryBtn: {
+    marginTop: 20,
+    marginBottom: 8,
     backgroundColor: '#1B7F66',
-    padding: 16,
     borderRadius: 16,
+    paddingVertical: 15,
     alignItems: 'center',
-    marginBottom: 12,
+    borderBottomWidth: 4,
+    borderBottomColor: '#125A48',
+  },
+  primaryBtnOff: {
+    opacity: 0.5,
   },
   primaryBtnText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '800',
-  },
-  secondaryBtn: {
-    backgroundColor: '#F1F5F9',
-    padding: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  secondaryBtnText: {
-    color: '#64748B',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  skipBtn: {
-    padding: 12,
-    alignItems: 'center',
-  },
-  skipBtnText: {
-    color: '#EF4444',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  portionGrid: {
-    gap: 10,
-    marginBottom: 16,
-  },
-  portionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    padding: 14,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    gap: 12,
-  },
-  portionEmoji: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  portionLabel: {
-    fontSize: 15,
-    color: '#334155',
-    fontWeight: '800',
+    fontWeight: '900',
   },
 });

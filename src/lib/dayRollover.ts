@@ -1,5 +1,5 @@
 import type { UserState } from '../types/foodymon';
-import { DAY_START_SCORE } from './score.ts';
+import { EMPTY_DAY, ZERO_POINTS } from './growth.ts';
 
 export interface DayCloseResult {
   /** Includes milestoneBonus. */
@@ -93,8 +93,9 @@ export function closeDay(state: UserState): { state: UserState } & DayCloseResul
         badMealCount: 0,
         emotion: null,
       },
-      currentDailyScore: DAY_START_SCORE,
-      level: 3,
+      records: EMPTY_DAY,
+      todayPoints: ZERO_POINTS,
+      currentDailyScore: 0,
     },
     rewardedJelly,
     milestoneBonus,

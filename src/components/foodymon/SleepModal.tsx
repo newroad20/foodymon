@@ -1,33 +1,50 @@
-import React, { useState } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
+import { sleepMinutes } from '@/lib/growth';
 
 interface SleepModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
-export function SleepModal({ visible, onClose }: SleepModalProps) {
-  const { state, logSleep } = useFoodyMon();
-  const [selectedHours, setSelectedHours] = useState(state.targetSleep || 7);
+const STEP = 15;
 
-  const hourOptions = [4, 5, 6, 7, 8, 9, 10, 11];
+const shift = (hhmm: string, delta: number) => {
+  const [h, m] = hhmm.split(':').map(Number);
+  const t = (((h * 60 + m + delta) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
+};
+
+const formatTime = (hhmm: string) => {
+  const [h, m] = hhmm.split(':').map(Number);
+  return `${h < 12 ? '오전' : '오후'} ${h % 12 || 12}:${String(m).padStart(2, '0')}`;
+};
+
+const formatDuration = (min: number) => `${Math.floor(min / 60)}시간${min % 60 ? ` ${min % 60}분` : ''}`;
+
+/** Sleep check-in: bed and wake times; the duration is worked out from them. */
+export function SleepModal({ visible, onClose }: SleepModalProps) {
+  const { state, saveSleep } = useFoodyMon();
+  const saved = state.records.sleep;
+  const [bedTime, setBedTime] = useState(saved?.bedTime ?? '23:00');
+  const [wakeTime, setWakeTime] = useState(saved?.wakeTime ?? '07:00');
+
+  useEffect(() => {
+    if (!visible) return;
+    setBedTime(saved?.bedTime ?? '23:00');
+    setWakeTime(saved?.wakeTime ?? '07:00');
+  }, [visible, saved]);
+
+  const minutes = sleepMinutes({ bedTime, wakeTime });
+  const age = state.birthYear ? new Date().getFullYear() - state.birthYear : null;
+  const recommended = age !== null && age <= 12 ? '9~12시간' : '8~10시간';
+  const band = age !== null && age <= 12 ? '6~12세' : '13~18세';
 
   const handleSave = async () => {
-    await logSleep(selectedHours);
-    const diff = Math.abs(state.targetSleep - selectedHours);
-    let msg = '잠을 알려 줘서 고마워. 숲에도 밤이 찾아왔어.';
-    if (diff <= 1) msg = '푹 잤구나! 숲에 고요한 밤이 깊게 내려앉았어.';
-    else if (diff >= 3) msg = '잠이 들쭉날쭉했구나. 오늘은 같이 천천히 가자.';
-
-    Alert.alert('숲의 밤', msg);
+    await saveSleep(bedTime, wakeTime);
+    Alert.alert('숲의 밤', saved ? '수면 기록을 고쳤어. 점수도 새 시간으로 다시 계산했어.' : '잠 이야기 고마워. 숲에도 고요한 밤이 왔어.');
     onClose();
   };
 
@@ -35,51 +52,65 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
-          {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>수면 · 숲의 밤</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+            <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기">
               <Text style={styles.closeBtnText}>✕</Text>
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.subtitle}>
-            어젯밤 총 몇 시간 동안 깊은 잠을 주무셨나요?
+          <Text style={styles.subtitle}>어젯밤 언제 잠들고 언제 일어났어?</Text>
+
+          <TimeStepper label="잠든 시각" icon="moon" value={bedTime} onChange={setBedTime} />
+          <TimeStepper label="일어난 시각" icon="sunny" value={wakeTime} onChange={setWakeTime} />
+
+          <View style={styles.result}>
+            <Text style={styles.resultLabel}>잔 시간</Text>
+            <Text style={styles.resultValue}>{formatDuration(minutes)}</Text>
+          </View>
+          <Text style={styles.note}>
+            {band} 권장 수면은 {recommended}이에요.{age === null ? ' (마이 탭에서 태어난 연도를 넣으면 나이에 맞춰 알려 줘요)' : ''}
           </Text>
-
-          {/* Target Sleep Notice */}
-          <View style={styles.targetBanner}>
-            <Text style={styles.targetBannerText}>
-              🎯 마스터의 목표 수면: <Text style={styles.bold}>{state.targetSleep}시간</Text>
-            </Text>
-          </View>
-
-          {/* Hour Selector Grid */}
-          <View style={styles.grid}>
-            {hourOptions.map((h) => {
-              const isSelected = selectedHours === h;
-              return (
-                <TouchableOpacity
-                  key={h}
-                  style={[styles.hourCard, isSelected && styles.hourCardSelected]}
-                  onPress={() => setSelectedHours(h)}>
-                  <Text style={[styles.hourText, isSelected && styles.hourTextSelected]}>
-                    {h}시간
-                  </Text>
-                  {h === state.targetSleep && (
-                    <Text style={styles.targetPill}>목표</Text>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          {saved && <Text style={styles.note}>오늘 이미 기록했어요. 고치면 새 시간으로 다시 계산해요.</Text>}
 
           <TouchableOpacity style={styles.primaryBtn} onPress={handleSave}>
-            <Text style={styles.primaryBtnText}>{selectedHours}시간 기록 완료 ✨</Text>
+            <Text style={styles.primaryBtnText}>{saved ? '수면 기록 고치기' : '수면 기록하기'}</Text>
           </TouchableOpacity>
         </View>
       </View>
     </Modal>
+  );
+}
+
+function TimeStepper({
+  label,
+  icon,
+  value,
+  onChange,
+}: {
+  label: string;
+  icon: 'moon' | 'sunny';
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <View style={styles.stepper}>
+      <Ionicons name={icon} size={20} color="#7C3AED" />
+      <Text style={styles.stepperLabel}>{label}</Text>
+      <TouchableOpacity
+        style={styles.stepBtn}
+        onPress={() => onChange(shift(value, -STEP))}
+        accessibilityLabel={`${label} 15분 앞으로`}>
+        <Ionicons name="remove" size={20} color="#334155" />
+      </TouchableOpacity>
+      <Text style={styles.time}>{formatTime(value)}</Text>
+      <TouchableOpacity
+        style={styles.stepBtn}
+        onPress={() => onChange(shift(value, STEP))}
+        accessibilityLabel={`${label} 15분 뒤로`}>
+        <Ionicons name="add" size={20} color="#334155" />
+      </TouchableOpacity>
+    </View>
   );
 }
 
@@ -94,13 +125,12 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
-    maxHeight: '80%',
+    gap: 12,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
   },
   title: {
     fontSize: 20,
@@ -118,69 +148,73 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#718096',
-    marginBottom: 16,
     lineHeight: 20,
     fontWeight: '600',
   },
-  targetBanner: {
-    backgroundColor: '#EDE9FE',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  targetBannerText: {
-    fontSize: 14,
-    color: '#6D28D9',
-    fontWeight: '600',
-  },
-  bold: {
-    fontWeight: '900',
-  },
-  grid: {
+  stepper: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'center',
     gap: 10,
-    marginBottom: 24,
-    justifyContent: 'space-between',
-  },
-  hourCard: {
-    width: '22%',
-    aspectRatio: 1,
     backgroundColor: '#F8FAFC',
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 16,
+    padding: 12,
   },
-  hourCardSelected: {
-    borderColor: '#8B5CF6',
-    backgroundColor: '#F3E8FF',
-  },
-  hourText: {
-    fontSize: 15,
+  stepperLabel: {
+    flex: 1,
+    fontSize: 14,
     color: '#334155',
     fontWeight: '800',
   },
-  hourTextSelected: {
-    color: '#7C3AED',
+  stepBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  targetPill: {
-    fontSize: 9,
-    color: '#7C3AED',
-    backgroundColor: '#DDD6FE',
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    borderRadius: 4,
-    marginTop: 2,
+  time: {
+    minWidth: 86,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#1E293B',
+    fontWeight: '900',
+    fontVariant: ['tabular-nums'],
+  },
+  result: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#F3E8FF',
+    borderRadius: 14,
+    padding: 14,
+  },
+  resultLabel: {
+    fontSize: 14,
+    color: '#6D28D9',
     fontWeight: '800',
+  },
+  resultValue: {
+    fontSize: 18,
+    color: '#6D28D9',
+    fontWeight: '900',
+  },
+  note: {
+    fontSize: 12,
+    color: '#64748B',
+    fontWeight: '600',
+    lineHeight: 18,
   },
   primaryBtn: {
     backgroundColor: '#8B5CF6',
     padding: 16,
     borderRadius: 16,
     alignItems: 'center',
+    marginTop: 4,
   },
   primaryBtnText: {
     color: '#FFFFFF',

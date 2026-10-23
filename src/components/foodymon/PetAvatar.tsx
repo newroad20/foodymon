@@ -23,7 +23,6 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
   const tilt = useRef(new Animated.Value(0)).current; // degrees
   const sink = useRef(new Animated.Value(0)).current; // px down
   const chew = useRef(new Animated.Value(1)).current; // vertical squash
-  const night = useRef(new Animated.Value(0)).current; // dark overlay opacity
   const food = useRef(new Animated.Value(0)).current; // 0 = held out, 1 = eaten
   const [reaction, setReaction] = useState<PetReaction | null>(null);
   // Which eating face shows: 0 mouth open, 1 chewing, 2 happy swallow.
@@ -34,12 +33,13 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
     setReaction(petReaction);
     const t = (v: Animated.Value, toValue: number, duration: number) =>
       Animated.timing(v, { toValue, duration, easing: Easing.inOut(Easing.quad), useNativeDriver: false });
-    const settle = Animated.parallel([t(tilt, 0, 500), t(sink, 0, 500), t(chew, 1, 300), t(night, 0, 600)]);
+    const settle = Animated.parallel([t(tilt, 0, 500), t(sink, 0, 500), t(chew, 1, 300)]);
     let anim: Animated.CompositeAnimation;
 
     if (petReaction.kind === 'sleep') {
       anim = Animated.sequence([
-        Animated.parallel([t(tilt, -14, 700), t(sink, 10, 700), t(night, 0.35, 700)]),
+        // Lies down while the screen turns to night (NightOverlay), breathing slowly, then wakes.
+        Animated.parallel([t(tilt, -14, 900), t(sink, 10, 900)]),
         Animated.loop(Animated.sequence([t(chew, 0.97, 900), t(chew, 1, 900)]), { iterations: 2 }),
         settle,
       ]);
@@ -81,7 +81,7 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
       anim.stop();
       timers.forEach(clearTimeout);
     };
-  }, [petReaction, tilt, sink, chew, night, food]);
+  }, [petReaction, tilt, sink, chew, food]);
   const bounceAnim = useRef(new Animated.Value(0)).current;
   const floatAnim = useRef(new Animated.Value(0)).current;
   const particleScale = useRef(new Animated.Value(0)).current;
@@ -230,8 +230,6 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
             <Image source={reactionArt ?? currentLevelInfo.image} style={styles.petImage} resizeMode="contain" />
           </Animated.View>
 
-          {/* Night falls over FoodyMon while it sleeps */}
-          <Animated.View pointerEvents="none" style={[styles.night, { opacity: night }]} />
           {reaction?.kind === 'sleep' && <Text style={styles.zzz}>💤</Text>}
 
           {/* The meal flies in and gets eaten */}
@@ -339,13 +337,6 @@ const styles = StyleSheet.create({
   petImage: {
     width: 220,
     height: 220,
-  },
-  night: {
-    position: 'absolute',
-    width: 240,
-    height: 240,
-    borderRadius: 120,
-    backgroundColor: '#1E1B4B',
   },
   zzz: {
     position: 'absolute',

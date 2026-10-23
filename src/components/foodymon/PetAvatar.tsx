@@ -26,6 +26,8 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
   const night = useRef(new Animated.Value(0)).current; // dark overlay opacity
   const food = useRef(new Animated.Value(0)).current; // 0 = held out, 1 = eaten
   const [reaction, setReaction] = useState<PetReaction | null>(null);
+  // Which eating face shows: 0 mouth open, 1 chewing, 2 happy swallow.
+  const [eatFrame, setEatFrame] = useState(0);
 
   useEffect(() => {
     if (!petReaction) return;
@@ -43,6 +45,7 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
       ]);
     } else if (petReaction.kind === 'eat') {
       food.setValue(0);
+      setEatFrame(0);
       const chomp = Animated.sequence([t(chew, 0.88, 120), t(chew, 1.05, 120)]);
       anim = Animated.sequence([
         Animated.delay(300),
@@ -66,8 +69,18 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
                 : Animated.sequence([t(sink, 6, 300), t(sink, 0, 300), Animated.delay(1600)]);
       anim = Animated.sequence([motion, settle]);
     }
+    // Eating faces: open while the food flies in (1.2s), chew open/closed 4 times, then a happy gulp.
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    if (petReaction.kind === 'eat') {
+      const at = (ms: number, frame: number) => timers.push(setTimeout(() => setEatFrame(frame), ms));
+      for (let i = 0; i < 8; i++) at(1200 + i * 120, i % 2 === 0 ? 1 : 0);
+      at(1200 + 8 * 120, 2);
+    }
     anim.start(({ finished }) => finished && setReaction(null));
-    return () => anim.stop();
+    return () => {
+      anim.stop();
+      timers.forEach(clearTimeout);
+    };
   }, [petReaction, tilt, sink, chew, night, food]);
   const bounceAnim = useRef(new Animated.Value(0)).current;
   const floatAnim = useRef(new Animated.Value(0)).current;
@@ -143,16 +156,17 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
   const currentLevelInfo =
     levelsData.find((l) => l.level === state.level) || levelsData[2];
   // Art for the current reaction when the team adds it; otherwise the stage image.
+  const art = petStateArt[state.level];
   const reactionArt =
     reaction?.kind === 'sleep'
-      ? petStateArt.sleep
+      ? art?.sleep
       : reaction?.kind === 'eat'
-        ? petStateArt.eat
+        ? art?.eat?.[eatFrame]
         : reaction?.kind === 'mood'
-          ? petStateArt.mood?.[reaction.emotion]
+          ? art?.mood?.[reaction.emotion]
           : undefined;
   const moodEmoji =
-    reaction?.kind === 'mood' ? (reaction.emotion === 'very_hard' ? '💧' : mindEmotions.find((m) => m.id === reaction.emotion)?.emoji) : null;
+    reaction?.kind === 'mood' && !reactionArt ? (reaction.emotion === 'very_hard' ? '💧' : mindEmotions.find((m) => m.id === reaction.emotion)?.emoji) : null;
 
   const equippedCostumeItem = costumesData.find(
     (c) => c.id === state.equippedCostume

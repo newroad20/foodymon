@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Image,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -13,6 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
+import { HatchEgg } from '@/components/foodymon/HatchEgg';
 
 interface RegisterScreenProps {
   onSwitchToLogin: () => void;
@@ -20,17 +20,12 @@ interface RegisterScreenProps {
 
 export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
   const { signUp } = useAuth();
-  const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!nickname.trim()) {
-      Alert.alert('알림', '닉네임을 입력해 주세요.');
-      return;
-    }
     if (!email.trim()) {
       Alert.alert('알림', '이메일을 입력해 주세요.');
       return;
@@ -45,19 +40,19 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
     }
 
     setLoading(true);
-    const { error, needsConfirmation } = await signUp(email.trim(), password, nickname.trim());
+    const { error, needsConfirmation } = await signUp(email.trim(), password);
     setLoading(false);
 
     if (error) {
       if (error.includes('already registered')) {
-        Alert.alert('가입 실패', '이미 사용 중인 이메일입니다.');
+        Alert.alert('이미 가입된 이메일이에요', '로그인 화면에서 이 이메일로 로그인해 주세요.');
       } else {
         Alert.alert('가입 실패', error);
       }
     } else if (needsConfirmation) {
       Alert.alert(
         '🎉 가입 완료!',
-        `${nickname} 마스터, 환영합니다!\n이 폰에서 인증 메일의 링크를 누르면 앱이 열리면서 바로 로그인돼요.\n(받은 편지함 또는 스팸함을 확인하세요)`,
+        `환영합니다!\n이 폰에서 인증 메일의 링크를 누르면 앱이 열리면서 바로 로그인돼요.\n(받은 편지함 또는 스팸함을 확인하세요)`,
         [{ text: '확인', onPress: onSwitchToLogin }]
       );
     }
@@ -73,11 +68,8 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
         keyboardShouldPersistTaps="handled">
         {/* Mascot */}
         <View style={styles.heroSection}>
-          <Image
-            source={require('@/assets/images/level1.png')}
-            style={styles.petImage}
-            resizeMode="contain"
-          />
+          {/* The pet hatches from this egg at the end of onboarding. */}
+          <HatchEgg taps={0} hatched={false} />
           <Text style={styles.appTitle}>푸디몬 입양하기</Text>
           <Text style={styles.appSubtitle}>함께 건강한 일상을 만들어봐요 🌱</Text>
         </View>
@@ -85,16 +77,6 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
         {/* Form Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>회원가입</Text>
-
-          <Text style={styles.label}>닉네임</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="마스터 닉네임 (예: 새길)"
-            placeholderTextColor="#94A3B8"
-            value={nickname}
-            onChangeText={setNickname}
-            maxLength={12}
-          />
 
           <Text style={styles.label}>이메일</Text>
           <TextInput
@@ -166,10 +148,6 @@ const styles = StyleSheet.create({
   heroSection: {
     alignItems: 'center',
     marginBottom: 28,
-  },
-  petImage: {
-    width: 130,
-    height: 130,
   },
   appTitle: {
     fontSize: 26,

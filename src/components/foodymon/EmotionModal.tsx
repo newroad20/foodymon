@@ -42,11 +42,11 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
     setSaving(true);
     const ok = await addMind({ emotion: e, situation: e === 'no_answer' ? null : situation, note: note.trim() });
     setSaving(false);
+    onClose();
     Alert.alert(
       '마음 날씨',
       ok ? '알려 줘서 고마워. 어떤 마음이든 다 소중해.' : `오늘 마음 기록은 ${MAX_MIND_RECORDS}번까지 할 수 있어요.`
     );
-    onClose();
   };
 
   const pickEmotion = (e: Emotion) => {

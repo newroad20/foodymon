@@ -33,11 +33,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   /** needsConfirmation: false when Supabase signed the user in right away (email confirmation off). */
-  signUp: (
-    email: string,
-    password: string,
-    nickname: string
-  ) => Promise<{ error: string | null; needsConfirmation: boolean }>;
+  signUp: (email: string, password: string) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   /** Permanently deletes the account and all its records, then signs out. */
@@ -76,18 +72,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signUp = async (email: string, password: string, nickname: string) => {
-    // The profile row is created by the on_auth_user_created trigger (supabase/schema.sql).
+  const signUp = async (email: string, password: string) => {
+    // The profile row is created by the on_auth_user_created trigger (supabase/schema.sql);
+    // the nickname is asked in onboarding.
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { nickname },
-        emailRedirectTo,
-      },
+      options: { emailRedirectTo },
     });
 
     if (error) return { error: error.message, needsConfirmation: false };
+    // With email confirmation on, Supabase hides an existing email by answering with an empty user.
+    if (data.user && data.user.identities?.length === 0) {
+      return { error: 'User already registered', needsConfirmation: false };
+    }
     return { error: null, needsConfirmation: !data.session };
   };
 

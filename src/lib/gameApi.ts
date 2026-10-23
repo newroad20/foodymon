@@ -195,6 +195,8 @@ export async function saveOnboarding(
     targetSleep: number;
     targetMeals: number;
     usualMealSize: number;
+    /** Only for users who may be under 14. */
+    guardian?: { name: string; contact: string };
   }
 ): Promise<void> {
   const res = await supabase
@@ -202,6 +204,11 @@ export async function saveOnboarding(
     .update({
       nickname: values.nickname,
       birth_year: values.birthYear,
+      ...(values.guardian && {
+        guardian_name: values.guardian.name,
+        guardian_contact: values.guardian.contact,
+        guardian_consent_at: new Date().toISOString(),
+      }),
       onboarded: true,
       target_sleep: values.targetSleep,
       target_meals: values.targetMeals,

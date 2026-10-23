@@ -63,8 +63,8 @@ test('calcDailyScore weights sleep/meal/emotion and applies the streak bonus', (
   const today = { sleepDiff: 0, sleepHours: 7, mealCount: 3, badMealCount: 0, emotion: 100 };
   assert.deepEqual(calcDailyScore({ today, targetMeals: 3, streak: 0 }, levels), { score: 100, level: 6 });
   const half = { ...today, sleepDiff: 2, mealCount: 1, emotion: 50 };
-  // 50*0.35 + 33.3*0.35 + 50*0.3 = 44.2 -> x1.05 = 46
-  assert.deepEqual(calcDailyScore({ today: half, targetMeals: 3, streak: 3 }, levels), { score: 46, level: 3 });
+  // 50*0.35 + 33.3*0.35 + 100*0.3 (any logged feeling) = 59.2 -> x1.05 = 62
+  assert.deepEqual(calcDailyScore({ today: half, targetMeals: 3, streak: 3 }, levels), { score: 62, level: 4 });
 });
 
 test('toRolloverResult maps the close_days response', () => {
@@ -112,5 +112,6 @@ test('calcDailyScore starts an unlogged day at the neutral level', () => {
   const empty = { sleepDiff: null, sleepHours: null, mealCount: 0, badMealCount: 0, emotion: null };
   assert.deepEqual(calcDailyScore({ today: empty, targetMeals: 3, streak: 10 }, levels), { score: 40, level: 3 });
   // One low check-in still counts as a real score.
-  assert.equal(calcDailyScore({ today: { ...empty, emotion: 20 }, targetMeals: 3, streak: 0 }, levels).score, 6);
+  assert.equal(calcDailyScore({ today: { ...empty, emotion: 20 }, targetMeals: 3, streak: 0 }, levels).score, 30);
+  assert.equal(calcDailyScore({ today: { ...empty, emotion: 100 }, targetMeals: 3, streak: 0 }, levels).score, 30);
 });

@@ -23,7 +23,8 @@ export function calcScoreParts(state: Pick<UserState, 'today' | 'targetMeals' | 
     mealScore = Math.min(100, (state.today.mealCount / state.targetMeals) * 100);
   }
 
-  const emotionScore = state.today.emotion !== null ? state.today.emotion : 50;
+  // Any feeling the user shares counts the same: an honest hard day must not lower the pet.
+  const emotionScore = state.today.emotion !== null ? 100 : 50;
 
   let multiplier = 1.0;
   if (state.streak >= 14) multiplier = 1.15;

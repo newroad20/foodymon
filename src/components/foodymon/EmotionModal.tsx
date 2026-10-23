@@ -1,4 +1,5 @@
 import React from 'react';
+import { router } from 'expo-router';
 import {
   Modal,
   View,
@@ -45,6 +46,14 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
           <Text style={styles.subtitle}>
             오늘 하루 마음의 날씨는 어떤가요?
           </Text>
+          <TouchableOpacity
+            onPress={() => {
+              onClose();
+              router.push('/help');
+            }}
+            accessibilityRole="link">
+            <Text style={styles.helpLink}>마음이 많이 힘들다면 → 도움 받기</Text>
+          </TouchableOpacity>
 
           <View style={styles.list}>
             {emotions.map((item) => (
@@ -98,6 +107,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#A0AEC0',
     fontWeight: '800',
+  },
+  helpLink: {
+    fontSize: 13,
+    color: '#17765D',
+    fontWeight: '800',
+    marginBottom: 14,
   },
   subtitle: {
     fontSize: 14,

@@ -283,6 +283,10 @@ export default function MyPageScreen() {
           </View>
         )}
 
+        <TouchableOpacity onPress={() => router.push('/privacy')} accessibilityRole="link">
+          <Text style={styles.policyLink}>개인정보 처리방침</Text>
+        </TouchableOpacity>
+
         {/* Account */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>계정</Text>
@@ -488,6 +492,13 @@ const styles = StyleSheet.create({
   },
   rowBtn: {
     paddingVertical: 12,
+  },
+  policyLink: {
+    textAlign: 'center',
+    fontSize: 13,
+    color: '#64748B',
+    fontWeight: '700',
+    textDecorationLine: 'underline',
   },
   deleteText: {
     fontSize: 13,

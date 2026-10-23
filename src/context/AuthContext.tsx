@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
 import { disableReminders } from '@/lib/reminders';
 import { deleteAllMealPhotos } from '@/lib/gameApi';
+import { EFFECTIVE_DATE } from '@/constants/privacyPolicy';
 import { describeAuthLinkError, parseAuthLink } from '@/lib/authLink';
 
 // Where the sign-up confirmation email sends the user back: this app's root
@@ -78,7 +79,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo },
+      options: {
+        emailRedirectTo,
+        // Proof of the two required consents ticked on the sign-up screen.
+        data: { consent_privacy_at: new Date().toISOString(), consent_sensitive_at: new Date().toISOString(), privacy_version: EFFECTIVE_DATE },
+      },
     });
 
     if (error) return { error: error.message, needsConfirmation: false };

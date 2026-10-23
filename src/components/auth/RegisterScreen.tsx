@@ -10,8 +10,11 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { PrivacyPolicy } from '@/app/privacy';
 import { HatchEgg } from '@/components/foodymon/HatchEgg';
 
 interface RegisterScreenProps {
@@ -24,6 +27,9 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [loading, setLoading] = useState(false);
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
+  const [agreeSensitive, setAgreeSensitive] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
 
   const handleRegister = async () => {
     if (!email.trim()) {
@@ -36,6 +42,10 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
     }
     if (password !== passwordConfirm) {
       Alert.alert('알림', '비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    if (!agreePrivacy || !agreeSensitive) {
+      Alert.alert('동의가 필요해요', '필수 항목 두 가지에 동의해야 가입할 수 있어요.');
       return;
     }
 
@@ -110,6 +120,24 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
             secureTextEntry
           />
 
+          <Consent
+            checked={agreePrivacy}
+            onToggle={() => setAgreePrivacy(!agreePrivacy)}
+            label="[필수] 개인정보 수집·이용 동의"
+          />
+          <Consent
+            checked={agreeSensitive}
+            onToggle={() => setAgreeSensitive(!agreeSensitive)}
+            label="[필수] 수면·식사·마음 기록(건강 관련 민감정보) 처리 동의"
+          />
+          <TouchableOpacity onPress={() => setShowPolicy(true)} accessibilityRole="link">
+            <Text style={styles.policyLink}>개인정보 처리방침 전문 보기 →</Text>
+          </TouchableOpacity>
+          <Text style={styles.policyNote}>만 14세 미만은 보호자의 동의가 필요해요.</Text>
+          <Modal visible={showPolicy} animationType="slide" onRequestClose={() => setShowPolicy(false)}>
+            <PrivacyPolicy onClose={() => setShowPolicy(false)} />
+          </Modal>
+
           <TouchableOpacity
             style={[styles.primaryBtn, loading && styles.btnDisabled]}
             onPress={handleRegister}
@@ -134,7 +162,44 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
   );
 }
 
+function Consent({ checked, onToggle, label }: { checked: boolean; onToggle: () => void; label: string }) {
+  return (
+    <TouchableOpacity
+      style={styles.consent}
+      onPress={onToggle}
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked }}>
+      <Ionicons name={checked ? 'checkbox' : 'square-outline'} size={22} color={checked ? '#1B7F66' : '#94A3B8'} />
+      <Text style={styles.consentText}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
 const styles = StyleSheet.create({
+  consent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 6,
+  },
+  consentText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#334155',
+    fontWeight: '700',
+  },
+  policyLink: {
+    fontSize: 13,
+    color: '#17765D',
+    fontWeight: '800',
+    paddingVertical: 6,
+  },
+  policyNote: {
+    fontSize: 12,
+    color: '#64748B',
+    fontWeight: '600',
+    marginBottom: 12,
+  },
   container: {
     flex: 1,
     backgroundColor: '#FDF5F5',

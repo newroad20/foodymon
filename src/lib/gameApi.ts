@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase';
 import { LogItem, UserState } from '@/types/foodymon';
 import { RolloverResult } from '@/lib/dayRollover';
 import { DailyRecordRow } from '@/lib/collection';
-import type { DayPoints, MealRecord, MindRecord, SleepRecord } from '@/lib/growth';
+import type { DayPoints, DayRecords, MealRecord, MindRecord, SleepRecord } from '@/lib/growth';
 import {
   buildUserState,
   CheckinLogRow,
@@ -436,5 +436,63 @@ export async function saveSmallGoal(
 
 export async function clearSmallGoal(userId: string, logDate: string): Promise<void> {
   const res = await supabase.from('small_goals').delete().eq('user_id', userId).eq('log_date', logDate);
+  if (res.error) throw res.error;
+}
+
+export interface DayDetail {
+  records: DayRecords;
+  points: DayPoints & { small_goal: { kind: GoalKind; size: number; held: boolean } | null };
+  photoUrls: Record<string, string>;
+}
+
+/** Everything recorded on one day, with its growth points and their basis. */
+export async function fetchDay(userId: string, date: string): Promise<DayDetail> {
+  const [sleepRes, mealRes, mindRes, pointsRes] = await Promise.all([
+    supabase.from('sleep_records').select('bed_time, wake_time').eq('user_id', userId).eq('log_date', date).maybeSingle(),
+    supabase
+      .from('meal_records')
+      .select('slot, status, menu, feeling, memo, photo_path')
+      .eq('user_id', userId)
+      .eq('log_date', date)
+      .order('slot'),
+    supabase
+      .from('mind_records')
+      .select('emotion, situation, note')
+      .eq('user_id', userId)
+      .eq('log_date', date)
+      .order('created_at'),
+    supabase.rpc('get_day_points', { p_day: date }),
+  ]);
+  for (const r of [sleepRes, mealRes, mindRes, pointsRes]) if (r.error) throw r.error;
+  const records = toDayRecords({
+    sleep: sleepRes.data as SleepRecordRow | null,
+    meals: (mealRes.data ?? []) as MealRecordRow[],
+    minds: (mindRes.data ?? []) as MindRecordRow[],
+  });
+  const photoUrls = await mealPhotoUrls(records.meals.flatMap((m) => (m.photoPath ? [m.photoPath] : [])));
+  return { records, points: pointsRes.data as DayDetail['points'], photoUrls };
+}
+
+export interface Journey {
+  first_date: string | null;
+  recorded_days: number;
+  total: number;
+  level: number;
+  sleep_count: number;
+  meal_count: number;
+  mind_count: number;
+  goals_done: number;
+  reflection: string;
+}
+
+/** The whole journey so far, for the summary card. */
+export async function fetchJourney(): Promise<Journey> {
+  const res = await supabase.rpc('get_journey');
+  if (res.error) throw res.error;
+  return res.data as Journey;
+}
+
+export async function saveReflection(userId: string, text: string): Promise<void> {
+  const res = await supabase.from('profiles').update({ reflection: text }).eq('id', userId);
   if (res.error) throw res.error;
 }

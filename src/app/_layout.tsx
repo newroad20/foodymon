@@ -55,6 +55,15 @@ function AppContent() {
             }}
           />
           <Stack.Screen
+            name="day/[date]"
+            options={{
+              headerShown: true,
+              headerBackTitle: '요약',
+              headerStyle: { backgroundColor: '#FDF5F5' },
+              headerShadowVisible: false,
+            }}
+          />
+          <Stack.Screen
             name="help"
             options={{
               headerShown: true,

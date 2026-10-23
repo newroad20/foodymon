@@ -11,6 +11,7 @@ import { toDateKey, hasLoggedToday } from '@/lib/dayRollover';
 import { addDays, buildTrend, summarizeTrend } from '@/lib/trend';
 import { fetchScoreHistory } from '@/lib/gameApi';
 import { ScoreTrendChart } from '@/components/foodymon/ScoreTrendChart';
+import { JourneyCard } from '@/components/foodymon/JourneyCard';
 
 const RANGES = [7, 14, 30] as const;
 type Range = (typeof RANGES)[number];
@@ -96,6 +97,8 @@ export default function SummaryScreen() {
           </TouchableOpacity>
         </View>
 
+        <JourneyCard />
+
         {/* S5-2 Trend */}
         <View style={styles.card}>
           <View style={styles.trendHeader}>
@@ -124,7 +127,7 @@ export default function SummaryScreen() {
           ) : error ? (
             <Text style={styles.errorText}>기록을 불러오지 못했어요. 탭을 다시 열어 주세요.</Text>
           ) : (
-            <ScoreTrendChart points={points} />
+            <ScoreTrendChart points={points} onOpenDay={(date) => router.push(`/day/${date}`)} />
           )}
         </View>
       </ScrollView>

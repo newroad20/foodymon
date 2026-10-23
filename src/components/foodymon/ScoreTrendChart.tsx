@@ -22,10 +22,12 @@ const shortDate = (key: string) => {
 
 interface Props {
   points: TrendPoint[];
+  /** Opens the diary for a recorded day (재형 피드백: 그래프에서 날짜 누르기). */
+  onOpenDay?: (date: string) => void;
 }
 
 /** Column chart of the daily health index (0–100), one column per day. Tap a column for its value. */
-export function ScoreTrendChart({ points }: Props) {
+export function ScoreTrendChart({ points, onOpenDay }: Props) {
   const [plotWidth, setPlotWidth] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
 
@@ -50,13 +52,20 @@ export function ScoreTrendChart({ points }: Props) {
     <View>
       <View style={styles.tooltipRow}>
         {active ? (
-          <Text style={styles.tooltip}>
-            {shortDate(active.date)}
-            {active.isToday ? ' (오늘)' : ''} ·{' '}
-            {active.score === null ? '기록 없음' : `${active.score}점`}
-          </Text>
+          <View style={styles.tooltipLine}>
+            <Text style={styles.tooltip}>
+              {shortDate(active.date)}
+              {active.isToday ? ' (오늘)' : ''} ·{' '}
+              {active.score === null ? '기록 없음' : `${active.score}점`}
+            </Text>
+            {onOpenDay && active.score !== null && (
+              <Pressable onPress={() => onOpenDay(active.date)} accessibilityRole="link" hitSlop={8}>
+                <Text style={styles.openDay}>그날 기록 보기 →</Text>
+              </Pressable>
+            )}
+          </View>
         ) : (
-          <Text style={styles.tooltipHint}>막대를 눌러 날짜별 점수를 확인해요</Text>
+          <Text style={styles.tooltipHint}>막대를 눌러 날짜별 기록을 확인해요</Text>
         )}
       </View>
 
@@ -126,6 +135,16 @@ const Y_AXIS_WIDTH = 28;
 const X_LABEL_WIDTH = 40;
 
 const styles = StyleSheet.create({
+  tooltipLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  openDay: {
+    fontSize: 13,
+    color: '#17765D',
+    fontWeight: '900',
+  },
   tooltipRow: {
     height: 22,
     justifyContent: 'center',

@@ -1,5 +1,5 @@
 import { PGlite } from '@electric-sql/pglite';
-// Runs schema.sql + 002 + 004 + 005 in PGlite and checks growth points (003 needs Supabase Storage).
+// Runs schema.sql + 002 + 004 + 005 + 006 in PGlite and checks growth points (003 needs Supabase Storage).
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
@@ -15,7 +15,7 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
     create function auth.uid() returns uuid language sql stable as
       $$ select nullif(current_setting('test.uid', true), '')::uuid $$;
   `);
-  for (const f of ['schema.sql', '002_game_rpc.sql', '004_birth_year.sql', '005_growth.sql', '005_growth.sql']) {
+  for (const f of ['schema.sql', '002_game_rpc.sql', '004_birth_year.sql', '005_growth.sql', '005_growth.sql', '006_day_detail.sql', '006_day_detail.sql']) {
     await db.exec(sql(f));
   }
   const U = '11111111-1111-1111-1111-111111111111';
@@ -143,6 +143,17 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
   assert.equal(await goalPts(), 10);
   await q(`insert into public.mind_records(user_id,log_date,emotion,situation,note) values ($1,$2,'tired','family','다퉜어')`, [V, today]);
   assert.equal(await goalPts(), 20);
+
+  // day detail and journey summary for this user
+  const day = (await q(`select public.get_day_points($1::date) r`, [today]))[0].r;
+  assert.deepEqual([day.goal, day.small_goal.kind], [20, 'mind_reason']);
+  await q(`update public.profiles set reflection = '조금 덜 불안해졌어' where id=$1`, [V]);
+  const j = (await q(`select public.get_journey() r`))[0].r;
+  assert.deepEqual(
+    [j.recorded_days, j.sleep_count, j.meal_count, j.mind_count, j.goals_done, j.reflection],
+    [2, 2, 3, 3, 1, '조금 덜 불안해졌어']
+  );
+  assert.equal(j.level, 3);
 
   await db.exec(`select set_config('test.uid', '', false)`);
   await assert.rejects(q(`select public.sync_growth($1::date)`, [today]), /not authenticated/);

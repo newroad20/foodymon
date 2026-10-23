@@ -46,7 +46,7 @@ export async function fetchGameState(
   const profileRes = await supabase
     .from('profiles')
     .select(
-      'nickname, onboarded, target_sleep, target_meals, usual_meal_size, jelly_balance, streak, shields, equipped_costume, equipped_backgrounds, history_scores, last_checkin_date, missed_date, missed_prev_streak'
+      'nickname, onboarded, birth_year, target_sleep, target_meals, usual_meal_size, jelly_balance, streak, shields, equipped_costume, equipped_backgrounds, history_scores, last_checkin_date, missed_date, missed_prev_streak'
     )
     .eq('id', userId)
     .single();
@@ -110,12 +110,19 @@ export async function saveCheckin(
 
 export async function saveOnboarding(
   userId: string,
-  values: { nickname: string; targetSleep: number; targetMeals: number; usualMealSize: number }
+  values: {
+    nickname: string;
+    birthYear: number;
+    targetSleep: number;
+    targetMeals: number;
+    usualMealSize: number;
+  }
 ): Promise<void> {
   const res = await supabase
     .from('profiles')
     .update({
       nickname: values.nickname,
+      birth_year: values.birthYear,
       onboarded: true,
       target_sleep: values.targetSleep,
       target_meals: values.targetMeals,
@@ -127,12 +134,13 @@ export async function saveOnboarding(
 
 export async function saveSettings(
   userId: string,
-  values: { nickname: string; targetSleep: number; targetMeals: number }
+  values: { nickname: string; birthYear: number | null; targetSleep: number; targetMeals: number }
 ): Promise<void> {
   const res = await supabase
     .from('profiles')
     .update({
       nickname: values.nickname,
+      birth_year: values.birthYear,
       target_sleep: values.targetSleep,
       target_meals: values.targetMeals,
     })

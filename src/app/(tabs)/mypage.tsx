@@ -18,6 +18,7 @@ import { router } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { useAuth } from '@/context/AuthContext';
 import { useMusic } from '@/context/MusicContext';
+import { parseBirthYear } from '@/lib/age';
 import {
   disableReminders,
   enableReminders,
@@ -49,6 +50,7 @@ export default function MyPageScreen() {
   };
 
   const [nickname, setNickname] = useState(state.masterName);
+  const [birthText, setBirthText] = useState(state.birthYear ? String(state.birthYear) : '');
   const [targetSleep, setTargetSleep] = useState(state.targetSleep);
   const [targetMeals, setTargetMeals] = useState(state.targetMeals);
   const [saving, setSaving] = useState(false);
@@ -56,14 +58,16 @@ export default function MyPageScreen() {
   // Follow the saved values when they change elsewhere (e.g. after a server sync).
   useEffect(() => {
     setNickname(state.masterName);
+    setBirthText(state.birthYear ? String(state.birthYear) : '');
     setTargetSleep(state.targetSleep);
     setTargetMeals(state.targetMeals);
-  }, [state.masterName, state.targetSleep, state.targetMeals]);
+  }, [state.masterName, state.birthYear, state.targetSleep, state.targetMeals]);
 
   const levelInfo = levelsData.find((l) => l.level === state.level) ?? levelsData[2];
   const trimmedName = nickname.trim();
   const dirty =
     trimmedName !== state.masterName ||
+    birthText !== (state.birthYear ? String(state.birthYear) : '') ||
     targetSleep !== state.targetSleep ||
     targetMeals !== state.targetMeals;
 
@@ -72,9 +76,15 @@ export default function MyPageScreen() {
       Alert.alert('이름을 입력해 주세요', '푸디몬이 마스터를 부를 이름이 필요해요!');
       return;
     }
+    const birthYear = birthText.trim() ? parseBirthYear(birthText) : null;
+    if (birthText.trim() && birthYear === null) {
+      Alert.alert('태어난 연도를 확인해 주세요', '네 자리 연도로 적어 주세요. (예: 2012)');
+      return;
+    }
     setSaving(true);
     const ok = await updateSettings({
       nickname: trimmedName,
+      birthYear,
       targetSleep,
       targetMeals,
     });
@@ -82,7 +92,7 @@ export default function MyPageScreen() {
     Alert.alert(
       ok ? '저장했어요 ✨' : '저장하지 못했어요',
       ok
-        ? '새 목표로 오늘의 건강 지수를 다시 계산했어요.'
+        ? '바뀐 내용으로 오늘의 건강 지수를 다시 계산했어요.'
         : '네트워크를 확인하고 다시 시도해 주세요.'
     );
   };
@@ -140,7 +150,7 @@ export default function MyPageScreen() {
 
         {/* Goals */}
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>내 정보 · 라이프스타일 목표</Text>
+          <Text style={styles.sectionTitle}>내 정보 · 요즘 내 생활</Text>
 
           <Text style={styles.label}>이름</Text>
           <TextInput
@@ -152,7 +162,17 @@ export default function MyPageScreen() {
             returnKeyType="done"
           />
 
-          <Text style={styles.label}>목표 수면 시간</Text>
+          <Text style={styles.label}>태어난 연도</Text>
+          <TextInput
+            style={styles.input}
+            value={birthText}
+            onChangeText={setBirthText}
+            placeholder="예: 2012 (나이에 맞는 잠 시간 안내용)"
+            keyboardType="number-pad"
+            maxLength={4}
+          />
+
+          <Text style={styles.label}>요즘 수면 시간</Text>
           <View style={styles.chipRow}>
             {sleepTargetOptions.map((hrs) => (
               <Chip
@@ -164,7 +184,7 @@ export default function MyPageScreen() {
             ))}
           </View>
 
-          <Text style={styles.label}>하루 목표 끼니</Text>
+          <Text style={styles.label}>요즘 하루 끼니</Text>
           <View style={styles.chipRow}>
             {mealTargetOptions.map((m) => (
               <Chip

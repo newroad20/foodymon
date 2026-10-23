@@ -23,6 +23,7 @@ const defaultState: UserState = {
   targetSleep: 7,
   targetMeals: 3,
   usualMealSize: 1.0,
+  birthYear: null,
 
   streak: 0,
   shields: 1,
@@ -61,7 +62,13 @@ interface FoodyMonContextType {
   retrySync: () => Promise<void>;
   currentDialogue: string;
   triggerPetInteraction: () => string;
-  completeOnboarding: (name: string, sleep: number, meals: number, mealSize: number) => Promise<void>;
+  completeOnboarding: (
+    name: string,
+    birthYear: number,
+    sleep: number,
+    meals: number,
+    mealSize: number
+  ) => Promise<void>;
   /** photoUri: a picked/taken photo; photoFailed is true when the meal was saved without it. */
   logMeal: (
     size: number,
@@ -77,7 +84,12 @@ interface FoodyMonContextType {
     mealCount: number;
     emotion: number | null;
   }) => Promise<{ success: boolean; message: string }>;
-  updateSettings: (values: { nickname: string; targetSleep: number; targetMeals: number }) => Promise<boolean>;
+  updateSettings: (values: {
+    nickname: string;
+    birthYear: number | null;
+    targetSleep: number;
+    targetMeals: number;
+  }) => Promise<boolean>;
   buyItem: (type: 'costume' | 'background', id: string) => Promise<{ success: boolean; message: string }>;
   /** Opens a gift box (S44); on success returns the item that came out. */
   openGiftBox: () => Promise<
@@ -246,6 +258,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
 
   const completeOnboarding = async (
     name: string,
+    birthYear: number,
     sleep: number,
     meals: number,
     mealSize: number
@@ -255,6 +268,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
       withScore({
         ...stateRef.current,
         masterName: name,
+        birthYear,
         targetSleep: sleep,
         targetMeals: meals,
         usualMealSize: mealSize,
@@ -265,6 +279,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     );
     try {
       await gameApi.saveOnboarding(userId, {
+        birthYear,
         nickname: name,
         targetSleep: sleep,
         targetMeals: meals,
@@ -368,12 +383,18 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
   };
 
   /** Updates name and lifestyle goals; today's score is recalculated against the new goals. */
-  const updateSettings = async (values: { nickname: string; targetSleep: number; targetMeals: number }) => {
+  const updateSettings = async (values: {
+    nickname: string;
+    birthYear: number | null;
+    targetSleep: number;
+    targetMeals: number;
+  }) => {
     const current = stateRef.current;
     const sleepHours = current.today.sleepHours;
     const next = withScore({
       ...current,
       masterName: values.nickname,
+      birthYear: values.birthYear,
       targetSleep: values.targetSleep,
       targetMeals: values.targetMeals,
       today: {

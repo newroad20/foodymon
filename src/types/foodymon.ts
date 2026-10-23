@@ -41,6 +41,8 @@ export interface UserState {
   targetSleep: number;
   targetMeals: number;
   usualMealSize: number;
+  /** Used only to pick the age band for recommended sleep; null until asked. */
+  birthYear: number | null;
 
   streak: number;
   shields: number;

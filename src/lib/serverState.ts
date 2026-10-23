@@ -8,6 +8,7 @@ export interface ProfileRow {
   target_sleep: number | string;
   target_meals: number;
   usual_meal_size: number | string;
+  birth_year?: number | null;
   jelly_balance: number;
   streak: number;
   shields: number;
@@ -80,6 +81,7 @@ export function buildUserState(
     targetSleep: Number(profile.target_sleep),
     targetMeals: profile.target_meals,
     usualMealSize: Number(profile.usual_meal_size),
+    birthYear: profile.birth_year ?? null,
 
     streak: profile.streak,
     shields: profile.shields,

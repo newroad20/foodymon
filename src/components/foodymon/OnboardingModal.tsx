@@ -18,15 +18,17 @@ import {
 } from '@/constants/foodymonData';
 import { enableReminders } from '@/lib/reminders';
 import { HATCH_TAPS, HatchEgg } from './HatchEgg';
+import { parseBirthYear } from '@/lib/age';
 import { bumpFeel } from '@/lib/haptics';
 
-// Step order: prologue story → name → sleep → meals → usual portion → tutorial pages → egg hatch.
+// Step order: prologue story → name → birth year → sleep → meals → usual portion → tutorial pages → egg hatch.
 // FoodyMon speaks from inside the egg until it hatches at the end.
 const NAME = prologuePages.length;
-const SLEEP = NAME + 1;
-const MEALS = NAME + 2;
-const SIZE = NAME + 3;
-const TUTORIAL = NAME + 4;
+const BIRTH = NAME + 1;
+const SLEEP = NAME + 2;
+const MEALS = NAME + 3;
+const SIZE = NAME + 4;
+const TUTORIAL = NAME + 5;
 const LAST = TUTORIAL + tutorialPages.length - 1;
 const HATCH = LAST + 1;
 
@@ -39,6 +41,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
   const [step, setStep] = useState(0);
 
   const [name, setName] = useState('');
+  const [birthText, setBirthText] = useState('');
   const [targetSleep, setTargetSleep] = useState(7);
   const [targetMeals, setTargetMeals] = useState(3);
   const [mealSize, setMealSize] = useState(1.0);
@@ -50,11 +53,15 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
       Alert.alert('알림', '이름을 한 글자 이상 적어 주세요.');
       return;
     }
+    if (step === BIRTH && parseBirthYear(birthText) === null) {
+      Alert.alert('알림', '태어난 연도를 네 자리로 적어 줘. (예: 2012)');
+      return;
+    }
     setStep(step + 1);
   };
 
   const finish = () => {
-    completeOnboarding(name.trim(), targetSleep, targetMeals, mealSize);
+    completeOnboarding(name.trim(), parseBirthYear(birthText)!, targetSleep, targetMeals, mealSize);
     // Ask for notification permission once the story is over; it can be turned off on My Page.
     enableReminders().catch(() => {});
   };
@@ -116,11 +123,31 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
             </View>
           )}
 
+          {step === BIRTH && (
+            <View style={styles.stepContent}>
+              <Text style={styles.storyTitle}>언제 태어났어?</Text>
+              <Text style={styles.dialogueText}>
+                "{name} 마스터, 반가워!{'\n'}몇 년에 태어났는지 알려 줄래?{'\n'}나이에 맞는 잠 시간을 알려 주려고 물어보는 거야."
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="태어난 연도 (예: 2012)"
+                value={birthText}
+                onChangeText={setBirthText}
+                keyboardType="number-pad"
+                maxLength={4}
+              />
+              <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>
+                <Text style={styles.primaryBtnText}>다음 →</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           {step === SLEEP && (
             <View style={styles.stepContent}>
-              <Text style={styles.storyTitle}>개운한 잠</Text>
+              <Text style={styles.storyTitle}>요즘의 잠</Text>
               <Text style={styles.dialogueText}>
-                "{name} 마스터, 반가워!{'\n'}보통 몇 시간 자면 개운해?"
+                "요즘 보통 몇 시간쯤 자?{'\n'}목표가 아니라 지금 생활을 알고 싶은 거라 정답은 없어."
               </Text>
               <View style={styles.optionsRow}>
                 {sleepTargetOptions.map((hrs) => (
@@ -149,9 +176,9 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
 
           {step === MEALS && (
             <View style={styles.stepContent}>
-              <Text style={styles.storyTitle}>편안한 끼니</Text>
+              <Text style={styles.storyTitle}>요즘의 끼니</Text>
               <Text style={styles.dialogueText}>
-                "하루에 몇 번 먹는 게 편해?"
+                "요즘 하루에 보통 몇 번 먹어?{'\n'}간식도 한 번으로 세도 돼."
               </Text>
               <View style={styles.optionsRow}>
                 {mealTargetOptions.map((m) => (

@@ -25,7 +25,7 @@ export const emotionOptions = [
 
 // Faces for check-in reactions, per stage (same body, only the face changes). Stages without
 // art act reactions out with motion only. eat = [mouth open, chewing, swallowed and happy].
-// Lv.3 faces are drawn over level3.png; replace with the designer's art when it arrives.
+// Faces are drawn over level3–6.png (face only, same body); replace with the designer's art when it arrives.
 export const petStateArt: Record<
   number,
   {
@@ -36,11 +36,7 @@ export const petStateArt: Record<
 > = {
   3: {
     sleep: require('@/assets/images/pet/level3/sleep.png'),
-    eat: [
-      require('@/assets/images/pet/level3/eat_open.png'),
-      require('@/assets/images/pet/level3/eat_chew.png'),
-      require('@/assets/images/pet/level3/eat_yum.png'),
-    ],
+    eat: [require('@/assets/images/pet/level3/eat_open.png'), require('@/assets/images/pet/level3/eat_chew.png'), require('@/assets/images/pet/level3/eat_yum.png')],
     mood: {
       very_good: require('@/assets/images/pet/level3/very_good.png'),
       good: require('@/assets/images/pet/level3/good.png'),
@@ -48,6 +44,42 @@ export const petStateArt: Record<
       very_hard: require('@/assets/images/pet/level3/very_hard.png'),
       unsure: require('@/assets/images/pet/level3/unsure.png'),
       no_answer: require('@/assets/images/pet/level3/no_answer.png'),
+    },
+  },
+  4: {
+    sleep: require('@/assets/images/pet/level4/sleep.png'),
+    eat: [require('@/assets/images/pet/level4/eat_open.png'), require('@/assets/images/pet/level4/eat_chew.png'), require('@/assets/images/pet/level4/eat_yum.png')],
+    mood: {
+      very_good: require('@/assets/images/pet/level4/very_good.png'),
+      good: require('@/assets/images/pet/level4/good.png'),
+      tired: require('@/assets/images/pet/level4/tired.png'),
+      very_hard: require('@/assets/images/pet/level4/very_hard.png'),
+      unsure: require('@/assets/images/pet/level4/unsure.png'),
+      no_answer: require('@/assets/images/pet/level4/no_answer.png'),
+    },
+  },
+  5: {
+    sleep: require('@/assets/images/pet/level5/sleep.png'),
+    eat: [require('@/assets/images/pet/level5/eat_open.png'), require('@/assets/images/pet/level5/eat_chew.png'), require('@/assets/images/pet/level5/eat_yum.png')],
+    mood: {
+      very_good: require('@/assets/images/pet/level5/very_good.png'),
+      good: require('@/assets/images/pet/level5/good.png'),
+      tired: require('@/assets/images/pet/level5/tired.png'),
+      very_hard: require('@/assets/images/pet/level5/very_hard.png'),
+      unsure: require('@/assets/images/pet/level5/unsure.png'),
+      no_answer: require('@/assets/images/pet/level5/no_answer.png'),
+    },
+  },
+  6: {
+    sleep: require('@/assets/images/pet/level6/sleep.png'),
+    eat: [require('@/assets/images/pet/level6/eat_open.png'), require('@/assets/images/pet/level6/eat_chew.png'), require('@/assets/images/pet/level6/eat_yum.png')],
+    mood: {
+      very_good: require('@/assets/images/pet/level6/very_good.png'),
+      good: require('@/assets/images/pet/level6/good.png'),
+      tired: require('@/assets/images/pet/level6/tired.png'),
+      very_hard: require('@/assets/images/pet/level6/very_hard.png'),
+      unsure: require('@/assets/images/pet/level6/unsure.png'),
+      no_answer: require('@/assets/images/pet/level6/no_answer.png'),
     },
   },
 };

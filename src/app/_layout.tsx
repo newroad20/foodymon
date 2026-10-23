@@ -55,6 +55,16 @@ function AppContent() {
             }}
           />
           <Stack.Screen
+            name="help"
+            options={{
+              headerShown: true,
+              title: '도움 받기',
+              headerBackTitle: '뒤로',
+              headerStyle: { backgroundColor: '#FDF5F5' },
+              headerShadowVisible: false,
+            }}
+          />
+          <Stack.Screen
             name="album"
             options={{
               headerShown: true,

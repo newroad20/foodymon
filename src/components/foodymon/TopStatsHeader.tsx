@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData } from '@/constants/foodymonData';
+import { router } from 'expo-router';
 
 interface TopStatsHeaderProps {
   onOpenHistory: () => void;
@@ -33,13 +34,24 @@ export function TopStatsHeader({ onOpenHistory }: TopStatsHeaderProps) {
         </View>
       </View>
 
-      {/* History Button */}
-      <TouchableOpacity
-        style={styles.historyButton}
-        activeOpacity={0.8}
-        onPress={onOpenHistory}>
-        <Ionicons name="book-outline" size={18} color="#334155" accessibilityLabel="기록장" />
-      </TouchableOpacity>
+      <View style={styles.statsRow}>
+        <TouchableOpacity
+          style={styles.historyButton}
+          activeOpacity={0.8}
+          onPress={() => router.push('/help')}
+          accessibilityRole="button"
+          accessibilityLabel="도움 받기">
+          <Ionicons name="help-buoy-outline" size={18} color="#334155" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.historyButton}
+          activeOpacity={0.8}
+          onPress={onOpenHistory}
+          accessibilityRole="button"
+          accessibilityLabel="기록장">
+          <Ionicons name="book-outline" size={18} color="#334155" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

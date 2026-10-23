@@ -202,6 +202,19 @@ export default function MyPageScreen() {
           <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
         </TouchableOpacity>
 
+        {/* Help */}
+        <TouchableOpacity
+          style={[styles.card, styles.linkCard]}
+          activeOpacity={0.8}
+          onPress={() => router.push('/help')}>
+          <Ionicons name="help-buoy" size={26} color="#1B7F66" />
+          <View style={styles.linkText}>
+            <Text style={styles.sectionTitleInline}>도움 받기</Text>
+            <Text style={styles.linkSub}>힘들 때 연락할 수 있는 곳</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
+        </TouchableOpacity>
+
         {/* Meal photo album */}
         <TouchableOpacity
           style={[styles.card, styles.linkCard]}

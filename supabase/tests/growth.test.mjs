@@ -93,6 +93,57 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
   assert.ok(r.total < 140);
   assert.equal(r.level, 5);
 
+  // ---------- small goals (second user, observe_days = 1) ----------
+  const V = '22222222-2222-2222-2222-222222222222';
+  await db.query(`insert into auth.users values ($1,'v@b.c','{}')`, [V]);
+  await db.exec(`select set_config('test.uid', '${V}', false)`);
+  const goal = async () => (await q(`select public.get_small_goal($1::date) r`, [today]))[0].r;
+  const goalPts = async () => (await q(`select goal from public.day_points($1, $2::date)`, [V, today]))[0].goal;
+  const meal = (day, slot, status = 'ate') =>
+    q(`insert into public.meal_records(user_id,log_date,slot,status) values ($1,$2::date + $3::integer,$4,$5)`, [V, today, day, slot, status]);
+
+  // first day: observing, goal = areas rule
+  await meal(0, 0);
+  let g = await goal();
+  assert.deepEqual([g.day, g.observing, g.goal, g.points], [1, true, null, 10]);
+
+  // with a record yesterday, today is day 2: suggestion from yesterday (1 meal < 3 -> more_meal)
+  await meal(-1, 0);
+  g = await goal();
+  assert.deepEqual([g.day, g.observing, g.suggestion, g.yesterday.eaten], [2, false, 'more_meal', 1]);
+  assert.equal(await goalPts(), 10); // no goal picked yet -> observe rule
+
+  // more_meal: yesterday 1 eaten; today 1 -> partial 10, 2 -> complete 20
+  await q(`insert into public.small_goals(user_id,log_date,kind) values ($1,$2,'more_meal')`, [V, today]);
+  assert.equal(await goalPts(), 10);
+  await meal(0, 2);
+  assert.equal(await goalPts(), 20);
+
+  // holding falls back to the observe rule (1 area -> 10), never below
+  await q(`update public.small_goals set held = true where user_id=$1`, [V]);
+  assert.equal(await goalPts(), 10);
+
+  // earlier_bed 30 min: yesterday 00:30; today 00:15 -> half (10); 00:00 -> 20; 01:00 -> tried (5)
+  await q(`update public.small_goals set held = false, kind='earlier_bed', size=30 where user_id=$1`, [V]);
+  assert.equal(await goalPts(), 0); // no sleep record today
+  await q(`insert into public.sleep_records(user_id,log_date,bed_time,wake_time) values ($1,$2::date - 1,'00:30','08:00')`, [V, today]);
+  await q(`insert into public.sleep_records(user_id,log_date,bed_time,wake_time) values ($1,$2,'00:15','08:00')`, [V, today]);
+  assert.equal(await goalPts(), 10);
+  await q(`update public.sleep_records set bed_time='23:55' where user_id=$1 and log_date=$2`, [V, today]);
+  assert.equal(await goalPts(), 20); // before midnight counts as earlier
+  await q(`update public.sleep_records set bed_time='01:00' where user_id=$1 and log_date=$2`, [V, today]);
+  assert.equal(await goalPts(), 5);
+
+  // mind_reason: emotion only 5, situation or note 10, both 20
+  await q(`update public.small_goals set kind='mind_reason', size=1 where user_id=$1`, [V]);
+  assert.equal(await goalPts(), 0);
+  await q(`insert into public.mind_records(user_id,log_date,emotion) values ($1,$2,'okay')`, [V, today]);
+  assert.equal(await goalPts(), 5);
+  await q(`insert into public.mind_records(user_id,log_date,emotion,situation) values ($1,$2,'tired','school')`, [V, today]);
+  assert.equal(await goalPts(), 10);
+  await q(`insert into public.mind_records(user_id,log_date,emotion,situation,note) values ($1,$2,'tired','family','다퉜어')`, [V, today]);
+  assert.equal(await goalPts(), 20);
+
   await db.exec(`select set_config('test.uid', '', false)`);
   await assert.rejects(q(`select public.sync_growth($1::date)`, [today]), /not authenticated/);
   await db.close();

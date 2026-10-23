@@ -111,7 +111,9 @@ export async function fetchGameState(
     growthTotal: growth?.total ?? 0,
   });
 
-  return { state, rollover: rollover && rollover.daysPassed > 0 ? rollover : null };
+  // The server also judges today's small goal; prefer its points over the local estimate.
+  const withServerPoints = growth ? { ...state, todayPoints: growth.today, currentDailyScore: growth.today.total } : state;
+  return { state: withServerPoints, rollover: rollover && rollover.daysPassed > 0 ? rollover : null };
 }
 
 export interface GrowthResult {
@@ -403,25 +405,36 @@ export async function backfillYesterday(
   return { ok: true };
 }
 
-export interface DailyQuest {
-  id: string;
-  tier: 1 | 2 | 3;
-  title: string;
-  reward: number;
-  progress: number;
-  target: number;
-  claimed: boolean;
+export type GoalKind = 'more_meal' | 'earlier_bed' | 'mind_reason';
+
+export interface SmallGoalInfo {
+  day: number;
+  observing: boolean;
+  goal: { kind: GoalKind; size: number; held: boolean } | null;
+  yesterday: { eaten: number; bed_time: string | null };
+  suggestion: GoalKind;
+  points: number;
 }
 
-/** Today's three quests (S70) with progress judged by the server from today's daily log. */
-export async function fetchDailyQuests(todayKey: string): Promise<DailyQuest[]> {
-  const res = await supabase.rpc('get_daily_quests', { p_today: todayKey });
+/** Today's small goal card data, judged by the server from the records. */
+export async function fetchSmallGoal(todayKey: string): Promise<SmallGoalInfo> {
+  const res = await supabase.rpc('get_small_goal', { p_today: todayKey });
   if (res.error) throw res.error;
-  return (res.data ?? []) as DailyQuest[];
+  return res.data as SmallGoalInfo;
 }
 
-export async function claimQuest(todayKey: string, questId: string): Promise<{ jellyBalance: number }> {
-  const res = await supabase.rpc('claim_quest', { p_today: todayKey, p_quest: questId });
+export async function saveSmallGoal(
+  userId: string,
+  logDate: string,
+  goal: { kind: GoalKind; size: number; held: boolean }
+): Promise<void> {
+  const res = await supabase
+    .from('small_goals')
+    .upsert({ user_id: userId, log_date: logDate, ...goal }, { onConflict: 'user_id,log_date' });
   if (res.error) throw res.error;
-  return { jellyBalance: (res.data as { jelly_balance: number }).jelly_balance };
+}
+
+export async function clearSmallGoal(userId: string, logDate: string): Promise<void> {
+  const res = await supabase.from('small_goals').delete().eq('user_id', userId).eq('log_date', logDate);
+  if (res.error) throw res.error;
 }

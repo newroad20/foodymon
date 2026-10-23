@@ -114,8 +114,8 @@ interface FoodyMonContextType {
   openGiftBox: () => Promise<
     { success: true; type: 'costume' | 'background'; id: string } | { success: false; message: string }
   >;
-  /** Claims a completed daily quest; the server pays the jelly. */
-  claimQuest: (questId: string) => Promise<boolean>;
+  /** Recounts growth on the server (after records or small-goal changes). */
+  refreshGrowth: () => Promise<void>;
   toggleCostume: (id: string) => void;
   toggleBackground: (id: string) => void;
   advanceToNextDay: () => { rewardedJelly: number; shieldUsed: boolean; shieldEarned: boolean };
@@ -164,7 +164,14 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
   /** Recounts growth on the server; celebrates when FoodyMon grows a stage. */
   const refreshGrowth = async () => {
     const g = await gameApi.syncGrowth(toDateKey(new Date()));
-    applyState({ ...stateRef.current, growthTotal: g.total, level: g.level });
+    // The server also judges today's small goal, so its points replace the local estimate.
+    applyState({
+      ...stateRef.current,
+      growthTotal: g.total,
+      level: g.level,
+      todayPoints: g.today,
+      currentDailyScore: g.today.total,
+    });
     if (g.evolved) {
       const info = levelsData.find((l) => l.level === g.level);
       successFeel();
@@ -286,8 +293,8 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     try {
       const logDate = next.lastActiveDate ?? toDateKey(new Date());
       await save(logDate);
-      await gameApi.saveCheckin(userId, next, log);
       await refreshGrowth();
+      await gameApi.saveCheckin(userId, stateRef.current, log);
       setSyncError(null);
     } catch (e) {
       console.error('Failed to save check-in:', e);
@@ -507,18 +514,6 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     return { success: true as const, type: res.type, id: res.id };
   };
 
-  const claimQuest = async (questId: string) => {
-    try {
-      const { jellyBalance } = await gameApi.claimQuest(toDateKey(new Date()), questId);
-      applyState({ ...stateRef.current, currency: jellyBalance });
-      successFeel();
-      return true;
-    } catch (e) {
-      console.error('Failed to claim quest:', e);
-      return false;
-    }
-  };
-
   const saveEquipped = (next: UserState) => {
     applyState(next);
     gameApi
@@ -571,7 +566,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         updateSettings,
         buyItem,
         openGiftBox,
-        claimQuest,
+        refreshGrowth,
         toggleCostume,
         toggleBackground,
         advanceToNextDay,

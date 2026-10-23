@@ -1,6 +1,6 @@
 import '@/lib/webAlert';
 import React, { useEffect, useState } from 'react';
-import { Stack } from 'expo-router';
+import { Slot, Stack, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
@@ -13,6 +13,7 @@ SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
   const { session, loading } = useAuth();
+  const pathname = usePathname();
   const [showRegister, setShowRegister] = useState(false);
 
   useEffect(() => {
@@ -28,6 +29,9 @@ function AppContent() {
       </View>
     );
   }
+
+  // The privacy policy must open for everyone (store review, sign-up consent).
+  if (pathname === '/privacy') return <Slot />;
 
   // Not logged in — show Login or Register screen
   if (!session) {

@@ -91,6 +91,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
       photoUri
     );
     setSaving(false);
+    onClose();
     Alert.alert(
       '감각 나누기',
       photoFailed
@@ -99,7 +100,6 @@ export function MealModal({ visible, onClose }: MealModalProps) {
           ? '알아차린 걸 나눠 줘서 고마워! 푸디몬이 냠냠 먹었어.'
           : '알려 줘서 고마워. 어떤 끼니든 소중한 기록이야.'
     );
-    onClose();
   };
 
   const eaten = status !== null && EATEN.includes(status);

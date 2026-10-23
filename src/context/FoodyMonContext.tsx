@@ -23,10 +23,12 @@ import {
   sleepMinutes,
   type DayRecords,
   type MealRecord,
+  type Emotion,
   type MindRecord,
 } from '@/lib/growth';
 import { pickDialogue } from '@/lib/dialogue';
 import { successFeel, tapFeel } from '@/lib/haptics';
+import { foodEmoji } from '@/lib/foodEmoji';
 import { formatLogTime, withDayPoints } from '@/lib/serverState';
 import * as gameApi from '@/lib/gameApi';
 
@@ -115,6 +117,8 @@ interface FoodyMonContextType {
   openGiftBox: () => Promise<
     { success: true; type: 'costume' | 'background'; id: string } | { success: false; message: string }
   >;
+  /** The latest check-in for FoodyMon to act out (sleep / eat / feeling). */
+  petReaction: PetReaction | null;
   /** Recounts growth on the server (after records or small-goal changes). */
   refreshGrowth: () => Promise<void>;
   toggleCostume: (id: string) => void;
@@ -134,6 +138,12 @@ function describeMind(r: MindRecord): string {
     .join(' · ');
 }
 
+/** What FoodyMon just reacted to on home; `id` changes each time so the same kind replays. */
+export type PetReaction =
+  | { id: number; kind: 'sleep' }
+  | { id: number; kind: 'eat'; photoUri: string | null; emoji: string }
+  | { id: number; kind: 'mood'; emotion: Emotion };
+
 const FoodyMonContext = createContext<FoodyMonContextType | undefined>(undefined);
 
 const errorMessage = (e: unknown) =>
@@ -145,6 +155,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
   const [syncError, setSyncError] = useState<string | null>(null);
   const [currentDialogue, setCurrentDialogue] = useState<string>('오늘 하루도 건강하게 지내자!');
   const [pendingRollover, setPendingRollover] = useState<RolloverResult | null>(null);
+  const [petReaction, setPetReaction] = useState<PetReaction | null>(null);
   // Latest state for async actions and AppState/interval callbacks, which would otherwise see a stale closure.
   const stateRef = useRef<UserState>(defaultState);
   const syncingRef = useRef<Promise<void> | null>(null);
@@ -346,6 +357,8 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
   const saveSleep = (bedTime: string, wakeTime: string) => {
     const sleep = { bedTime, wakeTime };
     const minutes = sleepMinutes(sleep);
+    // Reactions start once saving is done, so the check-in sheet is closing and home is visible.
+    const done = () => setPetReaction({ id: Date.now(), kind: 'sleep' });
     return recordCheckin(
       (r) => ({ ...r, sleep }),
       (d) => gameApi.saveSleepRecord(userId, d, sleep),
@@ -353,7 +366,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         type: 'sleep',
         content: `수면 ${bedTime} → ${wakeTime} (${Math.floor(minutes / 60)}시간${minutes % 60 ? ` ${minutes % 60}분` : ''})`,
       }
-    );
+    ).then(done);
   };
 
   const saveMeal = async (record: Omit<MealRecord, 'photoPath'>, photoUri?: string | null) => {
@@ -379,6 +392,9 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         photoPath,
       }
     );
+    if (['ate', 'little', 'hard'].includes(record.status)) {
+      setPetReaction({ id: Date.now(), kind: 'eat', photoUri: photoUri ?? null, emoji: foodEmoji(record.menu) });
+    }
     return { photoFailed };
   };
 
@@ -389,6 +405,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
       (d) => gameApi.addMindRecord(userId, d, record),
       { type: 'emotion', content: describeMind(record) }
     );
+    setPetReaction({ id: Date.now(), kind: 'mood', emotion: record.emotion });
     return true;
   };
 
@@ -570,6 +587,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         buyItem,
         openGiftBox,
         refreshGrowth,
+        petReaction,
         toggleCostume,
         toggleBackground,
         advanceToNextDay,

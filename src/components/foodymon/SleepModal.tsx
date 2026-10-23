@@ -44,8 +44,8 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
 
   const handleSave = async () => {
     await saveSleep(bedTime, wakeTime);
-    Alert.alert('숲의 밤', saved ? '수면 기록을 고쳤어. 점수도 새 시간으로 다시 계산했어.' : '잠 이야기 고마워. 숲에도 고요한 밤이 왔어.');
     onClose();
+    Alert.alert('숲의 밤', saved ? '수면 기록을 고쳤어. 점수도 새 시간으로 다시 계산했어.' : '잠 이야기 고마워. 숲에도 고요한 밤이 왔어.');
   };
 
   return (

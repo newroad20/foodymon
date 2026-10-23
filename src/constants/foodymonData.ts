@@ -1,4 +1,5 @@
 import { CostumeItem, BackgroundItem, QuizQuestion, LevelInfo } from '@/types/foodymon';
+import type { ImageSourcePropType } from 'react-native';
 import type { Emotion, MealStatus, Situation } from '@/lib/growth';
 
 export const levelsData: LevelInfo[] = [
@@ -21,6 +22,15 @@ export const emotionOptions = [
   { score: 40, emoji: '🙁', label: '조금 지침', desc: '스트레스나 피로감이 있어요.' },
   { score: 20, emoji: '😭', label: '매우 힘듦', desc: '지치고 위로가 필요해요...' },
 ];
+
+// Pet art for reactions. Empty for now: FoodyMon acts them out with motion and effects.
+// When art arrives, drop the files in assets/images/pet/ and require them here, e.g.
+// sleep: require('@/assets/images/pet/sleep.png'), mood: { very_good: require('...') }.
+export const petStateArt: {
+  sleep?: ImageSourcePropType;
+  eat?: ImageSourcePropType;
+  mood?: Partial<Record<Emotion, ImageSourcePropType>>;
+} = {};
 
 // Mind record (재형 피드백): every feeling counts the same; none of these is better than another.
 export const mindEmotions: { id: Emotion; emoji: string; label: string }[] = [

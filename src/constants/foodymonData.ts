@@ -23,14 +23,34 @@ export const emotionOptions = [
   { score: 20, emoji: '😭', label: '매우 힘듦', desc: '지치고 위로가 필요해요...' },
 ];
 
-// Pet art for reactions. Empty for now: FoodyMon acts them out with motion and effects.
-// When art arrives, drop the files in assets/images/pet/ and require them here, e.g.
-// sleep: require('@/assets/images/pet/sleep.png'), mood: { very_good: require('...') }.
-export const petStateArt: {
-  sleep?: ImageSourcePropType;
-  eat?: ImageSourcePropType;
-  mood?: Partial<Record<Emotion, ImageSourcePropType>>;
-} = {};
+// Faces for check-in reactions, per stage (same body, only the face changes). Stages without
+// art act reactions out with motion only. eat = [mouth open, chewing, swallowed and happy].
+// Lv.3 faces are drawn over level3.png; replace with the designer's art when it arrives.
+export const petStateArt: Record<
+  number,
+  {
+    sleep?: ImageSourcePropType;
+    eat?: [ImageSourcePropType, ImageSourcePropType, ImageSourcePropType];
+    mood?: Partial<Record<Emotion, ImageSourcePropType>>;
+  }
+> = {
+  3: {
+    sleep: require('@/assets/images/pet/level3/sleep.png'),
+    eat: [
+      require('@/assets/images/pet/level3/eat_open.png'),
+      require('@/assets/images/pet/level3/eat_chew.png'),
+      require('@/assets/images/pet/level3/eat_yum.png'),
+    ],
+    mood: {
+      very_good: require('@/assets/images/pet/level3/very_good.png'),
+      good: require('@/assets/images/pet/level3/good.png'),
+      tired: require('@/assets/images/pet/level3/tired.png'),
+      very_hard: require('@/assets/images/pet/level3/very_hard.png'),
+      unsure: require('@/assets/images/pet/level3/unsure.png'),
+      no_answer: require('@/assets/images/pet/level3/no_answer.png'),
+    },
+  },
+};
 
 // Mind record (재형 피드백): every feeling counts the same; none of these is better than another.
 export const mindEmotions: { id: Emotion; emoji: string; label: string }[] = [

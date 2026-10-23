@@ -18,17 +18,18 @@ import {
 } from '@/constants/foodymonData';
 import { enableReminders } from '@/lib/reminders';
 import { HATCH_TAPS, HatchEgg } from './HatchEgg';
-import { parseBirthYear } from '@/lib/age';
+import { isContact, mayBeUnder14, parseBirthYear } from '@/lib/age';
 import { bumpFeel } from '@/lib/haptics';
 
-// Step order: prologue story → name → birth year → sleep → meals → usual portion → tutorial pages → egg hatch.
+// Step order: prologue story → name → birth year → (guardian consent if under 14) → sleep → meals → usual portion → tutorial pages → egg hatch.
 // FoodyMon speaks from inside the egg until it hatches at the end.
 const NAME = prologuePages.length;
 const BIRTH = NAME + 1;
-const SLEEP = NAME + 2;
-const MEALS = NAME + 3;
-const SIZE = NAME + 4;
-const TUTORIAL = NAME + 5;
+const GUARDIAN = NAME + 2;
+const SLEEP = NAME + 3;
+const MEALS = NAME + 4;
+const SIZE = NAME + 5;
+const TUTORIAL = NAME + 6;
 const LAST = TUTORIAL + tutorialPages.length - 1;
 const HATCH = LAST + 1;
 
@@ -42,6 +43,11 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
 
   const [name, setName] = useState('');
   const [birthText, setBirthText] = useState('');
+  const [guardianName, setGuardianName] = useState('');
+  const [guardianContact, setGuardianContact] = useState('');
+  const [guardianAgree, setGuardianAgree] = useState(false);
+  const birthYear = parseBirthYear(birthText);
+  const needsGuardian = birthYear !== null && mayBeUnder14(birthYear);
   const [targetSleep, setTargetSleep] = useState(7);
   const [targetMeals, setTargetMeals] = useState(3);
   const [mealSize, setMealSize] = useState(1.0);
@@ -53,15 +59,27 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
       Alert.alert('알림', '이름을 한 글자 이상 적어 주세요.');
       return;
     }
-    if (step === BIRTH && parseBirthYear(birthText) === null) {
+    if (step === BIRTH && birthYear === null) {
       Alert.alert('알림', '태어난 연도를 네 자리로 적어 줘. (예: 2012)');
       return;
     }
-    setStep(step + 1);
+    if (step === GUARDIAN && (!guardianName.trim() || !isContact(guardianContact) || !guardianAgree)) {
+      Alert.alert('보호자 동의', '보호자 이름과 연락처(전화번호 또는 이메일)를 적고, 보호자가 동의 체크를 해 주세요.');
+      return;
+    }
+    // The guardian step only exists for users who may be under 14.
+    setStep(step === BIRTH && !needsGuardian ? SLEEP : step + 1);
   };
 
   const finish = () => {
-    completeOnboarding(name.trim(), parseBirthYear(birthText)!, targetSleep, targetMeals, mealSize);
+    completeOnboarding(
+      name.trim(),
+      birthYear!,
+      targetSleep,
+      targetMeals,
+      mealSize,
+      needsGuardian ? { name: guardianName.trim(), contact: guardianContact.trim() } : undefined
+    );
     // Ask for notification permission once the story is over; it can be turned off on My Page.
     enableReminders().catch(() => {});
   };
@@ -72,7 +90,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
   };
 
   const handlePrev = () => {
-    if (step > 0) setStep(step - 1);
+    if (step > 0) setStep(step === SLEEP && !needsGuardian ? BIRTH : step - 1);
   };
 
   if (!visible) return null;
@@ -137,6 +155,47 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
                 keyboardType="number-pad"
                 maxLength={4}
               />
+              <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>
+                <Text style={styles.primaryBtnText}>다음 →</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {step === GUARDIAN && (
+            <View style={styles.stepContent}>
+              <Text style={styles.storyTitle}>보호자 동의</Text>
+              <Text style={styles.dialogueText}>
+                "만 14세 미만 친구는 보호자의 동의가 있어야 함께할 수 있어.{'\n'}부모님이나 보호자에게 이 화면을 보여 줄래?"
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="보호자 이름"
+                value={guardianName}
+                onChangeText={setGuardianName}
+                maxLength={50}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="보호자 연락처 (전화번호 또는 이메일)"
+                value={guardianContact}
+                onChangeText={setGuardianContact}
+                autoCapitalize="none"
+                maxLength={100}
+              />
+              <TouchableOpacity
+                style={styles.guardianAgree}
+                onPress={() => setGuardianAgree(!guardianAgree)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: guardianAgree }}>
+                <Ionicons
+                  name={guardianAgree ? 'checkbox' : 'square-outline'}
+                  size={22}
+                  color={guardianAgree ? '#1B7F66' : '#94A3B8'}
+                />
+                <Text style={styles.guardianAgreeText}>
+                  저는 보호자이며, 아이의 개인정보와 수면·식사·마음 기록(민감정보) 처리에 동의합니다.
+                </Text>
+              </TouchableOpacity>
               <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>
                 <Text style={styles.primaryBtnText}>다음 →</Text>
               </TouchableOpacity>
@@ -297,6 +356,19 @@ function Dots({ count, active }: { count: number; active: number }) {
 }
 
 const styles = StyleSheet.create({
+  guardianAgree: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  guardianAgreeText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#334155',
+    fontWeight: '700',
+    lineHeight: 19,
+  },
   dots: {
     flexDirection: 'row',
     gap: 6,

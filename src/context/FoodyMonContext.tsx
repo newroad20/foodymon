@@ -90,7 +90,8 @@ interface FoodyMonContextType {
     birthYear: number,
     sleep: number,
     meals: number,
-    mealSize: number
+    mealSize: number,
+    guardian?: { name: string; contact: string }
   ) => Promise<void>;
   /** Saves (or replaces) today's sleep; growth points count once a day. */
   saveSleep: (bedTime: string, wakeTime: string) => Promise<void>;
@@ -307,7 +308,8 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     birthYear: number,
     sleep: number,
     meals: number,
-    mealSize: number
+    mealSize: number,
+    guardian?: { name: string; contact: string }
   ) => {
     const firstLog = { type: 'emotion' as const, content: `${name} 마스터와 푸디몬이 첫 만남을 가졌어요! 🎉` };
     applyState(
@@ -330,6 +332,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         targetSleep: sleep,
         targetMeals: meals,
         usualMealSize: mealSize,
+        guardian,
       });
       await gameApi.addHistoryLog(userId, toDateKey(new Date()), firstLog);
     } catch (e) {

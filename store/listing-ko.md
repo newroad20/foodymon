@@ -1,7 +1,7 @@
 # 스토어 등록 정보 (초안)
 
 App Store Connect / Google Play Console에 붙여넣을 내용. 글자 수 제한은 괄호 안.
-운영자: 좋사놀자 · 처리방침: https://foodymon.expo.app/privacy · 문의 이메일: (준비 중 — 팀 Gmail 만들면 채우기)
+운영자: 좋사놀자 · 처리방침: https://foodymon.expo.app/privacy · 문의 이메일: whgtkshfwk@gmail.com
 
 ## 공통
 
@@ -92,4 +92,4 @@ App Store Connect / Google Play Console에 붙여넣을 내용. 글자 수 제�
 - **심사용 테스트 계정** 이메일·비밀번호를 적어야 함 (가입 화면 통과 후 온보딩까지 마친 계정). 출시 직전에 만들기.
 - 메모 문구 초안:
   "푸디몬은 청소년이 수면·식사·감정을 판단 없이 기록하며 펫을 키우는 앱입니다. 칼로리·체중을 다루지 않으며 의료 진단 기능이 없습니다. 계정 삭제는 마이 탭 → 회원 탈퇴에서 할 수 있습니다."
-- **지원 URL**(iOS 필수): 문의 이메일이 정해지면 처리방침 페이지 또는 별도 지원 페이지로.
+- **지원 URL**(iOS 필수): https://foodymon.expo.app/privacy (문의: whgtkshfwk@gmail.com)

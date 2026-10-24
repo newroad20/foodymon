@@ -1,7 +1,7 @@
 // 개인정보 처리방침 (개인정보보호위원회 처리방침 작성지침 항목 기준). 법률 검토 전 초안.
-// 출시 전: CONTACT_EMAIL 채우기, 바뀐 처리 항목이 있으면 함께 고치고 EFFECTIVE_DATE 갱신.
+// 바뀐 처리 항목이 있으면 함께 고치고 EFFECTIVE_DATE 갱신.
 export const OPERATOR = '좋사놀자';
-export const CONTACT_EMAIL = '(준비 중)';
+export const CONTACT_EMAIL = 'whgtkshfwk@gmail.com';
 export const EFFECTIVE_DATE = '2026년 10월 23일';
 
 export const privacySections: { title: string; body: string[] }[] = [

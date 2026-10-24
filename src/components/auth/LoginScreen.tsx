@@ -23,6 +23,8 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  // Shown on the screen itself: browser pop-ups can be blocked (e.g. in-app browsers).
+  const [forgotMsg, setForgotMsg] = useState<string | null>(null);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -39,15 +41,15 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
 
   const handleForgot = async () => {
     if (!email.trim()) {
-      Alert.alert('비밀번호 찾기', '위 칸에 가입한 이메일을 먼저 적어 주세요.');
+      setForgotMsg('위 이메일 칸에 가입한 이메일을 먼저 적고 다시 눌러 주세요.');
       return;
     }
+    setForgotMsg('메일을 보내는 중이에요…');
     const { error } = await requestPasswordReset(email.trim());
-    Alert.alert(
-      '비밀번호 찾기',
+    setForgotMsg(
       error
         ? '메일을 보내지 못했어요. 잠시 후 다시 시도해 주세요.'
-        : '비밀번호를 다시 정하는 링크를 메일로 보냈어요. 이 기기에서 메일의 링크를 눌러 주세요. (스팸함도 확인해 주세요)'
+        : `${email.trim()}로 비밀번호를 다시 정하는 링크를 보냈어요. 이 기기에서 메일의 링크를 눌러 주세요. (스팸함도 확인해 주세요)`
     );
   };
 
@@ -106,6 +108,11 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
           <TouchableOpacity onPress={handleForgot} accessibilityRole="button">
             <Text style={styles.forgot}>비밀번호를 잊었어요</Text>
           </TouchableOpacity>
+          {forgotMsg && (
+            <Text style={styles.forgotMsg} accessibilityLiveRegion="polite">
+              {forgotMsg}
+            </Text>
+          )}
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
@@ -127,6 +134,17 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
 }
 
 const styles = StyleSheet.create({
+  forgotMsg: {
+    marginTop: 8,
+    padding: 10,
+    borderRadius: 12,
+    backgroundColor: '#E3F6EF',
+    color: '#17765D',
+    fontSize: 13,
+    fontWeight: '700',
+    lineHeight: 19,
+    textAlign: 'center',
+  },
   forgot: {
     textAlign: 'center',
     fontSize: 13,

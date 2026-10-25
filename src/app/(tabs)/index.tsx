@@ -22,6 +22,7 @@ import { HistoryModal } from '@/components/foodymon/HistoryModal';
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 import { BackfillModal } from '@/components/foodymon/BackfillModal';
 import { GoalCard } from '@/components/foodymon/GoalCard';
+import { track } from '@/lib/analytics';
 import { BACKFILL_COST } from '@/constants/foodymonData';
 import { RolloverResult } from '@/lib/dayRollover';
 
@@ -136,9 +137,18 @@ export default function FoodyMonHomeScreen() {
 
         {/* Bottom Action Dock */}
         <ActionDock
-          onOpenMeal={() => setShowMealModal(true)}
-          onOpenSleep={() => setShowSleepModal(true)}
-          onOpenEmotion={() => setShowEmotionModal(true)}
+          onOpenMeal={() => {
+            track('sheet_open', 'meal');
+            setShowMealModal(true);
+          }}
+          onOpenSleep={() => {
+            track('sheet_open', 'sleep');
+            setShowSleepModal(true);
+          }}
+          onOpenEmotion={() => {
+            track('sheet_open', 'mind');
+            setShowEmotionModal(true);
+          }}
           onOpenBag={() => router.push('/dressroom')}
           onNextDay={handleNextDaySimulation}
         />

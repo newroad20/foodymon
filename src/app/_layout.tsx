@@ -2,11 +2,12 @@ import '@/lib/webAlert';
 import React, { useEffect, useState } from 'react';
 import { Slot, Stack, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, AppState } from 'react-native';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { FoodyMonProvider } from '@/context/FoodyMonContext';
 import { MusicProvider } from '@/context/MusicContext';
 import { NightOverlay } from '@/components/foodymon/NightOverlay';
+import { setAnalyticsUser, track } from '@/lib/analytics';
 import { LoginScreen } from '@/components/auth/LoginScreen';
 import { RegisterScreen } from '@/components/auth/RegisterScreen';
 import { NewPasswordScreen } from '@/components/auth/NewPasswordScreen';
@@ -23,6 +24,21 @@ function AppContent() {
       SplashScreen.hideAsync();
     }
   }, [loading]);
+
+  // Usage log for the pilot: opens/closes and screen changes of a signed-in user.
+  const userId = session?.user.id ?? null;
+  useEffect(() => {
+    setAnalyticsUser(userId);
+    if (!userId) return;
+    track('app_open');
+    const sub = AppState.addEventListener('change', (s) =>
+      s === 'active' ? track('app_open') : s === 'background' && track('app_close')
+    );
+    return () => sub.remove();
+  }, [userId]);
+  useEffect(() => {
+    if (userId) track('screen', pathname);
+  }, [userId, pathname]);
 
   if (loading) {
     return (

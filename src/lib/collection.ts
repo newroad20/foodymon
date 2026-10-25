@@ -35,7 +35,7 @@ export const badgeDefs: BadgeDef[] = [
   { id: 'run_3', icon: '🔥', name: '3일 연속', description: '3일 연속으로 기록했어요' },
   { id: 'run_7', icon: '💪', name: '7일 연속', description: '7일 연속으로 기록했어요' },
   { id: 'run_30', icon: '🏆', name: '30일 연속', description: '30일 연속으로 기록했어요' },
-  { id: 'score_95', icon: '🌟', name: '천상계 달성', description: '건강 지수 95점 이상을 받았어요' },
+  { id: 'score_95', icon: '🌟', name: '천상계 달성', description: '하루 성장점 95점 이상을 모았어요' },
   { id: 'fashion_3', icon: '👗', name: '패셔니스타', description: '의상을 3개 모았어요' },
   { id: 'room_all', icon: '🏡', name: '마이룸 완성', description: '마이룸 소품을 모두 모았어요' },
 ];

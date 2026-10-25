@@ -440,7 +440,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     }
 
     await syncFromServer();
-    return { success: true, message: `어제 기록을 복구했어요! 연속 기록이 이어졌어요 🔥 (건강 지수 ${score}점)` };
+    return { success: true, message: `어제 기록을 복구했어요! 연속 기록이 이어졌어요 🔥` };
   };
 
   /** Updates name and lifestyle goals; today's score is recalculated against the new goals. */

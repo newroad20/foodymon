@@ -18,7 +18,7 @@ import { ActionDock } from '@/components/foodymon/ActionDock';
 import { MealModal } from '@/components/foodymon/MealModal';
 import { SleepModal } from '@/components/foodymon/SleepModal';
 import { EmotionModal } from '@/components/foodymon/EmotionModal';
-import { HistoryModal } from '@/components/foodymon/HistoryModal';
+import { CategoryHistoryModal } from '@/components/foodymon/CategoryHistoryModal';
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 import { BackfillModal } from '@/components/foodymon/BackfillModal';
 import { GoalCard } from '@/components/foodymon/GoalCard';
@@ -170,7 +170,7 @@ export default function FoodyMonHomeScreen() {
         visible={showEmotionModal}
         onClose={() => setShowEmotionModal(false)}
       />
-      <HistoryModal
+      <CategoryHistoryModal
         visible={showHistoryModal}
         onClose={() => setShowHistoryModal(false)}
       />

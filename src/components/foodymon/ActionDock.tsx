@@ -29,30 +29,38 @@ export function ActionDock({
         </TouchableOpacity>
       )}
 
-      {/* Main 4 Action Buttons: chunky Pou/Duolingo-style round buttons */}
-      <View style={styles.dock}>
-        {[
-          { label: '식사', icon: 'restaurant', color: '#FF9600', edge: '#CC7800', onPress: onOpenMeal },
-          { label: '수면', icon: 'moon', color: '#8E7CF0', edge: '#6F5ED0', onPress: onOpenSleep },
-          { label: '감정', icon: 'happy', color: '#FF6FA8', edge: '#D94E86', onPress: onOpenEmotion },
-          { label: '꾸미기', icon: 'shirt', color: '#1CB0F6', edge: '#1899D6', onPress: onOpenBag },
-        ].map((a) => (
-          <Pressable key={a.label} style={styles.actionBtn} onPress={a.onPress} accessibilityRole="button" accessibilityLabel={a.label}>
-            {({ pressed }) => (
-              <>
-                <View
-                  style={[
-                    styles.iconCircle,
-                    { backgroundColor: a.color, borderBottomColor: a.edge },
-                    pressed && styles.iconCirclePressed,
-                  ]}>
-                  <Ionicons name={a.icon as React.ComponentProps<typeof Ionicons>['name']} size={28} color="#FFFFFF" />
-                </View>
-                <Text style={styles.actionLabel}>{a.label}</Text>
-              </>
-            )}
-          </Pressable>
-        ))}
+      <View style={styles.dockCard}>
+        <View style={styles.dockHeading}>
+          <View>
+            <Text style={styles.dockEyebrow}>TODAY</Text>
+            <Text style={styles.dockTitle}>오늘의 이야기를 들려줘</Text>
+          </View>
+          <Text style={styles.dockHint}>기록할수록 가까워져요</Text>
+        </View>
+        <View style={styles.dock}>
+          {[
+            { label: '식사', icon: 'restaurant', color: '#FFF0D7', ink: '#C97719', edge: '#F3D39C', onPress: onOpenMeal },
+            { label: '수면', icon: 'moon', color: '#ECE9FF', ink: '#7566C9', edge: '#D6D0F5', onPress: onOpenSleep },
+            { label: '마음', icon: 'happy', color: '#FFE7EF', ink: '#C95E83', edge: '#F1C8D6', onPress: onOpenEmotion },
+            { label: '꾸미기', icon: 'shirt', color: '#DFF2EE', ink: '#287D68', edge: '#BFDED5', onPress: onOpenBag },
+          ].map((a) => (
+            <Pressable key={a.label} style={styles.actionBtn} onPress={a.onPress} accessibilityRole="button" accessibilityLabel={a.label}>
+              {({ pressed }) => (
+                <>
+                  <View
+                    style={[
+                      styles.iconCircle,
+                      { backgroundColor: a.color, borderColor: a.edge },
+                      pressed && styles.iconCirclePressed,
+                    ]}>
+                    <Ionicons name={a.icon as React.ComponentProps<typeof Ionicons>['name']} size={25} color={a.ink} />
+                  </View>
+                  <Text style={styles.actionLabel}>{a.label}</Text>
+                </>
+              )}
+            </Pressable>
+          ))}
+        </View>
       </View>
     </View>
   );
@@ -60,8 +68,8 @@ export function ActionDock({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
+    paddingHorizontal: 14,
+    paddingBottom: 14,
     alignItems: 'center',
     gap: 10,
     zIndex: 10,
@@ -79,39 +87,75 @@ const styles = StyleSheet.create({
     color: '#718096',
     fontWeight: '700',
   },
+  dockCard: {
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.94)',
+    borderRadius: 26,
+    paddingHorizontal: 14,
+    paddingTop: 13,
+    paddingBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(206, 222, 214, 0.9)',
+    shadowColor: '#3F5E50',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.13,
+    shadowRadius: 16,
+    elevation: 6,
+  },
+  dockHeading: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    paddingHorizontal: 3,
+    marginBottom: 10,
+  },
+  dockEyebrow: {
+    color: '#6E9886',
+    fontSize: 9,
+    lineHeight: 12,
+    letterSpacing: 1.4,
+    fontWeight: '900',
+  },
+  dockTitle: {
+    color: '#263A31',
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  dockHint: {
+    color: '#8A9991',
+    fontSize: 10,
+    fontWeight: '700',
+  },
   dock: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
-    paddingVertical: 14,
-    paddingHorizontal: 12,
+    paddingVertical: 2,
+    paddingHorizontal: 0,
     width: '100%',
   },
   actionBtn: {
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
+    minWidth: 62,
   },
   iconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderBottomWidth: 5,
+    width: 54,
+    height: 54,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderBottomWidth: 3,
     justifyContent: 'center',
     alignItems: 'center',
   },
   // Duolingo-style press: the button sinks onto its edge.
   iconCirclePressed: {
     borderBottomWidth: 1,
-    marginTop: 4,
+    marginTop: 2,
   },
   actionLabel: {
-    fontSize: 13,
-    color: '#4B4B4B',
+    fontSize: 12,
+    color: '#43564D',
     fontWeight: '900',
   },
 });

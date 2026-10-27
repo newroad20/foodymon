@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  ScrollView,
 } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -20,6 +21,7 @@ import { enableReminders } from '@/lib/reminders';
 import { HATCH_TAPS, HatchEgg } from './HatchEgg';
 import { isContact, mayBeUnder14, parseBirthYear } from '@/lib/age';
 import { bumpFeel } from '@/lib/haptics';
+import { WorldBackdrop } from './WorldBackdrop';
 
 // Step order: prologue story → name → birth year → (guardian consent if under 14) → sleep → meals → usual portion → tutorial pages → egg hatch.
 // FoodyMon speaks from inside the egg until it hatches at the end.
@@ -98,13 +100,24 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
   return (
     <Modal visible={visible} animationType="fade" transparent={false}>
       <View style={styles.container}>
-        {/* FoodyMon's egg; hatches at the end */}
-        <View style={styles.petContainer}>
-          <HatchEgg taps={taps} hatched={hatched} onTap={step === HATCH ? tapEgg : undefined} />
-        </View>
+        <WorldBackdrop />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled">
+          <View style={styles.storyBadge}>
+            <Ionicons name="leaf" size={14} color="#3B8169" />
+            <Text style={styles.storyBadgeText}>푸디몬과 첫 만남 · {Math.min(step + 1, HATCH + 1)}/{HATCH + 1}</Text>
+          </View>
+          <View style={styles.petStage}>
+            <View style={styles.petHalo} />
+            <View style={styles.petContainer}>
+              <HatchEgg taps={taps} hatched={hatched} onTap={step === HATCH ? tapEgg : undefined} />
+            </View>
+          </View>
 
-        {/* Story Card */}
-        <View style={styles.card}>
+          <View style={styles.card}>
           {step > 0 && !hatched && (
             <TouchableOpacity onPress={handlePrev} style={styles.backBtn}>
               <Text style={styles.backBtnText}>← 이전</Text>
@@ -339,7 +352,8 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               </TouchableOpacity>
             </View>
           )}
-        </View>
+          </View>
+        </ScrollView>
       </View>
     </Modal>
   );
@@ -394,24 +408,70 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#FDF5F5',
+    backgroundColor: '#F2FAF6',
+  },
+  scrollView: {
+    flex: 1,
+    width: '100%',
+  },
+  scrollContent: {
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    paddingHorizontal: 18,
+    paddingVertical: 28,
+  },
+  storyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderRadius: 99,
+    paddingHorizontal: 13,
+    paddingVertical: 7,
+    backgroundColor: 'rgba(255,255,255,0.84)',
+    borderWidth: 1,
+    borderColor: '#D6E9E0',
+    marginBottom: 6,
+  },
+  storyBadgeText: {
+    color: '#547366',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  petStage: {
+    width: 210,
+    height: 205,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  petHalo: {
+    position: 'absolute',
+    width: 175,
+    height: 175,
+    borderRadius: 88,
+    backgroundColor: 'rgba(217, 242, 231, 0.92)',
+    borderWidth: 1,
+    borderColor: '#C4E6D8',
   },
   petContainer: {
-    marginBottom: 20,
     alignItems: 'center',
+    zIndex: 1,
   },
   card: {
     width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 24,
+    maxWidth: 460,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    borderRadius: 28,
+    padding: 22,
     position: 'relative',
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    borderWidth: 1,
+    borderColor: '#D8E8E0',
+    shadowColor: '#426454',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 22,
+    elevation: 6,
   },
   backBtn: {
     position: 'absolute',
@@ -429,14 +489,14 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   storyTitle: {
-    fontSize: 18,
-    color: '#1B7F66',
+    fontSize: 21,
+    color: '#206C57',
     marginBottom: 12,
     fontWeight: '900',
   },
   dialogueText: {
     fontSize: 15,
-    color: '#334155',
+    color: '#40564C',
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 24,
@@ -445,13 +505,14 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     borderWidth: 1.5,
-    borderColor: '#CBD5E1',
-    borderRadius: 14,
+    borderColor: '#D4E5DD',
+    borderRadius: 17,
     padding: 14,
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 20,
-    color: '#1E293B',
+    color: '#243B31',
+    backgroundColor: '#F8FCFA',
     fontWeight: '600',
   },
   optionsRow: {
@@ -508,10 +569,12 @@ const styles = StyleSheet.create({
   },
   primaryBtn: {
     width: '100%',
-    backgroundColor: '#1B7F66',
+    backgroundColor: '#207C63',
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 17,
     alignItems: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: '#145743',
   },
   primaryBtnText: {
     color: '#FFFFFF',

@@ -16,6 +16,7 @@ import { useAuth } from '@/context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { PrivacyPolicy } from '@/app/privacy';
 import { HatchEgg } from '@/components/foodymon/HatchEgg';
+import { WorldBackdrop } from '@/components/foodymon/WorldBackdrop';
 
 interface RegisterScreenProps {
   onSwitchToLogin: () => void;
@@ -75,22 +76,31 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <WorldBackdrop mood="sunset" />
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled">
-        {/* Mascot */}
-        <View style={styles.heroSection}>
-          {/* The pet hatches from this egg at the end of onboarding. */}
-          <HatchEgg taps={0} hatched={false} />
-          <Text style={styles.appTitle}>푸디몬 입양하기</Text>
-          <Text style={styles.appSubtitle}>함께 건강한 일상을 만들어봐요 🌱</Text>
-        </View>
+        <View style={styles.content}>
+          <View style={styles.heroSection}>
+            <View style={styles.heroBadge}>
+              <Text style={styles.heroBadgeText}>새로운 만남이 시작돼요</Text>
+            </View>
+            <View style={styles.eggStage}>
+              <View style={styles.eggGlow} />
+              <HatchEgg taps={0} hatched={false} />
+            </View>
+            <Text style={styles.appTitle}>나만의 푸디몬 만나기</Text>
+            <Text style={styles.appSubtitle}>작은 알이 당신의 하루를 기다리고 있어요</Text>
+          </View>
 
-        {/* Form Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>회원가입</Text>
+          <View style={styles.card}>
+          <Text style={styles.cardEyebrow}>입양 준비</Text>
+          <Text style={styles.cardTitle}>먼저 계정을 만들어 주세요</Text>
 
-          <Text style={styles.label}>이메일</Text>
+          <View style={styles.labelRow}>
+            <Ionicons name="mail-outline" size={15} color="#5E806F" />
+            <Text style={styles.label}>이메일</Text>
+          </View>
           <TextInput
             style={styles.input}
             placeholder="예: example@email.com"
@@ -102,7 +112,10 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
             autoCorrect={false}
           />
 
-          <Text style={styles.label}>비밀번호</Text>
+          <View style={styles.labelRow}>
+            <Ionicons name="lock-closed-outline" size={15} color="#5E806F" />
+            <Text style={styles.label}>비밀번호</Text>
+          </View>
           <TextInput
             style={styles.input}
             placeholder="예: 6자 이상 입력"
@@ -112,7 +125,10 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
             secureTextEntry
           />
 
-          <Text style={styles.label}>비밀번호 확인</Text>
+          <View style={styles.labelRow}>
+            <Ionicons name="checkmark-circle-outline" size={15} color="#5E806F" />
+            <Text style={styles.label}>비밀번호 확인</Text>
+          </View>
           <TextInput
             style={styles.input}
             placeholder="예: 비밀번호 다시 입력"
@@ -147,7 +163,10 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
             {loading ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text style={styles.primaryBtnText}>푸디몬 입양하기 🥰</Text>
+              <View style={styles.primaryBtnContent}>
+                <Text style={styles.primaryBtnText}>입양 이야기 시작하기</Text>
+                <Ionicons name="sparkles" size={18} color="#FFFFFF" />
+              </View>
             )}
           </TouchableOpacity>
 
@@ -158,6 +177,7 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
               이미 계정이 있으신가요? <Text style={styles.linkText}>로그인</Text>
             </Text>
           </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -204,69 +224,123 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#FDF5F5',
+    backgroundColor: '#FFF7F1',
   },
   scroll: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingHorizontal: 18,
+    paddingVertical: 28,
+  },
+  content: {
+    width: '100%',
+    maxWidth: 460,
+    alignSelf: 'center',
   },
   heroSection: {
     alignItems: 'center',
-    marginBottom: 28,
+    marginBottom: 18,
+  },
+  heroBadge: {
+    borderRadius: 99,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderWidth: 1,
+    borderColor: '#F0DED1',
+  },
+  heroBadgeText: {
+    color: '#806854',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  eggStage: {
+    height: 166,
+    width: 190,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  eggGlow: {
+    position: 'absolute',
+    width: 152,
+    height: 152,
+    borderRadius: 76,
+    backgroundColor: '#FDE6D7',
+    borderWidth: 1,
+    borderColor: '#F6D6C3',
   },
   appTitle: {
-    fontSize: 26,
-    color: '#1B7F66',
-    marginTop: 8,
+    fontSize: 27,
+    color: '#176C57',
+    marginTop: 2,
     fontWeight: '900',
+    letterSpacing: -0.8,
   },
   appSubtitle: {
     fontSize: 14,
-    color: '#64748B',
-    marginTop: 4,
-    fontWeight: '600',
+    color: '#6F756F',
+    marginTop: 5,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 24,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    borderRadius: 28,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: '#E9E3DC',
+    shadowColor: '#705A48',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.11,
+    shadowRadius: 22,
+    elevation: 6,
+  },
+  cardEyebrow: {
+    fontSize: 12,
+    color: '#7E897F',
+    textAlign: 'center',
+    fontWeight: '800',
+    marginBottom: 4,
   },
   cardTitle: {
-    fontSize: 22,
-    color: '#1E293B',
-    marginBottom: 20,
+    fontSize: 20,
+    color: '#263A31',
+    marginBottom: 18,
     textAlign: 'center',
     fontWeight: '900',
   },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
   label: {
     fontSize: 13,
-    color: '#64748B',
-    marginBottom: 6,
+    color: '#52685D',
     fontWeight: '800',
   },
   input: {
     borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    borderRadius: 14,
+    borderColor: '#DDE7E1',
+    borderRadius: 17,
     padding: 14,
     fontSize: 15,
-    color: '#1E293B',
+    color: '#243B31',
     marginBottom: 14,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F8FCFA',
     fontWeight: '600',
   },
   primaryBtn: {
-    backgroundColor: '#1B7F66',
+    backgroundColor: '#207C63',
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 17,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 6,
     marginBottom: 16,
+    borderBottomWidth: 4,
+    borderBottomColor: '#145743',
   },
   btnDisabled: {
     opacity: 0.7,
@@ -275,6 +349,11 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '800',
+  },
+  primaryBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   secondaryBtn: {
     alignItems: 'center',

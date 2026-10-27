@@ -13,6 +13,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { WorldBackdrop } from '@/components/foodymon/WorldBackdrop';
 
 interface LoginScreenProps {
   onSwitchToRegister: () => void;
@@ -57,42 +59,57 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <WorldBackdrop />
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled">
-        {/* Mascot */}
-        <View style={styles.heroSection}>
-          <Image
-            source={require('@/assets/images/level3.png')}
-            style={styles.petImage}
-            resizeMode="contain"
-          />
-          <Text style={styles.appTitle}>푸디몬</Text>
-          <Text style={styles.appSubtitle}>당신의 일상과 함께 자라나는 펫 🌱</Text>
-        </View>
+        <View style={styles.content}>
+          <View style={styles.heroSection}>
+            <View style={styles.heroBadge}>
+              <Text style={styles.heroBadgeText}>오늘도 같이 자라요</Text>
+            </View>
+            <View style={styles.petStage}>
+              <View style={styles.petGlow} />
+              <Text style={styles.stageSparkle}>✦</Text>
+              <Image
+                source={require('@/assets/images/level3.png')}
+                style={styles.petImage}
+                resizeMode="contain"
+              />
+              <View style={styles.groundShadow} />
+            </View>
+            <Text style={styles.appTitle}>푸디몬</Text>
+            <Text style={styles.appSubtitle}>나의 하루를 나누면, 우리 사이도 자라나요</Text>
+          </View>
 
-        {/* Form Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>로그인</Text>
+          <View style={styles.card}>
+            <Text style={styles.cardEyebrow}>다시 만나서 반가워요</Text>
+            <Text style={styles.cardTitle}>푸디몬이 기다리고 있어요</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="이메일"
-            placeholderTextColor="#94A3B8"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="비밀번호"
-            placeholderTextColor="#94A3B8"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+            <View style={styles.inputWrap}>
+              <Ionicons name="mail-outline" size={19} color="#5E806F" />
+              <TextInput
+                style={styles.input}
+                placeholder="이메일"
+                placeholderTextColor="#9AA8A1"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
+            <View style={styles.inputWrap}>
+              <Ionicons name="lock-closed-outline" size={19} color="#5E806F" />
+              <TextInput
+                style={styles.input}
+                placeholder="비밀번호"
+                placeholderTextColor="#9AA8A1"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+            </View>
 
           <TouchableOpacity
             style={[styles.primaryBtn, loading && styles.btnDisabled]}
@@ -101,7 +118,10 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
             {loading ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text style={styles.primaryBtnText}>로그인</Text>
+              <View style={styles.primaryBtnContent}>
+                <Text style={styles.primaryBtnText}>내 푸디몬 만나러 가기</Text>
+                <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+              </View>
             )}
           </TouchableOpacity>
 
@@ -127,6 +147,7 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
               아직 계정이 없으신가요? <Text style={styles.linkText}>회원가입</Text>
             </Text>
           </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -154,67 +175,142 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#FDF5F5',
+    backgroundColor: '#F2FAF6',
   },
   scroll: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingHorizontal: 18,
+    paddingVertical: 28,
+  },
+  content: {
+    width: '100%',
+    maxWidth: 460,
+    alignSelf: 'center',
   },
   heroSection: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 18,
+  },
+  heroBadge: {
+    borderRadius: 99,
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderWidth: 1,
+    borderColor: '#D8EDE4',
+    marginBottom: 6,
+  },
+  heroBadgeText: {
+    color: '#477361',
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.2,
+  },
+  petStage: {
+    width: 190,
+    height: 156,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  petGlow: {
+    position: 'absolute',
+    width: 148,
+    height: 148,
+    borderRadius: 74,
+    backgroundColor: '#D9F2E7',
+    borderWidth: 1,
+    borderColor: '#C7E9DC',
+  },
+  stageSparkle: {
+    position: 'absolute',
+    right: 12,
+    top: 20,
+    color: '#E7AD4B',
+    fontSize: 18,
+    zIndex: 2,
+  },
+  groundShadow: {
+    position: 'absolute',
+    bottom: 5,
+    width: 86,
+    height: 12,
+    borderRadius: 99,
+    backgroundColor: 'rgba(51, 92, 73, 0.13)',
   },
   petImage: {
-    width: 150,
-    height: 150,
+    width: 165,
+    height: 165,
+    zIndex: 1,
   },
   appTitle: {
-    fontSize: 36,
-    color: '#1B7F66',
-    marginTop: 8,
-    letterSpacing: -1,
+    fontSize: 35,
+    color: '#176C57',
+    marginTop: 2,
+    letterSpacing: -1.2,
     fontWeight: '900',
   },
   appSubtitle: {
     fontSize: 14,
-    color: '#64748B',
-    marginTop: 4,
-    fontWeight: '600',
+    color: '#61756B',
+    marginTop: 5,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 24,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    backgroundColor: 'rgba(255, 255, 255, 0.94)',
+    borderRadius: 28,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: '#DCEBE4',
+    shadowColor: '#426454',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 22,
+    elevation: 6,
+  },
+  cardEyebrow: {
+    color: '#6C877A',
+    fontSize: 12,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: 4,
   },
   cardTitle: {
-    fontSize: 22,
-    color: '#1E293B',
-    marginBottom: 20,
+    fontSize: 20,
+    color: '#263A31',
+    marginBottom: 18,
     textAlign: 'center',
     fontWeight: '900',
   },
-  input: {
+  inputWrap: {
+    minHeight: 54,
     borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    borderRadius: 14,
-    padding: 14,
+    borderColor: '#D9E7E0',
+    borderRadius: 17,
+    paddingHorizontal: 15,
+    marginBottom: 11,
+    backgroundColor: '#F8FCFA',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 14,
     fontSize: 15,
-    color: '#1E293B',
-    marginBottom: 12,
-    backgroundColor: '#F8FAFC',
+    color: '#243B31',
     fontWeight: '600',
   },
   primaryBtn: {
-    backgroundColor: '#1B7F66',
+    backgroundColor: '#207C63',
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 17,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 5,
+    borderBottomWidth: 4,
+    borderBottomColor: '#145743',
   },
   btnDisabled: {
     opacity: 0.7,
@@ -223,6 +319,11 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '800',
+  },
+  primaryBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   divider: {
     flexDirection: 'row',
@@ -233,7 +334,7 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: '#DDE9E3',
   },
   dividerText: {
     fontSize: 13,
@@ -242,7 +343,7 @@ const styles = StyleSheet.create({
   },
   secondaryBtn: {
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 6,
   },
   secondaryBtnText: {
     fontSize: 14,

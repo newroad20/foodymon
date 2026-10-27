@@ -5,14 +5,16 @@ import { useFoodyMon } from '@/context/FoodyMonContext';
 export function RoomBackground() {
   const { state } = useFoodyMon();
   const hour = new Date().getHours();
+  const isNight = hour >= 20 || hour < 6;
+  const isSunset = hour >= 17 && hour < 20;
 
   // Determine window sky style
   let skyColor = '#81D4FA'; // Day
   let sunOrMoon = '☀️';
-  if (hour >= 17 && hour < 20) {
+  if (isSunset) {
     skyColor = '#FFB74D'; // Sunset
     sunOrMoon = '🌅';
-  } else if (hour >= 20 || hour < 6) {
+  } else if (isNight) {
     skyColor = '#1A237E'; // Night
     sunOrMoon = '🌙';
   }
@@ -24,16 +26,30 @@ export function RoomBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      {/* Wall (Top 70%) */}
-      <View style={styles.wall}>
-        {/* Cozy Window */}
+      <View style={[styles.wall, isNight && styles.wallNight, isSunset && styles.wallSunset]}>
+        <View style={[styles.wallGlow, isNight && styles.wallGlowNight]} />
+        <Text style={[styles.mote, styles.moteOne]}>✦</Text>
+        <Text style={[styles.mote, styles.moteTwo]}>✦</Text>
+
         <View style={styles.windowFrame}>
           <View style={[styles.windowGlass, { backgroundColor: skyColor }]}>
             <Text style={styles.sunMoon}>{sunOrMoon}</Text>
-            {/* Window divider cross */}
+            {!isNight && <View style={styles.cloudOne} />}
+            {!isNight && <View style={styles.cloudTwo} />}
+            <View style={styles.hillFar} />
+            <View style={styles.hillNear} />
             <View style={styles.windowDividerH} />
             <View style={styles.windowDividerV} />
           </View>
+        </View>
+
+        <View style={styles.wallFrame}>
+          <Text style={styles.wallFrameLeaf}>☘</Text>
+        </View>
+        <View style={styles.tinyShelf}>
+          <View style={styles.shelfBookA} />
+          <View style={styles.shelfBookB} />
+          <View style={styles.shelfVase} />
         </View>
 
         {/* Equipped Bookshelf (Left Wall) */}
@@ -44,10 +60,12 @@ export function RoomBackground() {
         )}
       </View>
 
-      {/* Floor (Bottom 30%) */}
       <View style={styles.floor}>
-        {/* Floor Line */}
         <View style={styles.floorBorder} />
+        <View style={[styles.floorPlank, { top: '28%' }]} />
+        <View style={[styles.floorPlank, { top: '58%' }]} />
+        <View style={[styles.floorPlank, { top: '84%' }]} />
+        <View style={styles.roomRug} />
 
         {/* Equipped Carpet */}
         {hasCarpet && (
@@ -79,22 +97,62 @@ export function RoomBackground() {
 const styles = StyleSheet.create({
   wall: {
     flex: 7,
-    backgroundColor: '#FDF5F5', // Soft creamy warm wall
+    backgroundColor: '#EFF8F2',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
   },
+  wallNight: {
+    backgroundColor: '#E9EDF7',
+  },
+  wallSunset: {
+    backgroundColor: '#FFF2E7',
+  },
+  wallGlow: {
+    position: 'absolute',
+    width: 420,
+    height: 420,
+    borderRadius: 210,
+    backgroundColor: 'rgba(255,255,255,0.58)',
+    bottom: -190,
+    alignSelf: 'center',
+  },
+  wallGlowNight: {
+    backgroundColor: 'rgba(255,255,255,0.28)',
+  },
+  mote: {
+    position: 'absolute',
+    color: '#E2B45A',
+    opacity: 0.45,
+  },
+  moteOne: {
+    top: 118,
+    left: 42,
+    fontSize: 13,
+  },
+  moteTwo: {
+    top: 205,
+    right: 130,
+    fontSize: 9,
+  },
   windowFrame: {
     position: 'absolute',
-    top: 250,
-    right: 25,
-    width: 80,
-    height: 95,
-    borderRadius: 40,
-    borderWidth: 4,
-    borderColor: '#D7CCC8',
-    backgroundColor: '#EFEBE9',
+    top: 92,
+    right: 24,
+    width: 100,
+    height: 126,
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderWidth: 6,
+    borderColor: '#E8DDD1',
+    backgroundColor: '#F8F2EB',
     overflow: 'hidden',
+    shadowColor: '#6A5947',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
   },
   windowGlass: {
     flex: 1,
@@ -103,11 +161,47 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   sunMoon: {
-    fontSize: 22,
+    fontSize: 20,
     position: 'absolute',
     top: 10,
     right: 10,
     fontWeight: '600',
+  },
+  cloudOne: {
+    position: 'absolute',
+    left: 7,
+    top: 45,
+    width: 36,
+    height: 10,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.65)',
+  },
+  cloudTwo: {
+    position: 'absolute',
+    right: 10,
+    top: 68,
+    width: 28,
+    height: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.52)',
+  },
+  hillFar: {
+    position: 'absolute',
+    width: 100,
+    height: 42,
+    borderRadius: 50,
+    backgroundColor: 'rgba(119, 178, 145, 0.7)',
+    bottom: -18,
+    left: -28,
+  },
+  hillNear: {
+    position: 'absolute',
+    width: 115,
+    height: 48,
+    borderRadius: 58,
+    backgroundColor: 'rgba(72, 139, 107, 0.72)',
+    bottom: -26,
+    right: -45,
   },
   windowDividerH: {
     position: 'absolute',
@@ -123,6 +217,57 @@ const styles = StyleSheet.create({
     width: 2,
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
   },
+  wallFrame: {
+    position: 'absolute',
+    top: 112,
+    left: 32,
+    width: 62,
+    height: 72,
+    borderRadius: 18,
+    borderWidth: 5,
+    borderColor: '#E7D7C5',
+    backgroundColor: '#FFFDF9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ rotate: '-2deg' }],
+  },
+  wallFrameLeaf: {
+    color: '#78AD8F',
+    fontSize: 29,
+  },
+  tinyShelf: {
+    position: 'absolute',
+    left: 25,
+    top: 200,
+    width: 82,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#CDAF91',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingLeft: 10,
+    gap: 3,
+  },
+  shelfBookA: {
+    width: 8,
+    height: 25,
+    borderRadius: 3,
+    backgroundColor: '#ECA78E',
+  },
+  shelfBookB: {
+    width: 9,
+    height: 20,
+    borderRadius: 3,
+    backgroundColor: '#7FB5A0',
+  },
+  shelfVase: {
+    width: 18,
+    height: 18,
+    marginLeft: 14,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    backgroundColor: '#E8C77E',
+  },
   bookshelfContainer: {
     position: 'absolute',
     left: 20,
@@ -134,12 +279,32 @@ const styles = StyleSheet.create({
   },
   floor: {
     flex: 3,
-    backgroundColor: '#EFEBE9', // Light cozy wood tone floor
+    backgroundColor: '#E9DDCE',
     position: 'relative',
   },
   floorBorder: {
-    height: 3,
-    backgroundColor: '#D7CCC8',
+    height: 8,
+    backgroundColor: '#D8C6B3',
+    borderTopWidth: 1,
+    borderTopColor: '#CBB7A2',
+  },
+  floorPlank: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: 'rgba(142, 113, 86, 0.13)',
+  },
+  roomRug: {
+    position: 'absolute',
+    width: 290,
+    height: 92,
+    borderRadius: 48,
+    alignSelf: 'center',
+    top: 12,
+    backgroundColor: 'rgba(255, 246, 226, 0.72)',
+    borderWidth: 2,
+    borderColor: 'rgba(224, 193, 147, 0.5)',
   },
   carpetContainer: {
     position: 'absolute',

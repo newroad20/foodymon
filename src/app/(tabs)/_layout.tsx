@@ -15,9 +15,16 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#1B7F66',
-        tabBarInactiveTintColor: '#A8A29E',
-        tabBarStyle: { backgroundColor: '#FFFFFF', borderTopColor: '#E5E5E5', borderTopWidth: 2 },
+        tabBarActiveTintColor: '#207C63',
+        tabBarInactiveTintColor: '#9AA8A1',
+        tabBarStyle: {
+          backgroundColor: '#FCFFFD',
+          borderTopColor: '#DCE9E3',
+          borderTopWidth: 1,
+          height: 68,
+          paddingTop: 7,
+          paddingBottom: 8,
+        },
         tabBarLabelStyle: { fontSize: 11, fontWeight: '800' },
       }}>
       <Tabs.Screen name="index" options={{ title: '홈', tabBarIcon: tabIcon('home') }} />

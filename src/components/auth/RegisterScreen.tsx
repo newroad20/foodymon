@@ -21,6 +21,8 @@ interface RegisterScreenProps {
   onSwitchToLogin: () => void;
 }
 
+const PLACEHOLDER_COLOR = '#9CA3AF';
+
 export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
   const { signUp } = useAuth();
   const [email, setEmail] = useState('');
@@ -91,8 +93,8 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
           <Text style={styles.label}>이메일</Text>
           <TextInput
             style={styles.input}
-            placeholder="example@email.com"
-            placeholderTextColor="#94A3B8"
+            placeholder="예: example@email.com"
+            placeholderTextColor={PLACEHOLDER_COLOR}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -103,8 +105,8 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
           <Text style={styles.label}>비밀번호</Text>
           <TextInput
             style={styles.input}
-            placeholder="6자 이상"
-            placeholderTextColor="#94A3B8"
+            placeholder="예: 6자 이상 입력"
+            placeholderTextColor={PLACEHOLDER_COLOR}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -113,8 +115,8 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
           <Text style={styles.label}>비밀번호 확인</Text>
           <TextInput
             style={styles.input}
-            placeholder="비밀번호 다시 입력"
-            placeholderTextColor="#94A3B8"
+            placeholder="예: 비밀번호 다시 입력"
+            placeholderTextColor={PLACEHOLDER_COLOR}
             value={passwordConfirm}
             onChangeText={setPasswordConfirm}
             secureTextEntry

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
+import { setAudioModeAsync, setIsAudioActiveAsync, useAudioPlayer } from 'expo-audio';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 
 // Prologue/tutorial plays the story theme; the forest (main app) plays the gentle loop.
@@ -19,6 +20,7 @@ const MusicContext = createContext<MusicContextType | null>(null);
 export function MusicProvider({ children }: { children: ReactNode }) {
   const { state, loading } = useFoodyMon();
   const [musicOn, setMusicOnState] = useState<boolean | null>(null); // null until the saved choice is read
+  const [appActive, setAppActive] = useState(AppState.currentState === 'active');
   const player = useAudioPlayer(state.onboarded ? homeTrack : storyTrack);
 
   useEffect(() => {
@@ -34,12 +36,31 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      const active = nextState === 'active';
+      setAppActive(active);
+      if (!active) {
+        player.pause();
+        setIsAudioActiveAsync(false).catch(() => {});
+      } else {
+        setIsAudioActiveAsync(true).catch(() => {});
+      }
+    });
+    return () => subscription.remove();
+  }, [player]);
+
+  useEffect(() => {
     if (loading || musicOn === null) return;
     player.loop = true;
     player.volume = VOLUME;
-    if (musicOn) player.play();
-    else player.pause();
-  }, [player, musicOn, loading, state.onboarded]);
+    if (musicOn && appActive) {
+      setIsAudioActiveAsync(true)
+        .then(() => player.play())
+        .catch(() => {});
+    } else {
+      player.pause();
+    }
+  }, [player, musicOn, loading, state.onboarded, appActive]);
 
   const setMusicOn = (on: boolean) => {
     setMusicOnState(on);

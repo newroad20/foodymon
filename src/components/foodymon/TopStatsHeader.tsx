@@ -16,9 +16,11 @@ export function TopStatsHeader({ onOpenHistory }: TopStatsHeaderProps) {
   return (
     <View style={styles.container}>
       {/* Left Stat Badges */}
-      <View style={styles.statsRow}>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>Lv.{state.level} {currentLvl.name}</Text>
+      <View style={styles.primaryStats}>
+        <View style={[styles.badge, styles.levelBadge]}>
+          <Text style={styles.badgeText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+            Lv.{state.level} {currentLvl.name}
+          </Text>
         </View>
 
         {/* Streak · jelly · shields in one pill */}
@@ -34,7 +36,7 @@ export function TopStatsHeader({ onOpenHistory }: TopStatsHeaderProps) {
         </View>
       </View>
 
-      <View style={styles.statsRow}>
+      <View style={styles.headerActions}>
         <TouchableOpacity
           style={styles.historyButton}
           activeOpacity={0.8}
@@ -63,14 +65,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
+    gap: 8,
     zIndex: 10,
   },
-  statsRow: {
+  primaryStats: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    flexWrap: 'wrap',
     flex: 1,
+    minWidth: 0,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 0,
   },
   badge: {
     flexDirection: 'row',
@@ -83,6 +91,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderBottomWidth: 4,
     borderColor: '#E5E5E5',
+  },
+  levelBadge: {
+    flexShrink: 1,
+    minWidth: 0,
   },
   sep: {
     width: 1,
@@ -102,7 +114,7 @@ const styles = StyleSheet.create({
     borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
+    marginLeft: 6,
     borderWidth: 2,
     borderBottomWidth: 4,
     borderColor: '#E5E5E5',

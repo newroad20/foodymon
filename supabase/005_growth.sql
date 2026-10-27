@@ -240,7 +240,8 @@ begin
 end; $$;
 
 -- ---------- 4. 누적 성장점과 진화 ----------
--- 단계별 필요 누적점: Lv.4 60, Lv.5 140, Lv.6 230. 하루 최대 1번, 단계를 건너뛰지 않는다.
+-- 단계별 필요 누적점: Lv.4 200, Lv.5 400, Lv.6 600. 완전 기록 기준 약 2일마다 성장한다.
+-- 하루 최대 1번, 단계를 건너뛰지 않는다.
 create or replace function public.sync_growth(p_today date)
 returns jsonb
 language plpgsql
@@ -274,7 +275,7 @@ begin
           union select log_date from public.mind_records where user_id = uid) days,
          lateral public.day_points(uid, days.log_date) d;
 
-  need := case p.evolution_stage when 3 then 60 when 4 then 140 when 5 then 230 else null end;
+  need := case p.evolution_stage when 3 then 200 when 4 then 400 when 5 then 600 else null end;
   if need is not null and total >= need
      and (p.last_evolved_date is null or p.last_evolved_date < p_today) then
     p.evolution_stage := p.evolution_stage + 1;

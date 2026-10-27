@@ -6,11 +6,11 @@ import {
   Alert,
   StatusBar,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
-import { useAuth } from '@/context/AuthContext';
 import { RoomBackground } from '@/components/foodymon/RoomBackground';
 import { TopStatsHeader } from '@/components/foodymon/TopStatsHeader';
 import { PetAvatar } from '@/components/foodymon/PetAvatar';
@@ -131,9 +131,12 @@ export default function FoodyMonHomeScreen() {
         )}
 
         {/* Center Room & Interactive Pet Avatar */}
-        <View style={styles.petSection}>
+        <ScrollView
+          style={styles.petScroll}
+          contentContainerStyle={styles.petSection}
+          showsVerticalScrollIndicator={false}>
           <PetAvatar />
-        </View>
+        </ScrollView>
 
         {/* Bottom Action Dock */}
         <ActionDock
@@ -246,9 +249,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '900',
   },
-  petSection: {
+  petScroll: {
     flex: 1,
+  },
+  petSection: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 8,
   },
 });

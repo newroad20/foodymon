@@ -22,7 +22,7 @@ import { CategoryHistoryModal } from '@/components/foodymon/CategoryHistoryModal
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 import { BackfillModal } from '@/components/foodymon/BackfillModal';
 import { GoalCard } from '@/components/foodymon/GoalCard';
-import { PetChatModal } from '@/components/foodymon/PetChatModal';
+import { PersistentPetChatModal } from '@/components/foodymon/PersistentPetChatModal';
 import { track } from '@/lib/analytics';
 import { BACKFILL_COST } from '@/constants/foodymonData';
 import { RolloverResult } from '@/lib/dayRollover';
@@ -177,7 +177,7 @@ export default function FoodyMonHomeScreen() {
         onClose={() => setShowHistoryModal(false)}
       />
       <BackfillModal visible={showBackfillModal} onClose={() => setShowBackfillModal(false)} />
-      {showChatModal && <PetChatModal onClose={() => setShowChatModal(false)} />}
+      {showChatModal && <PersistentPetChatModal onClose={() => setShowChatModal(false)} />}
 
       {/* Onboarding Prologue Modal (Shown on first launch) */}
       <OnboardingModal visible={!loading && !syncError && !state.onboarded} />

@@ -19,6 +19,7 @@ import {
 } from '@/lib/serverState';
 
 const RECENT_LOG_LIMIT = 50;
+const PET_CHAT_LIMIT = 100;
 
 /**
  * Loads the user's game state from Supabase. When the user is onboarded, first
@@ -501,5 +502,84 @@ export async function fetchJourney(): Promise<Journey> {
 
 export async function saveReflection(userId: string, text: string): Promise<void> {
   const res = await supabase.from('profiles').update({ reflection: text }).eq('id', userId);
+  if (res.error) throw res.error;
+}
+
+export interface PetChatPreference {
+  historyEnabled: boolean;
+  consentAt: string | null;
+}
+
+export interface StoredPetChatMessage {
+  id: string;
+  role: 'user' | 'pet';
+  content: string;
+  createdAt: string;
+}
+
+/** Null means the user has not decided whether chat history may be stored yet. */
+export async function fetchPetChatPreference(userId: string): Promise<PetChatPreference | null> {
+  const res = await supabase
+    .from('pet_chat_preferences')
+    .select('history_enabled, consent_at')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (res.error) throw res.error;
+  if (!res.data) return null;
+  return { historyEnabled: res.data.history_enabled, consentAt: res.data.consent_at };
+}
+
+export async function setPetChatHistoryPreference(userId: string, enabled: boolean): Promise<void> {
+  const now = new Date().toISOString();
+  const res = await supabase.from('pet_chat_preferences').upsert(
+    {
+      user_id: userId,
+      history_enabled: enabled,
+      consent_at: enabled ? now : null,
+      updated_at: now,
+    },
+    { onConflict: 'user_id' }
+  );
+  if (res.error) throw res.error;
+}
+
+/** Loads the newest 100 messages from the last 30 days, then displays them oldest first. */
+export async function fetchPetChatMessages(userId: string): Promise<StoredPetChatMessage[]> {
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const res = await supabase
+    .from('pet_chat_messages')
+    .select('id, role, content, created_at')
+    .eq('user_id', userId)
+    .gte('created_at', since)
+    .order('created_at', { ascending: false })
+    .limit(PET_CHAT_LIMIT);
+  if (res.error) throw res.error;
+  return (res.data ?? [])
+    .map((message) => ({
+      id: message.id,
+      role: message.role as StoredPetChatMessage['role'],
+      content: message.content,
+      createdAt: message.created_at,
+    }))
+    .reverse();
+}
+
+export async function savePetChatMessages(
+  userId: string,
+  messages: { role: 'user' | 'pet'; content: string }[]
+): Promise<void> {
+  if (messages.length === 0) return;
+  const res = await supabase.from('pet_chat_messages').insert(
+    messages.map((message) => ({
+      user_id: userId,
+      role: message.role,
+      content: message.content.slice(0, 500),
+    }))
+  );
+  if (res.error) throw res.error;
+}
+
+export async function deleteAllPetChatMessages(userId: string): Promise<void> {
+  const res = await supabase.from('pet_chat_messages').delete().eq('user_id', userId);
   if (res.error) throw res.error;
 }

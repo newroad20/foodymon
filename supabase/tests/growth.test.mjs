@@ -15,7 +15,7 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
     create function auth.uid() returns uuid language sql stable as
       $$ select nullif(current_setting('test.uid', true), '')::uuid $$;
   `);
-  for (const f of ['schema.sql', '002_game_rpc.sql', '004_birth_year.sql', '005_growth.sql', '005_growth.sql', '006_day_detail.sql', '006_day_detail.sql']) {
+  for (const f of ['schema.sql', '002_game_rpc.sql', '004_birth_year.sql', '005_growth.sql', '005_growth.sql', '006_day_detail.sql', '006_day_detail.sql', '009_slow_growth.sql', '009_slow_growth.sql']) {
     await db.exec(sql(f));
   }
   const U = '11111111-1111-1111-1111-111111111111';
@@ -68,30 +68,37 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
     /invalid date/
   );
 
-  // evolution: 68 >= 60 -> Lv.4, once a day
+  // Evolution now needs roughly two complete 100-point days.
   let r = await sync();
-  assert.deepEqual([r.total, r.level, r.evolved, r.today.total], [68, 4, true, 68]);
-  r = await sync();
-  assert.deepEqual([r.level, r.evolved], [4, false]);
+  assert.deepEqual([r.total, r.level, r.evolved, r.today.total], [68, 3, false, 68]);
 
-  // enough for Lv.5 already, but only one evolution per day; next day it evolves, never skips
-  await q(`update public.profiles set last_evolved_date = $2::date - 1 where id=$1`, [U, today]);
-  await q(`insert into public.sleep_records(user_id,log_date,bed_time,wake_time) values ($1,$2::date - 1,'22:00','07:00')`, [U, today]);
+  // Complete today: sleep 30 + six meals 40 + mind 10 + observation goal 20 = 100.
+  await q(`update public.sleep_records set bed_time='23:00', wake_time='07:00' where user_id=$1 and log_date=$2`, [U, today]);
+  await q(`delete from public.meal_records where user_id=$1 and log_date=$2 and slot in (1,5)`, [U, today]);
+  for (const slot of [0, 1, 2, 3, 4, 5]) {
+    await q(`insert into public.meal_records(user_id,log_date,slot,status) values ($1,$2,$3,'ate')
+             on conflict (user_id,log_date,slot) do update set status='ate'`, [U, today, slot]);
+  }
+  assert.equal((await points()).total, 100);
+  r = await sync();
+  assert.deepEqual([r.total, r.level, r.evolved], [100, 3, false]);
+
+  // A second complete day reaches 200 and grants exactly one level.
+  await q(`insert into public.sleep_records(user_id,log_date,bed_time,wake_time) values ($1,$2::date - 1,'23:00','07:00')`, [U, today]);
   await q(`insert into public.meal_records(user_id,log_date,slot,status)
            select $1, $2::date - 1, s, 'ate' from generate_series(0,5) s`, [U, today]);
-  await q(`insert into public.mind_records(user_id,log_date,emotion,note) values ($1,$2::date - 1,'okay','그냥')`, [U, today]);
-  assert.equal((await points(`${today}`)).total, 68);
+  await q(`insert into public.mind_records(user_id,log_date,emotion,situation,note)
+           values ($1,$2::date - 1,'okay','school','괜찮은 하루')`, [U, today]);
   r = await sync();
-  assert.equal(r.total, 68 + 100); // yesterday capped at 100
-  assert.deepEqual([r.level, r.evolved], [5, true]);
+  assert.deepEqual([r.total, r.level, r.evolved], [200, 4, true]);
   r = await sync();
-  assert.deepEqual([r.level, r.evolved], [5, false]);
+  assert.deepEqual([r.level, r.evolved], [4, false]);
 
   // deleting records lowers points but never the level
   await q(`delete from public.meal_records where user_id=$1`, [U]);
   r = await sync();
-  assert.ok(r.total < 140);
-  assert.equal(r.level, 5);
+  assert.ok(r.total < 200);
+  assert.equal(r.level, 4);
 
   // ---------- small goals (second user, observe_days = 1) ----------
   const V = '22222222-2222-2222-2222-222222222222';

@@ -13,6 +13,7 @@ import {
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { mindEmotions, mindSituations } from '@/constants/foodymonData';
 import { MAX_MIND_RECORDS, type Emotion, type Situation } from '@/lib/growth';
+import { emotionFollowUp } from '@/lib/followUp';
 
 interface EmotionModalProps {
   visible: boolean;
@@ -55,6 +56,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
   };
 
   const chosen = mindEmotions.find((m) => m.id === emotion);
+  const followUp = emotion ? emotionFollowUp(emotion, situation) : null;
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -102,8 +104,12 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
           ) : (
             <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
               <Text style={styles.subtitle}>
-                {chosen.emoji} {chosen.label}. 어떤 일이 있었는지 들려줄래? (선택)
+                {chosen.emoji} {chosen.label}
               </Text>
+              <View style={styles.followUpBox}>
+                <Text style={styles.followUpEyebrow}>푸디몬의 다음 질문</Text>
+                <Text style={styles.followUpQuestion}>{followUp?.question}</Text>
+              </View>
               <View style={styles.chipRow}>
                 {mindSituations.map((s) => (
                   <TouchableOpacity
@@ -118,9 +124,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
               </View>
               <TextInput
                 style={styles.input}
-                placeholder={
-                  situation === 'custom' ? '어떤 일이었는지 적어 줘' : '무슨 일이 있었고, 어떤 마음이 들었어? (선택)'
-                }
+                placeholder={followUp?.placeholder}
                 placeholderTextColor="#94A3B8"
                 value={note}
                 onChangeText={setNote}
@@ -188,6 +192,26 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     lineHeight: 20,
     fontWeight: '600',
+  },
+  followUpBox: {
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: '#FCE7F3',
+    borderWidth: 1,
+    borderColor: '#FBCFE8',
+  },
+  followUpEyebrow: {
+    marginBottom: 4,
+    fontSize: 11,
+    color: '#BE185D',
+    fontWeight: '900',
+  },
+  followUpQuestion: {
+    fontSize: 14,
+    color: '#831843',
+    fontWeight: '800',
+    lineHeight: 20,
   },
   list: {
     gap: 10,

@@ -17,6 +17,7 @@ import { useFoodyMon } from '@/context/FoodyMonContext';
 import { mealStatuses, quizzesData } from '@/constants/foodymonData';
 import { MEAL_SLOTS, type MealStatus } from '@/lib/growth';
 import { mealSlotForHour } from '@/lib/mealType';
+import { mealFollowUp } from '@/lib/followUp';
 
 interface MealModalProps {
   visible: boolean;
@@ -103,6 +104,16 @@ export function MealModal({ visible, onClose }: MealModalProps) {
   };
 
   const eaten = status !== null && EATEN.includes(status);
+  const followUp = status ? mealFollowUp(status) : null;
+
+  const pickStatus = (next: MealStatus) => {
+    setStatus(next);
+    if (!EATEN.includes(next)) {
+      setMenu('');
+      setFeeling('');
+      setPhotoUri(null);
+    }
+  };
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -141,7 +152,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
                 <TouchableOpacity
                   key={s.id}
                   style={[styles.chip, status === s.id && styles.chipActive]}
-                  onPress={() => setStatus(s.id)}
+                  onPress={() => pickStatus(s.id)}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: status === s.id }}>
                   <Text style={[styles.chipText, status === s.id && styles.chipTextActive]}>{s.label}</Text>
@@ -203,12 +214,13 @@ export function MealModal({ visible, onClose }: MealModalProps) {
 
             {status !== null && (
               <>
-                <Text style={styles.label}>
-                  {status === 'hard' || status === 'skipped' ? '어떤 점이 어려웠어? (선택)' : '남기고 싶은 말 (선택)'}
-                </Text>
+                <View style={styles.followUpBox}>
+                  <Text style={styles.followUpEyebrow}>푸디몬의 다음 질문</Text>
+                  <Text style={styles.followUpQuestion}>{followUp?.question}</Text>
+                </View>
                 <TextInput
                   style={[styles.input, styles.multiline]}
-                  placeholder="적고 싶을 때만 적어도 괜찮아"
+                  placeholder={followUp?.placeholder}
                   placeholderTextColor="#94A3B8"
                   value={memo}
                   onChangeText={setMemo}
@@ -328,6 +340,27 @@ const styles = StyleSheet.create({
   quizQuestion: {
     fontSize: 14,
     color: '#17765D',
+    fontWeight: '800',
+    lineHeight: 20,
+  },
+  followUpBox: {
+    marginTop: 16,
+    marginBottom: 8,
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: '#FFF7ED',
+    borderWidth: 1,
+    borderColor: '#FED7AA',
+  },
+  followUpEyebrow: {
+    marginBottom: 4,
+    fontSize: 11,
+    color: '#C2410C',
+    fontWeight: '900',
+  },
+  followUpQuestion: {
+    fontSize: 14,
+    color: '#7C2D12',
     fontWeight: '800',
     lineHeight: 20,
   },

@@ -294,17 +294,18 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
 
 const styles = StyleSheet.create({
   container: {
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
+    paddingVertical: 6,
   },
   speechBubble: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
-    marginBottom: 16,
-    maxWidth: '85%',
+    marginBottom: 12,
+    maxWidth: '90%',
     alignItems: 'center',
     borderWidth: 2,
     borderBottomWidth: 4,
@@ -335,8 +336,8 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   petImage: {
-    width: 220,
-    height: 220,
+    width: 200,
+    height: 200,
   },
   zzz: {
     position: 'absolute',
@@ -401,8 +402,9 @@ const styles = StyleSheet.create({
     marginTop: -8,
   },
   scoreContainer: {
-    width: '80%',
-    marginTop: 20,
+    width: '90%',
+    maxWidth: 360,
+    marginTop: 12,
     backgroundColor: 'rgba(255, 255, 255, 0.85)',
     padding: 12,
     borderRadius: 16,
@@ -413,14 +415,18 @@ const styles = StyleSheet.create({
   scoreHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 8,
     marginBottom: 6,
   },
   scoreLabel: {
+    flex: 1,
     fontSize: 12,
     color: '#718096',
     fontWeight: '700',
   },
   scoreValue: {
+    flexShrink: 0,
     fontSize: 13,
     color: '#4A5568',
     fontWeight: '800',
@@ -441,5 +447,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#64748B',
     fontWeight: '700',
+    lineHeight: 17,
+    textAlign: 'center',
   },
 });

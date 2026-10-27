@@ -8,6 +8,7 @@ import {
   Animated,
   Easing,
 } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData, costumesData, mindEmotions, petStateArt } from '@/constants/foodymonData';
 import type { PetReaction } from '@/context/FoodyMonContext';
@@ -15,9 +16,10 @@ import { growthProgress } from '@/lib/growth';
 
 interface PetAvatarProps {
   onTap?: () => void;
+  onOpenChat?: () => void;
 }
 
-export function PetAvatar({ onTap }: PetAvatarProps) {
+export function PetAvatar({ onTap, onOpenChat }: PetAvatarProps) {
   const { state, currentDialogue, triggerPetInteraction, petReaction } = useFoodyMon();
   // Check-in reactions: lying down to sleep, eating the meal, showing the feeling.
   const tilt = useRef(new Animated.Value(0)).current; // degrees
@@ -175,10 +177,22 @@ export function PetAvatar({ onTap }: PetAvatarProps) {
   return (
     <View style={styles.container}>
       {/* Speech Dialogue Bubble */}
-      <View style={styles.speechBubble}>
+      <TouchableOpacity
+        style={styles.speechBubble}
+        activeOpacity={onOpenChat ? 0.8 : 1}
+        onPress={onOpenChat}
+        disabled={!onOpenChat}
+        accessibilityRole={onOpenChat ? 'button' : undefined}
+        accessibilityLabel={onOpenChat ? '푸디몬과 이야기하기' : undefined}>
         <Text style={styles.dialogueText}>{currentDialogue}</Text>
+        {onOpenChat && (
+          <View style={styles.chatHint}>
+            <Ionicons name="chatbubble-ellipses-outline" size={12} color="#4B806C" />
+            <Text style={styles.chatHintText}>눌러서 이야기하기</Text>
+          </View>
+        )}
         <View style={styles.speechArrow} />
-      </View>
+      </TouchableOpacity>
 
       {/* Interactive Pet Image */}
       <TouchableOpacity
@@ -320,6 +334,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
     fontWeight: '700',
+  },
+  chatHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 5,
+  },
+  chatHintText: {
+    color: '#5B806F',
+    fontSize: 10,
+    fontWeight: '800',
   },
   speechArrow: {
     position: 'absolute',

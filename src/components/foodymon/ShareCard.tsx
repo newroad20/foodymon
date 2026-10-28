@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { UserState } from '@/types/foodymon';
-import { backgroundsData, costumesData, levelsData } from '@/constants/foodymonData';
+import { backgroundsData, costumeArt, costumesData, levelsData, petImage } from '@/constants/foodymonData';
 import { hasLoggedToday } from '@/lib/dayRollover';
 
 export const SHARE_CARD_WIDTH = 320;
@@ -35,8 +35,8 @@ export const ShareCard = forwardRef<View, { state: UserState }>(function ShareCa
         {roomItems.length > 0 && (
           <Text style={styles.room}>{roomItems.map((b) => b.emoji).join(' ')}</Text>
         )}
-        {costume && <Text style={styles.costume}>{costume.icon}</Text>}
-        <Image source={levelInfo.image} style={styles.pet} resizeMode="contain" />
+        {costume && !costumeArt[state.level]?.[costume.id] && <Text style={styles.costume}>{costume.icon}</Text>}
+        <Image source={petImage(state.level, costume?.id ?? null)} style={styles.pet} resizeMode="contain" />
         <Text style={styles.levelBadge}>
           Lv.{levelInfo.level} {levelInfo.name}
         </Text>

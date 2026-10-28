@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
-import { levelsData, costumesData, mindEmotions, petStateArt } from '@/constants/foodymonData';
+import { levelsData, costumesData, costumeArt, mindEmotions, petImage, petStateArt } from '@/constants/foodymonData';
 import type { PetReaction } from '@/context/FoodyMonContext';
 import { growthProgress } from '@/lib/growth';
 
@@ -158,7 +158,9 @@ export function PetAvatar({ onTap, onOpenChat }: PetAvatarProps) {
   const currentLevelInfo =
     levelsData.find((l) => l.level === state.level) || levelsData[2];
   // Art for the current reaction when the team adds it; otherwise the stage image.
-  const art = petStateArt[state.level];
+  // With a costume on, keep showing the costume art; reactions then use motion only.
+  const wearing = !!(state.equippedCostume && costumeArt[state.level]?.[state.equippedCostume]);
+  const art = wearing ? undefined : petStateArt[state.level];
   const reactionArt =
     reaction?.kind === 'sleep'
       ? art?.sleep
@@ -209,7 +211,7 @@ export function PetAvatar({ onTap, onOpenChat }: PetAvatarProps) {
             },
           ]}>
           {/* Equipped Costume Icon on top of pet */}
-          {equippedCostumeItem && (
+          {equippedCostumeItem && !wearing && (
             <View style={styles.costumeContainer}>
               <Text style={styles.costumeEmoji}>
                 {equippedCostumeItem.icon}
@@ -241,7 +243,11 @@ export function PetAvatar({ onTap, onOpenChat }: PetAvatarProps) {
                 { scaleY: chew },
               ],
             }}>
-            <Image source={reactionArt ?? currentLevelInfo.image} style={styles.petImage} resizeMode="contain" />
+            <Image
+              source={reactionArt ?? petImage(state.level, state.equippedCostume)}
+              style={styles.petImage}
+              resizeMode="contain"
+            />
           </Animated.View>
 
           {reaction?.kind === 'sleep' && <Text style={styles.zzz}>💤</Text>}

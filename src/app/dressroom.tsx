@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable, Alert, ActivityIndicator
 import { Image } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
-import { GIFT_BOX_COST, backgroundsData, costumesData, levelsData } from '@/constants/foodymonData';
+import { GIFT_BOX_COST, backgroundsData, costumeArt, costumesData, petImage } from '@/constants/foodymonData';
 
 type Category = 'costume' | 'background';
 type Item = { id: string; icon: string; name: string; price: number };
@@ -19,7 +19,6 @@ export default function DressroomScreen() {
   const allOwned =
     state.ownedCostumes.length >= costumesData.length && state.ownedBackgrounds.length >= backgroundsData.length;
 
-  const levelInfo = levelsData.find((l) => l.level === state.level) ?? levelsData[2];
   const items: Item[] = category === 'costume' ? costumesData : backgroundsData;
   const owned = category === 'costume' ? state.ownedCostumes : state.ownedBackgrounds;
 
@@ -89,8 +88,8 @@ export default function DressroomScreen() {
           <Text style={styles.jellyText}>{state.currency}</Text>
         </View>
         {roomItems.length > 0 && <Text style={styles.room}>{roomItems.map((b) => b.emoji).join('  ')}</Text>}
-        {costume && <Text style={styles.costume}>{costume.icon}</Text>}
-        <Image source={levelInfo.image} style={styles.pet} contentFit="contain" />
+        {costume && !costumeArt[state.level]?.[costume.id] && <Text style={styles.costume}>{costume.icon}</Text>}
+        <Image source={petImage(state.level, costume?.id ?? null)} style={styles.pet} contentFit="contain" />
         {trying && <Text style={styles.tryingTag}>미리보기: {trying.item.name}</Text>}
       </View>
 

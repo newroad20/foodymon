@@ -181,6 +181,65 @@ export const costumesData: CostumeItem[] = [
   { id: 'bunny', icon: '🐰', name: '토끼 귀', price: 50 },
 ];
 
+// FoodyMon wearing each costume, per stage (team art, 2026-10). Shown instead of the stage image
+// while that costume is on; the old emoji overlay is only a fallback for missing art.
+export const costumeArt: Record<number, Record<string, ImageSourcePropType>> = {
+  1: {
+    crown: require('@/assets/images/costume/level1/crown.png'),
+    ribbon: require('@/assets/images/costume/level1/ribbon.png'),
+    glasses: require('@/assets/images/costume/level1/glasses.png'),
+    flower: require('@/assets/images/costume/level1/flower.png'),
+    wizard: require('@/assets/images/costume/level1/wizard.png'),
+    bunny: require('@/assets/images/costume/level1/bunny.png'),
+  },
+  2: {
+    crown: require('@/assets/images/costume/level2/crown.png'),
+    ribbon: require('@/assets/images/costume/level2/ribbon.png'),
+    glasses: require('@/assets/images/costume/level2/glasses.png'),
+    flower: require('@/assets/images/costume/level2/flower.png'),
+    wizard: require('@/assets/images/costume/level2/wizard.png'),
+    bunny: require('@/assets/images/costume/level2/bunny.png'),
+  },
+  3: {
+    crown: require('@/assets/images/costume/level3/crown.png'),
+    ribbon: require('@/assets/images/costume/level3/ribbon.png'),
+    glasses: require('@/assets/images/costume/level3/glasses.png'),
+    flower: require('@/assets/images/costume/level3/flower.png'),
+    wizard: require('@/assets/images/costume/level3/wizard.png'),
+    bunny: require('@/assets/images/costume/level3/bunny.png'),
+  },
+  4: {
+    crown: require('@/assets/images/costume/level4/crown.png'),
+    ribbon: require('@/assets/images/costume/level4/ribbon.png'),
+    glasses: require('@/assets/images/costume/level4/glasses.png'),
+    flower: require('@/assets/images/costume/level4/flower.png'),
+    wizard: require('@/assets/images/costume/level4/wizard.png'),
+    bunny: require('@/assets/images/costume/level4/bunny.png'),
+  },
+  5: {
+    crown: require('@/assets/images/costume/level5/crown.png'),
+    ribbon: require('@/assets/images/costume/level5/ribbon.png'),
+    glasses: require('@/assets/images/costume/level5/glasses.png'),
+    flower: require('@/assets/images/costume/level5/flower.png'),
+    wizard: require('@/assets/images/costume/level5/wizard.png'),
+    bunny: require('@/assets/images/costume/level5/bunny.png'),
+  },
+  6: {
+    crown: require('@/assets/images/costume/level6/crown.png'),
+    ribbon: require('@/assets/images/costume/level6/ribbon.png'),
+    glasses: require('@/assets/images/costume/level6/glasses.png'),
+    flower: require('@/assets/images/costume/level6/flower.png'),
+    wizard: require('@/assets/images/costume/level6/wizard.png'),
+    bunny: require('@/assets/images/costume/level6/bunny.png'),
+  },
+};
+
+/** The pet picture for a stage, wearing `costumeId` when there is art for it. */
+export function petImage(level: number, costumeId: string | null) {
+  const stage = levelsData.find((l) => l.level === level) ?? levelsData[2];
+  return (costumeId && costumeArt[level]?.[costumeId]) || stage.image;
+}
+
 export const backgroundsData: BackgroundItem[] = [
   { id: 'carpet', icon: '🧶', name: '포근한 카펫', price: 30, type: 'carpet', emoji: '🧶' },
   { id: 'bookshelf', icon: '📚', name: '미니 책장', price: 50, type: 'bookshelf', emoji: '📚' },

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
+import { useParentalGate } from '@/context/ParentalGateContext';
 
 // Official Korean help lines (feedback 2026-10-21). Free, 24h unless noted.
 const LINES = [
@@ -18,6 +19,7 @@ const call = (number: string) =>
 
 /** Where to get help: official hotlines, telling a trusted adult, or carrying on. */
 export default function HelpScreen() {
+  const guard = useParentalGate();
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.lead}>
@@ -29,7 +31,7 @@ export default function HelpScreen() {
           key={l.number}
           style={[styles.card, l.urgent && styles.cardUrgent]}
           activeOpacity={0.8}
-          onPress={() => call(l.number)}
+          onPress={() => guard(() => call(l.number), '전화 걸기')}
           accessibilityRole="button"
           accessibilityLabel={`${l.name} ${l.number}에 전화하기`}>
           <View style={styles.cardText}>

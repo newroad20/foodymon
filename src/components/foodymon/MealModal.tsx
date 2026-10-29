@@ -160,7 +160,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
               ))}
             </View>
 
-            {eaten && (
+            {eaten && !state.kidMode && (
               <>
                 <Text style={styles.label}>무엇을 먹었어? (선택)</Text>
                 <TextInput
@@ -212,7 +212,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
               </>
             )}
 
-            {status !== null && (
+            {status !== null && !state.kidMode && (
               <>
                 <View style={styles.followUpBox}>
                   <Text style={styles.followUpEyebrow}>푸디몬의 다음 질문</Text>

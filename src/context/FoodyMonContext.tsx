@@ -31,6 +31,7 @@ import { successFeel, tapFeel } from '@/lib/haptics';
 import { foodEmoji } from '@/lib/foodEmoji';
 import { formatLogTime, withDayPoints } from '@/lib/serverState';
 import * as gameApi from '@/lib/gameApi';
+import { setAnalyticsPaused } from '@/lib/analytics';
 
 // How often to check whether the calendar day changed while the app stays open.
 const DAY_CHECK_INTERVAL_MS = 60 * 1000;
@@ -45,6 +46,7 @@ const defaultState: UserState = {
   targetMeals: 3,
   usualMealSize: 1.0,
   birthYear: null,
+  kidMode: false,
 
   streak: 0,
   shields: 1,
@@ -93,8 +95,10 @@ interface FoodyMonContextType {
     sleep: number,
     meals: number,
     mealSize: number,
-    guardian?: { name: string; contact: string }
+    guardian?: { name: string; contact: string; kidMode: boolean }
   ) => Promise<void>;
+  /** Turns kid mode on or off (callers put turning it off behind the parental gate). */
+  setKidMode: (on: boolean) => Promise<boolean>;
   /** Saves (or replaces) today's sleep; growth points count once a day. */
   saveSleep: (bedTime: string, wakeTime: string) => Promise<void>;
   /** Saves (or replaces) one meal slot. photoFailed: the meal was saved without the picked photo. */
@@ -320,7 +324,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     sleep: number,
     meals: number,
     mealSize: number,
-    guardian?: { name: string; contact: string }
+    guardian?: { name: string; contact: string; kidMode: boolean }
   ) => {
     const firstLog = { type: 'emotion' as const, content: `${name} 마스터와 푸디몬이 첫 만남을 가졌어요! 🎉` };
     applyState(
@@ -328,6 +332,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         ...stateRef.current,
         masterName: name,
         birthYear,
+        kidMode: guardian?.kidMode ?? false,
         targetSleep: sleep,
         targetMeals: meals,
         usualMealSize: mealSize,
@@ -566,6 +571,20 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     return result;
   };
 
+  const setKidMode = async (on: boolean) => {
+    applyState({ ...stateRef.current, kidMode: on });
+    try {
+      await gameApi.saveKidMode(userId, on);
+      return true;
+    } catch (e) {
+      console.error('Failed to save kid mode:', e);
+      setSyncError(errorMessage(e));
+      return false;
+    }
+  };
+
+  useEffect(() => setAnalyticsPaused(state.kidMode), [state.kidMode]);
+
   const dismissRollover = useCallback(() => setPendingRollover(null), []);
 
   return (
@@ -587,6 +606,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         buyItem,
         openGiftBox,
         refreshGrowth,
+        setKidMode,
         petReaction,
         toggleCostume,
         toggleBackground,

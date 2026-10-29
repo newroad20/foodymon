@@ -45,6 +45,8 @@ export interface UserState {
   usualMealSize: number;
   /** Used only to pick the age band for recommended sleep; null until asked. */
   birthYear: number | null;
+  /** Guardian-chosen kid mode: simpler screens, no usage log, outside actions behind a parental gate. */
+  kidMode: boolean;
 
   streak: number;
   shields: number;

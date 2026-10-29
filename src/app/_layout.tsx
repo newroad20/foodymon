@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { FoodyMonProvider } from '@/context/FoodyMonContext';
 import { MusicProvider } from '@/context/MusicContext';
 import { NightOverlay } from '@/components/foodymon/NightOverlay';
+import { ParentalGateProvider } from '@/context/ParentalGateContext';
 import { setAnalyticsUser, track } from '@/lib/analytics';
 import { LoginScreen } from '@/components/auth/LoginScreen';
 import { RegisterScreen } from '@/components/auth/RegisterScreen';
@@ -67,6 +68,7 @@ function AppContent() {
     // key: start fresh when a different account logs in
     <FoodyMonProvider key={session.user.id} userId={session.user.id}>
       <MusicProvider>
+        <ParentalGateProvider>
         {/* The night after a sleep check-in covers every screen, tab bar included. */}
         <View style={styles.fill}>
           <Stack screenOptions={{ headerShown: false }}>
@@ -133,6 +135,7 @@ function AppContent() {
           </Stack>
           <NightOverlay />
         </View>
+        </ParentalGateProvider>
       </MusicProvider>
     </FoodyMonProvider>
   );

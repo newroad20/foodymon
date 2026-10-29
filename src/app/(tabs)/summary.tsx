@@ -5,6 +5,7 @@ import { Image } from 'expo-image';
 import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFoodyMon } from '@/context/FoodyMonContext';
+import { useParentalGate } from '@/context/ParentalGateContext';
 import { levelsData } from '@/constants/foodymonData';
 import { sleepMinutes } from '@/lib/growth';
 import { toDateKey, hasLoggedToday } from '@/lib/dayRollover';
@@ -25,6 +26,7 @@ function greeting(logged: boolean) {
 
 export default function SummaryScreen() {
   const { userId, state } = useFoodyMon();
+  const guard = useParentalGate();
   const [range, setRange] = useState<Range>(7);
   const [rows, setRows] = useState<{ log_date: string; daily_score: number | null }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,7 +94,7 @@ export default function SummaryScreen() {
             <PartTile icon="flag" color="#1B7F66" label="목표" weight="/20" value={`영역 ${areas}개`} score={areas ? pts.goal : null} />
           </View>
 
-          <TouchableOpacity style={styles.shareBtn} activeOpacity={0.85} onPress={() => router.push('/share')}>
+          <TouchableOpacity style={styles.shareBtn} activeOpacity={0.85} onPress={() => guard(() => router.push('/share'), '자랑하기')}>
             <Text style={styles.shareText}>내 푸디몬 자랑하기</Text>
           </TouchableOpacity>
         </View>

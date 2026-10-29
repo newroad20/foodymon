@@ -48,6 +48,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
   const [guardianName, setGuardianName] = useState('');
   const [guardianContact, setGuardianContact] = useState('');
   const [guardianAgree, setGuardianAgree] = useState(false);
+  const [kidMode, setKidMode] = useState(true);
   const birthYear = parseBirthYear(birthText);
   const needsGuardian = birthYear !== null && mayBeUnder14(birthYear);
   const [targetSleep, setTargetSleep] = useState(7);
@@ -80,7 +81,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
       targetSleep,
       targetMeals,
       mealSize,
-      needsGuardian ? { name: guardianName.trim(), contact: guardianContact.trim() } : undefined
+      needsGuardian ? { name: guardianName.trim(), contact: guardianContact.trim(), kidMode } : undefined
     );
     // Ask for notification permission once the story is over; it can be turned off on My Page.
     enableReminders().catch(() => {});
@@ -207,6 +208,20 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
                 />
                 <Text style={styles.guardianAgreeText}>
                   저는 보호자이며, 아이의 개인정보와 수면·식사·마음 기록(민감정보) 처리에 동의합니다.
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.guardianAgree}
+                onPress={() => setKidMode(!kidMode)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: kidMode }}>
+                <Ionicons
+                  name={kidMode ? 'checkbox' : 'square-outline'}
+                  size={22}
+                  color={kidMode ? '#1B7F66' : '#94A3B8'}
+                />
+                <Text style={styles.guardianAgreeText}>
+                  아동 모드로 시작 (추천): 사진·글쓰기 숨김, 사용 기록 안 남김, 앱 밖으로 나가는 동작은 보호자 확인
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>

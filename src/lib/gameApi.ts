@@ -50,7 +50,7 @@ export async function fetchGameState(
   const profileRes = await supabase
     .from('profiles')
     .select(
-      'nickname, onboarded, birth_year, target_sleep, target_meals, usual_meal_size, jelly_balance, streak, shields, equipped_costume, equipped_backgrounds, history_scores, last_checkin_date, missed_date, missed_prev_streak, evolution_stage'
+      'nickname, onboarded, birth_year, kid_mode, target_sleep, target_meals, usual_meal_size, jelly_balance, streak, shields, equipped_costume, equipped_backgrounds, history_scores, last_checkin_date, missed_date, missed_prev_streak, evolution_stage'
     )
     .eq('id', userId)
     .single();
@@ -197,7 +197,7 @@ export async function saveOnboarding(
     targetMeals: number;
     usualMealSize: number;
     /** Only for users who may be under 14. */
-    guardian?: { name: string; contact: string };
+    guardian?: { name: string; contact: string; kidMode: boolean };
   }
 ): Promise<void> {
   const res = await supabase
@@ -209,6 +209,7 @@ export async function saveOnboarding(
         guardian_name: values.guardian.name,
         guardian_contact: values.guardian.contact,
         guardian_consent_at: new Date().toISOString(),
+        kid_mode: values.guardian.kidMode,
       }),
       onboarded: true,
       target_sleep: values.targetSleep,
@@ -216,6 +217,11 @@ export async function saveOnboarding(
       usual_meal_size: values.usualMealSize,
     })
     .eq('id', userId);
+  if (res.error) throw res.error;
+}
+
+export async function saveKidMode(userId: string, on: boolean): Promise<void> {
+  const res = await supabase.from('profiles').update({ kid_mode: on }).eq('id', userId);
   if (res.error) throw res.error;
 }
 

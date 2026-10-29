@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
+import { useParentalGate } from '@/context/ParentalGateContext';
 import { levelsData } from '@/constants/foodymonData';
 import { buildPetChatOpening, replyToPetChat } from '@/lib/petChat';
 import {
@@ -40,6 +41,7 @@ type Panel = 'chat' | 'settings';
 
 export function PersistentPetChatModal({ onClose }: PetChatModalProps) {
   const { userId, state } = useFoodyMon();
+  const guard = useParentalGate();
   const opening = useMemo(
     () => buildPetChatOpening(state.masterName, state.records, new Date().getHours()),
     [state.masterName, state.records]
@@ -232,7 +234,7 @@ export function PersistentPetChatModal({ onClose }: PetChatModalProps) {
                 <ConsentPoint icon="trash-outline" text="언제든 전체 삭제 가능" />
                 <ConsentPoint icon="cloud-offline-outline" text="외부 AI로 전송하지 않음" />
               </View>
-              <TouchableOpacity style={styles.primaryBtn} onPress={() => chooseStorage(true)}>
+              <TouchableOpacity style={styles.primaryBtn} onPress={() => guard(() => chooseStorage(true), '대화 저장 동의')}>
                 <Text style={styles.primaryBtnText}>자동 저장하고 시작하기</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.secondaryBtn} onPress={() => chooseStorage(false)}>
@@ -291,6 +293,7 @@ export function PersistentPetChatModal({ onClose }: PetChatModalProps) {
                   </TouchableOpacity>
                 ))}
               </ScrollView>
+              {!state.kidMode && (
               <View style={styles.inputRow}>
                 <TextInput
                   style={styles.input}
@@ -306,6 +309,7 @@ export function PersistentPetChatModal({ onClose }: PetChatModalProps) {
                   <Ionicons name="arrow-up" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
               </View>
+              )}
               <Text style={styles.privacyNote}>
                 {storageMode === 'enabled' ? '대화는 30일 보관 후 자동 삭제돼요.' : '이번 대화는 저장되지 않아요.'}
               </Text>

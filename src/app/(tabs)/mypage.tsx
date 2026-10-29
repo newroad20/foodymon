@@ -16,6 +16,7 @@ import Constants from 'expo-constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
+import { useParentalGate } from '@/context/ParentalGateContext';
 import { useAuth } from '@/context/AuthContext';
 import { useMusic } from '@/context/MusicContext';
 import { parseBirthYear } from '@/lib/age';
@@ -28,7 +29,8 @@ import {
 import { levelsData, mealTargetOptions, sleepTargetOptions } from '@/constants/foodymonData';
 
 export default function MyPageScreen() {
-  const { state, updateSettings } = useFoodyMon();
+  const { state, updateSettings, setKidMode } = useFoodyMon();
+  const guard = useParentalGate();
   const { user, signOut, deleteAccount } = useAuth();
   const { musicOn, setMusicOn } = useMusic();
   const [remindersOn, setRemindersOn] = useState(false);
@@ -37,7 +39,9 @@ export default function MyPageScreen() {
     remindersEnabled().then(setRemindersOn).catch(() => {});
   }, []);
 
-  const toggleReminders = async (on: boolean) => {
+  const toggleReminders = (on: boolean) => guard(() => applyReminders(on), '알림 설정');
+
+  const applyReminders = async (on: boolean) => {
     setRemindersOn(on);
     try {
       if (!on) return await disableReminders();
@@ -97,14 +101,19 @@ export default function MyPageScreen() {
     );
   };
 
-  const handleSignOut = () => {
-    Alert.alert('로그아웃', '정말 로그아웃할까요? 기록은 계정에 안전하게 저장되어 있어요.', [
-      { text: '취소', style: 'cancel' },
-      { text: '로그아웃', style: 'destructive', onPress: () => signOut() },
-    ]);
-  };
+  const handleSignOut = () =>
+    guard(
+      () =>
+        Alert.alert('로그아웃', '정말 로그아웃할까요? 기록은 계정에 안전하게 저장되어 있어요.', [
+          { text: '취소', style: 'cancel' },
+          { text: '로그아웃', style: 'destructive', onPress: () => signOut() },
+        ]),
+      '로그아웃'
+    );
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = () => guard(confirmDeleteAccount, '회원 탈퇴');
+
+  const confirmDeleteAccount = () => {
     Alert.alert(
       '회원 탈퇴',
       '탈퇴하면 푸디몬, 모든 기록, 젤리와 아이템이 영구히 지워지고 되돌릴 수 없어요. 정말 탈퇴할까요?',
@@ -120,6 +129,12 @@ export default function MyPageScreen() {
         },
       ]
     );
+  };
+
+  // Turning kid mode on is always allowed; turning it off needs the guardian.
+  const toggleKidMode = (on: boolean) => {
+    if (on) setKidMode(true);
+    else guard(() => setKidMode(false), '아동 모드 끄기');
   };
 
   return (
@@ -247,6 +262,21 @@ export default function MyPageScreen() {
           </View>
           <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
         </TouchableOpacity>
+
+        {/* Kid mode */}
+        <View style={[styles.card, styles.linkCard]}>
+          <Ionicons name="happy" size={26} color="#1B7F66" />
+          <View style={styles.linkText}>
+            <Text style={styles.sectionTitleInline}>아동 모드</Text>
+            <Text style={styles.linkSub}>사진·글쓰기 숨김, 사용 기록 안 남김, 끄려면 보호자 확인</Text>
+          </View>
+          <Switch
+            value={state.kidMode}
+            onValueChange={toggleKidMode}
+            trackColor={{ true: '#1B7F66' }}
+            accessibilityLabel="아동 모드"
+          />
+        </View>
 
         {/* Sound */}
         <View style={[styles.card, styles.linkCard]}>

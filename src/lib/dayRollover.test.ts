@@ -12,6 +12,7 @@ function makeState(overrides: Partial<UserState> = {}): UserState {
     targetMeals: 3,
     usualMealSize: 1.0,
     birthYear: null,
+    kidMode: false,
     streak: 0,
     shields: 1,
     currency: 50,

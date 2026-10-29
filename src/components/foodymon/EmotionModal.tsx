@@ -122,6 +122,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
                   </TouchableOpacity>
                 ))}
               </View>
+              {!state.kidMode && (
               <TextInput
                 style={styles.input}
                 placeholder={followUp?.placeholder}
@@ -131,6 +132,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
                 maxLength={500}
                 multiline
               />
+              )}
               <TouchableOpacity
                 style={[styles.primaryBtn, saving && styles.primaryBtnOff]}
                 disabled={saving}

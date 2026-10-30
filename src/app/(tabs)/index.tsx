@@ -22,7 +22,7 @@ import { CategoryHistoryModal } from '@/components/foodymon/CategoryHistoryModal
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 import { BackfillModal } from '@/components/foodymon/BackfillModal';
 import { GoalCard } from '@/components/foodymon/GoalCard';
-import { PersistentPetChatModal } from '@/components/foodymon/PersistentPetChatModal';
+import { DailyDiaryModal } from '@/components/foodymon/DailyDiaryModal';
 import { track } from '@/lib/analytics';
 import { BACKFILL_COST } from '@/constants/foodymonData';
 import { RolloverResult } from '@/lib/dayRollover';
@@ -59,7 +59,7 @@ export default function FoodyMonHomeScreen() {
   const [showEmotionModal, setShowEmotionModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showBackfillModal, setShowBackfillModal] = useState(false);
-  const [showChatModal, setShowChatModal] = useState(false);
+  const [showDiaryModal, setShowDiaryModal] = useState(false);
   // "나중에" hides the offer until the app restarts.
   const [backfillDismissed, setBackfillDismissed] = useState<string | null>(null);
   const backfillOffer = state.backfill && backfillDismissed !== state.backfill.date ? state.backfill : null;
@@ -137,7 +137,7 @@ export default function FoodyMonHomeScreen() {
           style={styles.petScroll}
           contentContainerStyle={styles.petSection}
           showsVerticalScrollIndicator={false}>
-          <PetAvatar onOpenChat={() => setShowChatModal(true)} />
+          <PetAvatar onOpenChat={() => setShowDiaryModal(true)} interactionLabel="오늘의 일기 쓰기" />
         </ScrollView>
 
         {/* Bottom Action Dock */}
@@ -177,7 +177,7 @@ export default function FoodyMonHomeScreen() {
         onClose={() => setShowHistoryModal(false)}
       />
       <BackfillModal visible={showBackfillModal} onClose={() => setShowBackfillModal(false)} />
-      {showChatModal && <PersistentPetChatModal onClose={() => setShowChatModal(false)} />}
+      {showDiaryModal && <DailyDiaryModal onClose={() => setShowDiaryModal(false)} />}
 
       {/* Onboarding Prologue Modal (Shown on first launch) */}
       <OnboardingModal visible={!loading && !syncError && !state.onboarded} />

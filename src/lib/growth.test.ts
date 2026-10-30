@@ -1,6 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayPoints, growthProgress, sleepMinutes, type DayRecords, type MealRecord } from './growth.ts';
+import {
+  bedtimeDistanceMinutes,
+  dayPoints,
+  growthProgress,
+  isBedtimeRecommended,
+  sleepGuidance,
+  sleepMinutes,
+  type DayRecords,
+  type MealRecord,
+} from './growth.ts';
 
 const meal = (slot: number, status: MealRecord['status']): MealRecord => ({
   slot, status, menu: '', feeling: '', memo: '', photoPath: null,
@@ -12,11 +21,24 @@ test('sleepMinutes crosses midnight', () => {
   assert.equal(sleepMinutes({ bedTime: '01:00', wakeTime: '06:30' }), 330);
 });
 
+test('sleep guidance considers both duration and age-based bedtime', () => {
+  const child = sleepGuidance(2016, 2026);
+  const teen = sleepGuidance(2011, 2026);
+  const adult = sleepGuidance(1990, 2026);
+  assert.deepEqual([child.bedtimeStart, child.bedtimeEnd, child.durationLabel], ['19:00', '21:00', '9~12시간']);
+  assert.deepEqual([teen.bedtimeStart, teen.bedtimeEnd, teen.durationLabel], ['21:00', '22:00', '8~10시간']);
+  assert.deepEqual([adult.bedtimeStart, adult.bedtimeEnd, adult.durationLabel], ['22:00', '23:00', '7~9시간']);
+  assert.equal(isBedtimeRecommended('22:30', adult), true);
+  assert.equal(bedtimeDistanceMinutes('03:00', adult), 240);
+  assert.equal(dayPoints({ ...empty, sleep: { bedTime: '03:00', wakeTime: '11:00' } }, 1990, 2026).sleep, 18);
+});
+
 test('dayPoints matches the SQL rules (same cases as supabase/tests/growth.test.mjs)', () => {
   assert.deepEqual(dayPoints(empty, null, 2026), { sleep: 0, meal: 0, mind: 0, goal: 0, total: 0 });
   const night = { bedTime: '23:00', wakeTime: '07:00' };
   assert.deepEqual(dayPoints({ ...empty, sleep: night }, null, 2026), { sleep: 30, meal: 0, mind: 0, goal: 10, total: 40 });
   assert.equal(dayPoints({ ...empty, sleep: night }, 2016, 2026).sleep, 24); // 10 years old, 8h
+  assert.equal(dayPoints({ ...empty, sleep: { bedTime: '21:30', wakeTime: '05:30' } }, 2011, 2026).sleep, 30);
   assert.equal(dayPoints({ ...empty, sleep: { bedTime: '01:00', wakeTime: '06:30' } }, 2011, 2026).sleep, 10);
 
   const day: DayRecords = {

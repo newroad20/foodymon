@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -14,12 +14,28 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { fetchMealPhotos, MealPhoto } from '@/lib/gameApi';
-import { formatLogTime } from '@/lib/serverState';
 
 const COLUMNS = 3;
-const GAP = 4;
+const GAP = 8;
 
-/** Every meal photo the user has attached, as a grid; tap one to see it large with its note. */
+interface PhotoDay {
+  date: string;
+  title: string;
+  photos: MealPhoto[];
+}
+
+const dateTitle = (key: string) =>
+  new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' }).format(
+    new Date(`${key}T12:00:00`)
+  );
+
+function groupByDate(photos: MealPhoto[]): PhotoDay[] {
+  const groups = new Map<string, MealPhoto[]>();
+  for (const photo of photos) groups.set(photo.logDate, [...(groups.get(photo.logDate) ?? []), photo]);
+  return [...groups].map(([date, items]) => ({ date, title: dateTitle(date), photos: items }));
+}
+
+/** Meal photos grouped by day and meal slot, so context is visible without opening each photo. */
 export default function AlbumScreen() {
   const { userId } = useFoodyMon();
   const { width } = useWindowDimensions();
@@ -31,6 +47,7 @@ export default function AlbumScreen() {
   useFocusEffect(
     useCallback(() => {
       let active = true;
+      setLoading(true);
       fetchMealPhotos(userId)
         .then((data) => {
           if (!active) return;
@@ -48,7 +65,8 @@ export default function AlbumScreen() {
     }, [userId])
   );
 
-  const size = (width - 32 - GAP * (COLUMNS - 1)) / COLUMNS;
+  const days = useMemo(() => groupByDate(photos), [photos]);
+  const tileSize = (width - 32 - 28 - GAP * (COLUMNS - 1)) / COLUMNS;
 
   if (loading) {
     return (
@@ -61,35 +79,48 @@ export default function AlbumScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={photos}
-        keyExtractor={(p) => p.id}
-        numColumns={COLUMNS}
-        contentContainerStyle={styles.grid}
-        columnWrapperStyle={{ gap: GAP }}
+        data={days}
+        keyExtractor={(day) => day.date}
+        contentContainerStyle={styles.list}
         ListHeaderComponent={
           error ? (
             <Text style={styles.notice}>사진을 불러오지 못했어요. 다시 열어 주세요.</Text>
           ) : photos.length > 0 ? (
-            <Text style={styles.count}>사진 {photos.length}장</Text>
+            <View style={styles.headerCard}>
+              <Text style={styles.headerTitle}>식사 앨범</Text>
+              <Text style={styles.count}>{days.length}일 · 사진 {photos.length}장</Text>
+            </View>
           ) : null
         }
         ListEmptyComponent={
           error ? null : (
             <View style={styles.empty}>
               <Ionicons name="camera-outline" size={40} color="#9FD8C5" />
-              <Text style={styles.emptyText}>
-                아직 사진이 없어요.{'\n'}식사를 기록할 때 📷 버튼으로 남겨 보세요!
-              </Text>
+              <Text style={styles.emptyText}>아직 사진이 없어요.{`\n`}식사를 기록할 때 📷 버튼으로 남겨 보세요!</Text>
             </View>
           )
         }
-        renderItem={({ item }) => (
-          <Pressable
-            onPress={() => setOpen(item)}
-            accessibilityRole="imagebutton"
-            accessibilityLabel={`${formatLogTime(new Date(item.createdAt))} 식사 사진`}>
-            <Image source={{ uri: item.url }} style={{ width: size, height: size, borderRadius: 10 }} contentFit="cover" />
-          </Pressable>
+        renderItem={({ item: day }) => (
+          <View style={styles.dayCard}>
+            <View style={styles.dayHeader}>
+              <Ionicons name="calendar-outline" size={17} color="#24745F" />
+              <Text style={styles.dayTitle}>{day.title}</Text>
+            </View>
+            <View style={styles.photoRow}>
+              {day.photos.map((photo) => (
+                <Pressable
+                  key={photo.id}
+                  style={{ width: tileSize }}
+                  onPress={() => setOpen(photo)}
+                  accessibilityRole="imagebutton"
+                  accessibilityLabel={`${day.title} ${photo.mealLabel} 식사 사진`}>
+                  <Image source={{ uri: photo.url }} style={[styles.photo, { width: tileSize, height: tileSize }]} contentFit="cover" />
+                  <Text style={styles.mealLabel} numberOfLines={1}>{photo.mealLabel}</Text>
+                  <Text style={styles.mealCopy} numberOfLines={1}>{photo.content || '기록한 식사'}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
         )}
       />
 
@@ -98,8 +129,8 @@ export default function AlbumScreen() {
           {open && (
             <View style={styles.viewer}>
               <Image source={{ uri: open.url }} style={styles.large} contentFit="cover" />
-              <Text style={styles.time}>{formatLogTime(new Date(open.createdAt))}</Text>
-              <Text style={styles.note}>{open.content}</Text>
+              <Text style={styles.time}>{dateTitle(open.logDate)} · {open.mealLabel}</Text>
+              <Text style={styles.note}>{open.content || '기록한 식사'}</Text>
             </View>
           )}
         </Pressable>
@@ -109,75 +140,25 @@ export default function AlbumScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FDF5F5',
-  },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FDF5F5',
-  },
-  grid: {
-    padding: 16,
-    gap: GAP,
-  },
-  count: {
-    fontSize: 13,
-    color: '#64748B',
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  notice: {
-    fontSize: 13,
-    color: '#B45309',
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  empty: {
-    alignItems: 'center',
-    gap: 12,
-    paddingTop: 80,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#64748B',
-    fontWeight: '600',
-    textAlign: 'center',
-    lineHeight: 21,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  viewer: {
-    width: '100%',
-    maxWidth: 420,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 12,
-    gap: 8,
-  },
-  large: {
-    width: '100%',
-    aspectRatio: 1,
-    borderRadius: 14,
-  },
-  time: {
-    fontSize: 12,
-    color: '#64748B',
-    fontWeight: '700',
-    paddingHorizontal: 4,
-  },
-  note: {
-    fontSize: 15,
-    color: '#1E293B',
-    fontWeight: '600',
-    paddingHorizontal: 4,
-    paddingBottom: 4,
-  },
+  container: { flex: 1, backgroundColor: '#FDF5F5' },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FDF5F5' },
+  list: { padding: 16, gap: 12 },
+  headerCard: { marginBottom: 4 },
+  headerTitle: { fontSize: 20, color: '#263A31', fontWeight: '900' },
+  count: { fontSize: 13, color: '#64748B', fontWeight: '700', marginTop: 3 },
+  notice: { fontSize: 13, color: '#B45309', fontWeight: '700', marginBottom: 8 },
+  empty: { alignItems: 'center', gap: 12, paddingTop: 80 },
+  emptyText: { fontSize: 14, color: '#64748B', fontWeight: '600', textAlign: 'center', lineHeight: 21 },
+  dayCard: { backgroundColor: '#FFFFFF', borderRadius: 20, padding: 14, gap: 12, borderWidth: 1, borderColor: '#E9E2E2' },
+  dayHeader: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  dayTitle: { fontSize: 16, color: '#2E443A', fontWeight: '900' },
+  photoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: GAP },
+  photo: { borderRadius: 12, backgroundColor: '#E8F1ED' },
+  mealLabel: { marginTop: 6, fontSize: 12, color: '#24745F', fontWeight: '900' },
+  mealCopy: { marginTop: 1, fontSize: 10, color: '#7A8982', fontWeight: '600' },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center', justifyContent: 'center', padding: 20 },
+  viewer: { width: '100%', maxWidth: 420, backgroundColor: '#FFFFFF', borderRadius: 20, padding: 12, gap: 8 },
+  large: { width: '100%', aspectRatio: 1, borderRadius: 14 },
+  time: { fontSize: 13, color: '#24745F', fontWeight: '900', paddingHorizontal: 4 },
+  note: { fontSize: 15, color: '#1E293B', fontWeight: '600', paddingHorizontal: 4, paddingBottom: 4 },
 });

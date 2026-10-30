@@ -201,21 +201,40 @@ declare
   m       integer;
   eaten   integer;
   areas   integer := 0;
+  bed     time;
+  bed_n   integer;
+  start_n integer;
+  end_n   integer;
+  dist    integer;
+  min_m   integer;
+  max_m   integer;
 begin
   select birth_year into by_year from public.profiles where id = p_uid;
   age := extract(year from p_day)::integer - coalesce(by_year, 0);
 
-  -- 수면: 연령별 권장 범위 (6~12세 9~12시간, 13세 이상 8~10시간; 연도 모르면 13세 이상 기준)
-  select minutes into m from public.sleep_records where user_id = p_uid and log_date = p_day;
+  -- 수면: 연령별 권장 총량과 취침 시각을 함께 본다. 기존 날짜에는 새 시각 규칙을 소급하지 않는다.
+  select minutes, bed_time into m, bed from public.sleep_records where user_id = p_uid and log_date = p_day;
   sleep := 0;
   if m is not null then
     areas := areas + 1;
     if by_year is not null and age <= 12 then
-      sleep := case when m > 720 then 24 when m >= 540 then 30 when m >= 480 then 24
-                    when m >= 420 then 18 else 10 end;
+      min_m := 540; max_m := 720; start_n := 60; end_n := 180;
+    elsif by_year is not null and age <= 18 then
+      min_m := 480; max_m := 600; start_n := 180; end_n := 240;
     else
-      sleep := case when m > 600 then 24 when m >= 480 then 30 when m >= 420 then 24
-                    when m >= 360 then 18 else 10 end;
+      min_m := 420; max_m := 540; start_n := 240; end_n := 300;
+    end if;
+    sleep := case when m > max_m then 24 when m >= min_m then 30
+                  when m >= min_m - 60 then 24 when m >= min_m - 120 then 18 else 10 end;
+    if p_day >= date '2026-10-30' and bed is not null then
+      bed_n := public.night_minutes(bed);
+      if not (bed_n between start_n and end_n) then
+        dist := least(abs(bed_n - start_n), 1440 - abs(bed_n - start_n),
+                      abs(bed_n - end_n), 1440 - abs(bed_n - end_n));
+        if dist > 120 then sleep := least(sleep, 18);
+        else sleep := least(sleep, 24);
+        end if;
+      end if;
     end if;
   end if;
 
@@ -307,16 +326,37 @@ security definer
 set search_path = public
 as $$
 declare
-  uid      uuid := auth.uid();
-  first_d  date;
-  g        public.small_goals%rowtype;
-  y_eaten  integer;
-  y_sleep  integer;
-  y_bed    time;
-  pts      record;
+  uid          uuid := auth.uid();
+  first_d      date;
+  g            public.small_goals%rowtype;
+  y_eaten      integer;
+  y_sleep      integer;
+  y_bed        time;
+  pts          record;
+  target_n     integer;
+  by_year      smallint;
+  age          integer;
+  min_m        integer;
+  max_m        integer;
+  start_n      integer;
+  end_n        integer;
+  bed_n        integer;
+  bedtime_ok   boolean := false;
+  sleep_ok     boolean := false;
+  needs_prompt boolean := false;
+  suggestion   text;
 begin
   if uid is null then
     raise exception 'not authenticated';
+  end if;
+  select target_meals, birth_year into target_n, by_year from public.profiles where id = uid;
+  age := extract(year from p_today)::integer - coalesce(by_year, 0);
+  if by_year is not null and age <= 12 then
+    min_m := 540; max_m := 720; start_n := 60; end_n := 180;
+  elsif by_year is not null and age <= 18 then
+    min_m := 480; max_m := 600; start_n := 180; end_n := 240;
+  else
+    min_m := 420; max_m := 540; start_n := 240; end_n := 300;
   end if;
   select min(d) into first_d from (
     select min(log_date) d from public.sleep_records where user_id = uid
@@ -327,6 +367,15 @@ begin
     from public.meal_records where user_id = uid and log_date = p_today - 1;
   select minutes, bed_time into y_sleep, y_bed
     from public.sleep_records where user_id = uid and log_date = p_today - 1;
+  if y_bed is not null then
+    bed_n := public.night_minutes(y_bed);
+    bedtime_ok := bed_n between start_n and end_n;
+  end if;
+  sleep_ok := y_sleep is not null and y_sleep between min_m and max_m and bedtime_ok;
+  needs_prompt := y_eaten < greatest(target_n, 1) or not sleep_ok;
+  suggestion := case when y_eaten < greatest(target_n, 1) then 'more_meal'
+                     when not sleep_ok then 'earlier_bed'
+                     else 'mind_reason' end;
   select * into pts from public.day_points(uid, p_today);
 
   return jsonb_build_object(
@@ -334,11 +383,13 @@ begin
     'observing',  (p_today - coalesce(first_d, p_today)) < public.observe_days(),
     'goal',       case when g.kind is null then null
                        else jsonb_build_object('kind', g.kind, 'size', g.size, 'held', g.held) end,
-    'yesterday',  jsonb_build_object('eaten', y_eaten, 'bed_time', to_char(y_bed, 'HH24:MI')),
-    -- 추천: 어제 먹은 칸이 3개 미만이면 식사, 잠이 8시간 미만이면 취침, 아니면 감정 이유
-    'suggestion', case when y_eaten < 3 then 'more_meal'
-                       when y_sleep is not null and y_sleep < 480 then 'earlier_bed'
-                       else 'mind_reason' end,
+    'yesterday',  jsonb_build_object('eaten', y_eaten, 'bed_time', to_char(y_bed, 'HH24:MI'),
+                                     'sleep_minutes', y_sleep, 'bedtime_ok', bedtime_ok),
+    'target_meals', greatest(target_n, 1),
+    'recommended_bed_start', to_char((time '18:00' + start_n * interval '1 minute')::time, 'HH24:MI'),
+    'recommended_bed_end', to_char((time '18:00' + end_n * interval '1 minute')::time, 'HH24:MI'),
+    'needs_prompt', needs_prompt,
+    'suggestion', suggestion,
     'points',     pts.goal
   );
 end; $$;

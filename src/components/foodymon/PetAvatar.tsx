@@ -17,9 +17,10 @@ import { growthProgress } from '@/lib/growth';
 interface PetAvatarProps {
   onTap?: () => void;
   onOpenChat?: () => void;
+  interactionLabel?: string;
 }
 
-export function PetAvatar({ onTap, onOpenChat }: PetAvatarProps) {
+export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이야기하기' }: PetAvatarProps) {
   const { state, currentDialogue, triggerPetInteraction, petReaction } = useFoodyMon();
   // Check-in reactions: lying down to sleep, eating the meal, showing the feeling.
   const tilt = useRef(new Animated.Value(0)).current; // degrees
@@ -188,12 +189,12 @@ export function PetAvatar({ onTap, onOpenChat }: PetAvatarProps) {
         onPress={onOpenChat}
         disabled={!onOpenChat}
         accessibilityRole={onOpenChat ? 'button' : undefined}
-        accessibilityLabel={onOpenChat ? '푸디몬과 이야기하기' : undefined}>
+        accessibilityLabel={onOpenChat ? interactionLabel : undefined}>
         <Text style={styles.dialogueText}>{currentDialogue}</Text>
         {onOpenChat && (
           <View style={styles.chatHint}>
-            <Ionicons name="chatbubble-ellipses-outline" size={12} color="#4B806C" />
-            <Text style={styles.chatHintText}>눌러서 이야기하기</Text>
+            <Ionicons name={interactionLabel.includes('일기') ? 'book-outline' : 'chatbubble-ellipses-outline'} size={12} color="#4B806C" />
+            <Text style={styles.chatHintText}>{interactionLabel}</Text>
           </View>
         )}
         <View style={styles.speechArrow} />

@@ -288,6 +288,9 @@ export interface MealPhoto {
   id: string;
   content: string;
   createdAt: string;
+  logDate: string;
+  slot: number;
+  mealLabel: string;
   url: string;
 }
 
@@ -295,18 +298,27 @@ export interface MealPhoto {
 export async function fetchMealPhotos(userId: string): Promise<MealPhoto[]> {
   // shortcut: newest 300 photos; page with .range() once someone has more.
   const res = await supabase
-    .from('checkin_logs')
-    .select('id, content, created_at, photo_path')
+    .from('meal_records')
+    .select('log_date, slot, menu, feeling, memo, photo_path, updated_at')
     .eq('user_id', userId)
     .not('photo_path', 'is', null)
-    .order('created_at', { ascending: false })
+    .order('log_date', { ascending: false })
+    .order('slot', { ascending: true })
     .limit(300);
   if (res.error) throw res.error;
   const rows = res.data ?? [];
   const urls = await mealPhotoUrls(rows.map((r) => r.photo_path as string));
   return rows.flatMap((r) =>
     urls[r.photo_path as string]
-      ? [{ id: r.id, content: r.content, createdAt: r.created_at, url: urls[r.photo_path as string] }]
+      ? [{
+          id: `${r.log_date}-${r.slot}`,
+          content: [r.menu, r.feeling, r.memo].filter(Boolean).join(' · '),
+          createdAt: r.updated_at,
+          logDate: r.log_date,
+          slot: r.slot,
+          mealLabel: ['아침', '오전 간식', '점심', '오후 간식', '저녁', '저녁 간식'][r.slot] ?? '식사',
+          url: urls[r.photo_path as string],
+        }]
       : []
   );
 }
@@ -419,7 +431,11 @@ export interface SmallGoalInfo {
   day: number;
   observing: boolean;
   goal: { kind: GoalKind; size: number; held: boolean } | null;
-  yesterday: { eaten: number; bed_time: string | null };
+  yesterday: { eaten: number; bed_time: string | null; sleep_minutes: number | null; bedtime_ok: boolean };
+  target_meals: number;
+  recommended_bed_start: string;
+  recommended_bed_end: string;
+  needs_prompt: boolean;
   suggestion: GoalKind;
   points: number;
 }
@@ -502,6 +518,35 @@ export async function fetchJourney(): Promise<Journey> {
 
 export async function saveReflection(userId: string, text: string): Promise<void> {
   const res = await supabase.from('profiles').update({ reflection: text }).eq('id', userId);
+  if (res.error) throw res.error;
+}
+
+export interface DailyReflection {
+  logDate: string;
+  text: string;
+  updatedAt: string;
+}
+
+export async function fetchDailyReflections(userId: string, limit = 8): Promise<DailyReflection[]> {
+  const res = await supabase
+    .from('daily_reflections')
+    .select('log_date, text, updated_at')
+    .eq('user_id', userId)
+    .order('log_date', { ascending: false })
+    .limit(limit);
+  if (res.error) throw res.error;
+  return (res.data ?? []).map((entry) => ({
+    logDate: entry.log_date,
+    text: entry.text,
+    updatedAt: entry.updated_at,
+  }));
+}
+
+export async function saveDailyReflection(userId: string, logDate: string, text: string): Promise<void> {
+  const res = await supabase.from('daily_reflections').upsert(
+    { user_id: userId, log_date: logDate, text: text.slice(0, 2000) },
+    { onConflict: 'user_id,log_date' }
+  );
   if (res.error) throw res.error;
 }
 

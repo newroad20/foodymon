@@ -47,8 +47,11 @@ export function PetAvatar({ onTap, onOpenChat }: PetAvatarProps) {
       ]);
     } else if (petReaction.kind === 'eat') {
       food.setValue(0);
+      // A previous interrupted reaction must not leave the next face stretched.
+      chew.setValue(1);
       setEatFrame(0);
-      const chomp = Animated.sequence([t(chew, 0.88, 120), t(chew, 1.05, 120)]);
+      // Finish every bite at the natural aspect ratio so the final happy face is not distorted.
+      const chomp = Animated.sequence([t(chew, 0.88, 120), t(chew, 1, 120)]);
       anim = Animated.sequence([
         Animated.delay(300),
         t(food, 1, 900),

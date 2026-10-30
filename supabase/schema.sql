@@ -83,7 +83,17 @@ create table if not exists public.pet_chat_messages (
 create index if not exists pet_chat_messages_user_time_idx
   on public.pet_chat_messages (user_id, created_at desc);
 
--- ---------- 6. updated_at 자동 갱신 ----------
+-- ---------- 6. 날짜별 하루 일기 ----------
+create table if not exists public.daily_reflections (
+  user_id    uuid not null references public.profiles(id) on delete cascade,
+  log_date   date not null default current_date,
+  text       text not null default '' check (char_length(text) <= 2000),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (user_id, log_date)
+);
+
+-- ---------- 7. updated_at 자동 갱신 ----------
 create or replace function public.set_updated_at()
 returns trigger language plpgsql as $$
 begin
@@ -94,6 +104,11 @@ end; $$;
 drop trigger if exists profiles_set_updated_at on public.profiles;
 create trigger profiles_set_updated_at
   before update on public.profiles
+  for each row execute function public.set_updated_at();
+
+drop trigger if exists daily_reflections_set_updated_at on public.daily_reflections;
+create trigger daily_reflections_set_updated_at
+  before update on public.daily_reflections
   for each row execute function public.set_updated_at();
 
 -- 새 메시지를 저장할 때 같은 사용자의 30일 지난 대화를 자동 정리한다.
@@ -115,7 +130,7 @@ create trigger pet_chat_messages_trim_old
   after insert on public.pet_chat_messages
   for each row execute function public.trim_old_pet_chat_messages();
 
--- ---------- 7. 회원가입 시 프로필 자동 생성 ----------
+-- ---------- 8. 회원가입 시 프로필 자동 생성 ----------
 -- (이메일 인증을 켜면 가입 직후 세션이 없어서 앱에서 직접 insert 하면 실패함.
 --  그래서 DB 트리거가 nickname(메타데이터)을 읽어 프로필을 만든다.)
 create or replace function public.handle_new_user()
@@ -136,13 +151,14 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- ---------- 8. RLS ----------
+-- ---------- 9. RLS ----------
 alter table public.profiles     enable row level security;
 alter table public.daily_logs   enable row level security;
 alter table public.checkin_logs enable row level security;
 alter table public.user_items   enable row level security;
 alter table public.pet_chat_preferences enable row level security;
 alter table public.pet_chat_messages    enable row level security;
+alter table public.daily_reflections    enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own" on public.profiles
@@ -172,9 +188,13 @@ drop policy if exists "pet_chat_messages_own" on public.pet_chat_messages;
 create policy "pet_chat_messages_own" on public.pet_chat_messages
   for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
 
--- ---------- 9. 권한 (치팅 방지) ----------
+drop policy if exists "daily_reflections_own" on public.daily_reflections;
+create policy "daily_reflections_own" on public.daily_reflections
+  for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- ---------- 10. 권한 (치팅 방지) ----------
 revoke all on public.profiles, public.daily_logs, public.checkin_logs, public.user_items,
-              public.pet_chat_preferences, public.pet_chat_messages
+              public.pet_chat_preferences, public.pet_chat_messages, public.daily_reflections
   from anon, authenticated;
 
 grant select on public.profiles to authenticated;
@@ -188,3 +208,4 @@ grant select, insert, update, delete on public.checkin_logs to authenticated;
 grant select on public.user_items to authenticated;  -- 구매는 추후 RPC(buy_item)로만
 grant select, insert, update, delete on public.pet_chat_preferences to authenticated;
 grant select, insert, delete on public.pet_chat_messages to authenticated;
+grant select, insert, update, delete on public.daily_reflections to authenticated;

@@ -53,6 +53,43 @@ const toMinutes = (hhmm: string) => {
   return h * 60 + m;
 };
 
+export interface SleepGuidance {
+  ageLabel: string;
+  durationLabel: string;
+  minMinutes: number;
+  maxMinutes: number;
+  bedtimeStart: string;
+  bedtimeEnd: string;
+}
+
+/** FoodyMon's age-based sleep rhythm guide. Duration follows established sleep guidance. */
+export function sleepGuidance(birthYear: number | null, year: number): SleepGuidance {
+  const age = birthYear === null ? 19 : year - birthYear;
+  if (age <= 12) {
+    return { ageLabel: '유아·어린이', durationLabel: '9~12시간', minMinutes: 540, maxMinutes: 720, bedtimeStart: '19:00', bedtimeEnd: '21:00' };
+  }
+  if (age <= 18) {
+    return { ageLabel: '청소년', durationLabel: '8~10시간', minMinutes: 480, maxMinutes: 600, bedtimeStart: '21:00', bedtimeEnd: '22:00' };
+  }
+  return { ageLabel: '성인', durationLabel: '7~9시간', minMinutes: 420, maxMinutes: 540, bedtimeStart: '22:00', bedtimeEnd: '23:00' };
+}
+
+/** Minutes since 18:00, so after-midnight bedtimes remain later than evening bedtimes. */
+const nightMinutes = (hhmm: string) => (toMinutes(hhmm) - 18 * 60 + 1440) % 1440;
+
+export function bedtimeDistanceMinutes(bedTime: string, guidance: SleepGuidance): number {
+  const value = nightMinutes(bedTime);
+  const start = nightMinutes(guidance.bedtimeStart);
+  const end = nightMinutes(guidance.bedtimeEnd);
+  if (value >= start && value <= end) return 0;
+  const circular = (a: number, b: number) => Math.min(Math.abs(a - b), 1440 - Math.abs(a - b));
+  return Math.min(circular(value, start), circular(value, end));
+}
+
+export function isBedtimeRecommended(bedTime: string, guidance: SleepGuidance): boolean {
+  return bedtimeDistanceMinutes(bedTime, guidance) === 0;
+}
+
 /** Minutes asleep from bed and wake times, across midnight. */
 export function sleepMinutes(r: SleepRecord): number {
   return (((toMinutes(r.wakeTime) - toMinutes(r.bedTime)) % 1440) + 1440) % 1440;
@@ -69,10 +106,21 @@ export function dayPoints(day: DayRecords, birthYear: number | null, year: numbe
   if (day.sleep) {
     areas++;
     const m = sleepMinutes(day.sleep);
-    const child = birthYear !== null && year - birthYear <= 12;
-    sleep = child
-      ? m > 720 ? 24 : m >= 540 ? 30 : m >= 480 ? 24 : m >= 420 ? 18 : 10
-      : m > 600 ? 24 : m >= 480 ? 30 : m >= 420 ? 24 : m >= 360 ? 18 : 10;
+    const guide = sleepGuidance(birthYear, year);
+    sleep = m > guide.maxMinutes
+      ? 24
+      : m >= guide.minMinutes
+        ? 30
+        : m >= guide.minMinutes - 60
+          ? 24
+          : m >= guide.minMinutes - 120
+            ? 18
+            : 10;
+    // Duration alone is not the whole rhythm. A far-late bedtime still earns credit,
+    // but cannot receive the maximum sleep growth points.
+    const bedtimeDistance = bedtimeDistanceMinutes(day.sleep.bedTime, guide);
+    if (bedtimeDistance > 120) sleep = Math.min(sleep, 18);
+    else if (bedtimeDistance > 0) sleep = Math.min(sleep, 24);
   }
 
   const eaten = day.meals.filter((r) => EATEN.includes(r.status)).length;

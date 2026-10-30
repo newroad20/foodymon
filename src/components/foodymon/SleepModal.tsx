@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
-import { sleepMinutes } from '@/lib/growth';
+import { bedtimeDistanceMinutes, isBedtimeRecommended, sleepGuidance, sleepMinutes } from '@/lib/growth';
 
 interface SleepModalProps {
   visible: boolean;
@@ -38,9 +38,10 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
   }, [visible, saved]);
 
   const minutes = sleepMinutes({ bedTime, wakeTime });
-  const age = state.birthYear ? new Date().getFullYear() - state.birthYear : null;
-  const recommended = age !== null && age <= 12 ? '9~12시간' : '8~10시간';
-  const band = age !== null && age <= 12 ? '6~12세' : '13~18세';
+  const guide = sleepGuidance(state.birthYear, new Date().getFullYear());
+  const bedtimeOk = isBedtimeRecommended(bedTime, guide);
+  const durationOk = minutes >= guide.minMinutes && minutes <= guide.maxMinutes;
+  const bedtimeDistance = bedtimeDistanceMinutes(bedTime, guide);
 
   const handleSave = async () => {
     await saveSleep(bedTime, wakeTime);
@@ -68,9 +69,19 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
             <Text style={styles.resultLabel}>잔 시간</Text>
             <Text style={styles.resultValue}>{formatDuration(minutes)}</Text>
           </View>
-          <Text style={styles.note}>
-            {band} 권장 수면은 {recommended}이에요.{age === null ? ' (마이 탭에서 태어난 연도를 넣으면 나이에 맞춰 알려 줘요)' : ''}
-          </Text>
+          <View style={[styles.rhythmCard, bedtimeOk && durationOk && styles.rhythmCardGood]}>
+            <Ionicons name={bedtimeOk && durationOk ? 'checkmark-circle' : 'time-outline'} size={20} color={bedtimeOk && durationOk ? '#17765D' : '#8B5CF6'} />
+            <View style={styles.rhythmCopy}>
+              <Text style={styles.rhythmTitle}>{guide.ageLabel} 생활 리듬 가이드</Text>
+              <Text style={styles.note}>취침 {formatTime(guide.bedtimeStart)}~{formatTime(guide.bedtimeEnd)} · 수면 {guide.durationLabel}</Text>
+              {!bedtimeOk && (
+                <Text style={styles.rhythmHint}>
+                  총 수면시간과 별개로 취침 시각이 권장 시간대에서 {Math.max(15, Math.round(bedtimeDistance / 15) * 15)}분 벗어나 있어요. 오늘은 15분만 가까워져 봐요.
+                </Text>
+              )}
+            </View>
+          </View>
+          {state.birthYear === null && <Text style={styles.note}>마이 탭에서 태어난 연도를 넣으면 나이에 맞춰 안내해요.</Text>}
           {saved && <Text style={styles.note}>오늘 이미 기록했어요. 고치면 새 시간으로 다시 계산해요.</Text>}
 
           <TouchableOpacity style={styles.primaryBtn} onPress={handleSave}>
@@ -207,6 +218,35 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#64748B',
     fontWeight: '600',
+    lineHeight: 18,
+  },
+  rhythmCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    padding: 13,
+    borderRadius: 14,
+    backgroundColor: '#F5F3FF',
+    borderWidth: 1,
+    borderColor: '#DDD6FE',
+  },
+  rhythmCardGood: {
+    backgroundColor: '#ECFDF5',
+    borderColor: '#BBF7D0',
+  },
+  rhythmCopy: {
+    flex: 1,
+    gap: 3,
+  },
+  rhythmTitle: {
+    fontSize: 13,
+    color: '#334155',
+    fontWeight: '900',
+  },
+  rhythmHint: {
+    fontSize: 12,
+    color: '#6D28D9',
+    fontWeight: '700',
     lineHeight: 18,
   },
   primaryBtn: {

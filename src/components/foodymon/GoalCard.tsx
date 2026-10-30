@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { toDateKey } from '@/lib/dayRollover';
 import { clearSmallGoal, fetchSmallGoal, saveSmallGoal, type GoalKind, type SmallGoalInfo } from '@/lib/gameApi';
@@ -44,6 +45,7 @@ export function GoalCard() {
   const { userId, state, refreshGrowth } = useFoodyMon();
   const [info, setInfo] = useState<SmallGoalInfo | null>(null);
   const [open, setOpen] = useState(false);
+  const [autoPrompt, setAutoPrompt] = useState(false);
   const todayKey = toDateKey(new Date());
 
   const load = useCallback(() => {
@@ -54,6 +56,21 @@ export function GoalCard() {
 
   // Points come from today's records on the server, so reload after every check-in.
   useEffect(load, [load, state.todayPoints]);
+
+  useEffect(() => {
+    if (!info || info.observing || info.goal || !info.needs_prompt) return;
+    let active = true;
+    const key = `@foodymon:small-goal-prompt:${userId}:${todayKey}`;
+    AsyncStorage.getItem(key).then((seen) => {
+      if (!active || seen) return;
+      AsyncStorage.setItem(key, 'shown').catch(() => {});
+      setAutoPrompt(true);
+      setOpen(true);
+    }).catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [info, todayKey, userId]);
 
   if (!info) return null;
 
@@ -78,10 +95,19 @@ export function GoalCard() {
       : goal?.held
         ? '오늘은 목표를 쉬어 가요'
         : '오늘의 작은 목표를 골라 볼까?';
+  const promptCopy = info.suggestion === 'more_meal'
+    ? `어제 식사를 ${info.yesterday.eaten}번 기록했어. 목표 ${info.target_meals}번에 조금 못 미쳤네. 오늘 한 끼 더 챙기면 최대 20 성장점을 받을 수 있어!`
+    : info.yesterday.bed_time
+      ? `어제 ${info.yesterday.bed_time}에 잠들었어. 오늘은 ${info.recommended_bed_start}~${info.recommended_bed_end}에 조금 더 가까워져 볼까?`
+      : '어제 수면 기록을 찾지 못했어. 오늘 잠든 시각과 일어난 시각을 남겨 리듬을 살펴볼까?';
+  const close = () => {
+    setOpen(false);
+    setAutoPrompt(false);
+  };
 
   return (
     <>
-      <TouchableOpacity style={styles.card} activeOpacity={0.85} onPress={() => setOpen(true)}>
+      <TouchableOpacity style={styles.card} activeOpacity={0.85} onPress={() => { setAutoPrompt(false); setOpen(true); }}>
         <View style={styles.cardLeft}>
           <Ionicons name="flag" size={16} color="#1B7F66" />
           <Text style={styles.cardTitle} numberOfLines={1}>
@@ -91,12 +117,12 @@ export function GoalCard() {
         <Text style={styles.cardMeta}>+{info.points}점</Text>
       </TouchableOpacity>
 
-      <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
+      <Modal visible={open} transparent animationType="slide" onRequestClose={close}>
         <View style={styles.overlay}>
           <View style={styles.sheet}>
             <View style={styles.header}>
-              <Text style={styles.title}>작은 목표 · {info.day}일차</Text>
-              <TouchableOpacity onPress={() => setOpen(false)} style={styles.closeBtn} accessibilityLabel="닫기">
+              <Text style={styles.title}>{autoPrompt ? '어제 기록을 보고 제안해요' : `작은 목표 · ${info.day}일차`}</Text>
+              <TouchableOpacity onPress={close} style={styles.closeBtn} accessibilityLabel="닫기">
                 <Text style={styles.closeText}>✕</Text>
               </TouchableOpacity>
             </View>
@@ -152,7 +178,13 @@ export function GoalCard() {
               </View>
             ) : (
               <>
-                <Text style={styles.subtitle}>어제 기록을 보고 골라 봤어. 마음에 드는 걸로 시작해도 돼.</Text>
+                {autoPrompt && (
+                  <View style={styles.promptBox}>
+                    <Ionicons name="sparkles" size={19} color="#17765D" />
+                    <Text style={styles.promptBoxText}>{promptCopy}</Text>
+                  </View>
+                )}
+                <Text style={styles.subtitle}>{autoPrompt ? '추천 목표를 시작하거나, 오늘은 부담 없이 넘겨도 괜찮아요.' : '어제 기록을 보고 골라 봤어. 마음에 드는 걸로 시작해도 돼.'}</Text>
                 {OPTIONS.map((kind) => {
                   const d = describe(kind, kind === 'earlier_bed' ? 15 : 1, info);
                   return (
@@ -255,6 +287,23 @@ const styles = StyleSheet.create({
     color: '#64748B',
     lineHeight: 19,
     fontWeight: '600',
+  },
+  promptBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 9,
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: '#E3F6EF',
+    borderWidth: 1,
+    borderColor: '#B5E6D4',
+  },
+  promptBoxText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#2E594A',
+    fontWeight: '800',
+    lineHeight: 20,
   },
   box: {
     gap: 6,

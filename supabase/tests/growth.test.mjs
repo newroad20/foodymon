@@ -15,7 +15,7 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
     create function auth.uid() returns uuid language sql stable as
       $$ select nullif(current_setting('test.uid', true), '')::uuid $$;
   `);
-  for (const f of ['schema.sql', '002_game_rpc.sql', '004_birth_year.sql', '005_growth.sql', '005_growth.sql', '006_day_detail.sql', '006_day_detail.sql', '009_slow_growth.sql', '009_slow_growth.sql']) {
+  for (const f of ['schema.sql', '002_game_rpc.sql', '004_birth_year.sql', '005_growth.sql', '005_growth.sql', '006_day_detail.sql', '006_day_detail.sql', '009_slow_growth.sql', '009_slow_growth.sql', '011_daily_diary_and_sleep_rhythm.sql', '011_daily_diary_and_sleep_rhythm.sql']) {
     await db.exec(sql(f));
   }
   const U = '11111111-1111-1111-1111-111111111111';
@@ -40,9 +40,13 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
   await setYear(year - 10);
   assert.equal((await points()).sleep, 24);
   await q(`update public.sleep_records set wake_time='08:30' where user_id=$1`, [U]); // 9.5h
+  assert.equal((await points()).sleep, 24); // duration is enough, but 23:00 is late for this band
+  await q(`update public.sleep_records set bed_time='20:00', wake_time='05:30' where user_id=$1`, [U]);
   assert.equal((await points()).sleep, 30);
   await setYear(year - 15);
-  assert.equal((await points()).sleep, 30); // 9.5h within 8-10
+  assert.equal((await points()).sleep, 24); // enough duration, but 20:00 is earlier than the teen window
+  await q(`update public.sleep_records set bed_time='21:30', wake_time='07:00' where user_id=$1`, [U]);
+  assert.equal((await points()).sleep, 30);
   await q(`update public.sleep_records set bed_time='01:00', wake_time='06:30' where user_id=$1`, [U]); // 5.5h
   assert.equal((await points()).sleep, 10);
 
@@ -73,7 +77,7 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
   assert.deepEqual([r.total, r.level, r.evolved, r.today.total], [68, 3, false, 68]);
 
   // Complete today: sleep 30 + six meals 40 + mind 10 + observation goal 20 = 100.
-  await q(`update public.sleep_records set bed_time='23:00', wake_time='07:00' where user_id=$1 and log_date=$2`, [U, today]);
+  await q(`update public.sleep_records set bed_time='21:30', wake_time='05:30' where user_id=$1 and log_date=$2`, [U, today]);
   await q(`delete from public.meal_records where user_id=$1 and log_date=$2 and slot in (1,5)`, [U, today]);
   for (const slot of [0, 1, 2, 3, 4, 5]) {
     await q(`insert into public.meal_records(user_id,log_date,slot,status) values ($1,$2,$3,'ate')
@@ -84,7 +88,7 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
   assert.deepEqual([r.total, r.level, r.evolved], [100, 3, false]);
 
   // A second complete day reaches 200 and grants exactly one level.
-  await q(`insert into public.sleep_records(user_id,log_date,bed_time,wake_time) values ($1,$2::date - 1,'23:00','07:00')`, [U, today]);
+  await q(`insert into public.sleep_records(user_id,log_date,bed_time,wake_time) values ($1,$2::date - 1,'21:30','05:30')`, [U, today]);
   await q(`insert into public.meal_records(user_id,log_date,slot,status)
            select $1, $2::date - 1, s, 'ate' from generate_series(0,5) s`, [U, today]);
   await q(`insert into public.mind_records(user_id,log_date,emotion,situation,note)
@@ -117,7 +121,7 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
   // with a record yesterday, today is day 2: suggestion from yesterday (1 meal < 3 -> more_meal)
   await meal(-1, 0);
   g = await goal();
-  assert.deepEqual([g.day, g.observing, g.suggestion, g.yesterday.eaten], [2, false, 'more_meal', 1]);
+  assert.deepEqual([g.day, g.observing, g.suggestion, g.yesterday.eaten, g.needs_prompt], [2, false, 'more_meal', 1, true]);
   assert.equal(await goalPts(), 10); // no goal picked yet -> observe rule
 
   // more_meal: yesterday 1 eaten; today 1 -> partial 10, 2 -> complete 20
@@ -161,6 +165,16 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
     [2, 2, 3, 3, 1, '조금 덜 불안해졌어']
   );
   assert.equal(j.level, 3);
+
+  // daily diary is one auto-saved entry per date and keeps text within the app limit
+  await q(`insert into public.daily_reflections(user_id,log_date,text) values ($1,$2,'오늘은 한 끼를 더 챙겼다')`, [V, today]);
+  await q(`insert into public.daily_reflections(user_id,log_date,text) values ($1,$2,'고쳐 쓴 일기')
+           on conflict (user_id,log_date) do update set text=excluded.text`, [V, today]);
+  assert.equal((await q(`select text from public.daily_reflections where user_id=$1`, [V]))[0].text, '고쳐 쓴 일기');
+  await assert.rejects(
+    q(`update public.daily_reflections set text=repeat('가',2001) where user_id=$1`, [V]),
+    /daily_reflections_text_check/
+  );
 
   await db.exec(`select set_config('test.uid', '', false)`);
   await assert.rejects(q(`select public.sync_growth($1::date)`, [today]), /not authenticated/);

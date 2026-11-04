@@ -272,7 +272,7 @@ export default function MyPageScreen() {
             />
             <View style={styles.linkText}>
               <Text style={styles.sectionTitleInline}>알림</Text>
-              <Text style={styles.linkSub}>아침 9시 · 저녁 8시에 푸디몬이 불러요</Text>
+              <Text style={styles.linkSub}>아침 9시 · 저녁 8시에 푸디몬이 질문을 건네요</Text>
             </View>
             <Switch
               value={remindersOn}

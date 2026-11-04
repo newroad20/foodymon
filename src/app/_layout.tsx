@@ -8,6 +8,7 @@ import { FoodyMonProvider } from '@/context/FoodyMonContext';
 import { MusicProvider } from '@/context/MusicContext';
 import { NightOverlay } from '@/components/foodymon/NightOverlay';
 import { setAnalyticsUser, track } from '@/lib/analytics';
+import { refreshReminders } from '@/lib/reminders';
 import { LoginScreen } from '@/components/auth/LoginScreen';
 import { RegisterScreen } from '@/components/auth/RegisterScreen';
 import { NewPasswordScreen } from '@/components/auth/NewPasswordScreen';
@@ -31,9 +32,13 @@ function AppContent() {
     setAnalyticsUser(userId);
     if (!userId) return;
     track('app_open');
-    const sub = AppState.addEventListener('change', (s) =>
-      s === 'active' ? track('app_open') : s === 'background' && track('app_close')
-    );
+    refreshReminders().catch(() => {});
+    const sub = AppState.addEventListener('change', (s) => {
+      if (s === 'active') {
+        track('app_open');
+        refreshReminders().catch(() => {});
+      } else if (s === 'background') track('app_close');
+    });
     return () => sub.remove();
   }, [userId]);
   useEffect(() => {

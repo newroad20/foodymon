@@ -40,10 +40,10 @@ export interface DayPoints {
 
 /**
  * Cumulative points needed to reach each stage; the pet starts at Lv.3 with 0.
- * A complete day is worth at most 100, so each stage takes about two complete days.
- * Mirrors sync_growth in supabase/005_growth.sql and 009_slow_growth.sql.
+ * Paced for the 100 days: an average of 40 points a day reaches the last stage on day 100.
+ * Mirrors sync_growth in supabase/012_hundred_days.sql.
  */
-export const STAGE_POINTS: Record<number, number> = { 3: 0, 4: 200, 5: 400, 6: 600 };
+export const STAGE_POINTS: Record<number, number> = { 3: 0, 4: 500, 5: 1800, 6: 4000 };
 export const MAX_MIND_RECORDS = 3;
 // Small goals start after this many observation days (SQL observe_days(): pilot 1, release 7).
 // The app only estimates the goal part locally; the server's points replace it after each save.

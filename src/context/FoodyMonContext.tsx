@@ -27,6 +27,8 @@ import {
   type MindRecord,
 } from '@/lib/growth';
 import { pickDialogue } from '@/lib/dialogue';
+import { journeyEnd } from '@/lib/journey';
+import { enableReminders, refreshReminders, setReminderEnd } from '@/lib/reminders';
 import { successFeel, tapFeel } from '@/lib/haptics';
 import { foodEmoji } from '@/lib/foodEmoji';
 import { formatLogTime, withDayPoints } from '@/lib/serverState';
@@ -45,6 +47,7 @@ const defaultState: UserState = {
   targetMeals: 3,
   usualMealSize: 1.0,
   birthYear: null,
+  journeyStart: null,
 
   streak: 0,
   shields: 1,
@@ -95,6 +98,8 @@ interface FoodyMonContextType {
     mealSize: number,
     guardian?: { name: string; contact: string }
   ) => Promise<void>;
+  /** Starts a new 100 days after the last one ended. */
+  startNewJourney: () => Promise<void>;
   /** Saves (or replaces) today's sleep; growth points count once a day. */
   saveSleep: (bedTime: string, wakeTime: string) => Promise<void>;
   /** Saves (or replaces) one meal slot. photoFailed: the meal was saved without the picked photo. */
@@ -328,6 +333,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         ...stateRef.current,
         masterName: name,
         birthYear,
+        journeyStart: toDateKey(new Date()),
         targetSleep: sleep,
         targetMeals: meals,
         usualMealSize: mealSize,
@@ -339,6 +345,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     try {
       await gameApi.saveOnboarding(userId, {
         birthYear,
+        journeyStart: toDateKey(new Date()),
         nickname: name,
         targetSleep: sleep,
         targetMeals: meals,
@@ -352,6 +359,24 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     }
     // Starts the day on the server (sets the first check-in date).
     await syncFromServer();
+  };
+
+  // Reminders stop with the journey.
+  useEffect(() => {
+    setReminderEnd(state.journeyStart ? journeyEnd(state.journeyStart) : null);
+    refreshReminders().catch(() => {});
+  }, [state.journeyStart]);
+
+  const startNewJourney = async () => {
+    const today = toDateKey(new Date());
+    applyState({ ...stateRef.current, journeyStart: today });
+    try {
+      await gameApi.startJourney(userId, today);
+      await enableReminders();
+    } catch (e) {
+      console.error('Failed to start a new journey:', e);
+      setSyncError(errorMessage(e));
+    }
   };
 
   const saveSleep = (bedTime: string, wakeTime: string) => {
@@ -579,6 +604,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         currentDialogue,
         triggerPetInteraction,
         completeOnboarding,
+        startNewJourney,
         saveSleep,
         saveMeal,
         addMind,

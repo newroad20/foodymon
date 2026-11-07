@@ -141,6 +141,12 @@ export const prologuePages = [
 
 export const tutorialPages = [
   {
+    icon: 'calendar',
+    color: '#1B7F66',
+    title: '우리의 100일',
+    line: '오늘부터 100일 동안 함께할 거야.\n쉬어 가는 날이 있어도 괜찮아.\n100일이 지나면 같이 돌아보자.',
+  },
+  {
     icon: 'restaurant',
     color: '#FF9600',
     title: '식사 = 감각 나누기',

@@ -47,7 +47,7 @@ export function JourneyCard() {
     <View style={styles.card}>
       <Text style={styles.title}>지금까지의 기록 · {j.recorded_days}일 함께했어요</Text>
       <View style={styles.row}>
-        <Stat value={`${j.total}점`} label="누적 성장점" />
+        <Stat value={`${j.total}점`} label="이번 100일 성장점" />
         <Stat value={`Lv.${j.level}`} label={level?.name ?? ''} />
         <Stat value={`${j.goals_done}번`} label="작은 목표 완료" />
       </View>

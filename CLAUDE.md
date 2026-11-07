@@ -36,8 +36,9 @@ npx expo export --platform ios --output-dir <tmp>   # bundle check
   `daily_logs`, `checkin_logs`, and a few `profiles` columns (see grants in `supabase/schema.sql`).
 - Growth (재형 feedback, 2026-10): records live in `sleep_records` / `meal_records` (6 slots) /
   `mind_records` (3 a day); `day_points` scores a day (sleep 30 + meal 40 + mind 10 + goal 20, max 100;
-  every feeling scores the same) and `sync_growth` evolves `profiles.evolution_stage` 3→6 at 60/140/230
-  cumulative points, once a day, never down (`supabase/005_growth.sql`). `src/lib/growth.ts` mirrors it
+  every feeling scores the same) and `sync_growth` evolves `profiles.evolution_stage` 3→6 at 500/1800/4000
+  cumulative points, once a day, never down (`supabase/012_hundred_days.sql`). The journey lasts 100 calendar days
+  from `profiles.journey_start` (`lib/journey.ts`); after that home shows `JourneyComplete` and recording stops until a new start. `src/lib/growth.ts` mirrors it
   for the UI — keep both in sync. `daily_logs` is still written (derived totals) for streak/jelly.
   Small goals (`small_goals`, `goal_points`, `get_small_goal`, home `GoalCard`) replaced the S70 daily
   quests in the app; observation days = `observe_days()` (pilot 1, release 7).

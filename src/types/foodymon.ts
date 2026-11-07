@@ -45,6 +45,8 @@ export interface UserState {
   usualMealSize: number;
   /** Used only to pick the age band for recommended sleep; null until asked. */
   birthYear: number | null;
+  /** Day 1 of the current 100 days ('YYYY-MM-DD'); null until hatched. */
+  journeyStart: string | null;
 
   streak: number;
   shields: number;

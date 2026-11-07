@@ -50,7 +50,7 @@ export async function fetchGameState(
   const profileRes = await supabase
     .from('profiles')
     .select(
-      'nickname, onboarded, birth_year, target_sleep, target_meals, usual_meal_size, jelly_balance, streak, shields, equipped_costume, equipped_backgrounds, history_scores, last_checkin_date, missed_date, missed_prev_streak, evolution_stage'
+      'nickname, onboarded, birth_year, journey_start, target_sleep, target_meals, usual_meal_size, jelly_balance, streak, shields, equipped_costume, equipped_backgrounds, history_scores, last_checkin_date, missed_date, missed_prev_streak, evolution_stage'
     )
     .eq('id', userId)
     .single();
@@ -193,6 +193,7 @@ export async function saveOnboarding(
   values: {
     nickname: string;
     birthYear: number;
+    journeyStart: string;
     targetSleep: number;
     targetMeals: number;
     usualMealSize: number;
@@ -205,6 +206,7 @@ export async function saveOnboarding(
     .update({
       nickname: values.nickname,
       birth_year: values.birthYear,
+      journey_start: values.journeyStart,
       ...(values.guardian && {
         guardian_name: values.guardian.name,
         guardian_contact: values.guardian.contact,
@@ -495,6 +497,12 @@ export async function fetchDay(userId: string, date: string): Promise<DayDetail>
   });
   const photoUrls = await mealPhotoUrls(records.meals.flatMap((m) => (m.photoPath ? [m.photoPath] : [])));
   return { records, points: pointsRes.data as DayDetail['points'], photoUrls };
+}
+
+/** Begins a new 100 days after the last one ended; earlier records stay. */
+export async function startJourney(userId: string, today: string): Promise<void> {
+  const res = await supabase.from('profiles').update({ journey_start: today }).eq('id', userId);
+  if (res.error) throw res.error;
 }
 
 export interface Journey {

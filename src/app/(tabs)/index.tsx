@@ -23,9 +23,11 @@ import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 import { BackfillModal } from '@/components/foodymon/BackfillModal';
 import { GoalCard } from '@/components/foodymon/GoalCard';
 import { DailyDiaryModal } from '@/components/foodymon/DailyDiaryModal';
+import { JourneyComplete } from '@/components/foodymon/JourneyComplete';
+import { JOURNEY_DAYS, journeyDay } from '@/lib/journey';
 import { track } from '@/lib/analytics';
 import { BACKFILL_COST } from '@/constants/foodymonData';
-import { RolloverResult } from '@/lib/dayRollover';
+import { RolloverResult, toDateKey } from '@/lib/dayRollover';
 
 function describeRollover(r: RolloverResult): { title: string; message: string } {
   const lines: string[] = [];
@@ -43,15 +45,19 @@ function describeRollover(r: RolloverResult): { title: string; message: string }
 export default function FoodyMonHomeScreen() {
   const { state, loading, syncError, retrySync, advanceToNextDay, pendingRollover, dismissRollover } =
     useFoodyMon();
+  const day = state.journeyStart ? journeyDay(state.journeyStart, toDateKey(new Date())) : null;
+  const journeyOver = day !== null && day > JOURNEY_DAYS;
 
   // Tell the user what happened when the day changed (streak, jelly, shields).
   useEffect(() => {
     if (!pendingRollover) return;
+    // Streak news means nothing while the journey is finished.
+    if (journeyOver) return dismissRollover();
     const { title, message } = describeRollover(pendingRollover);
     Alert.alert(title, message, [{ text: '확인', onPress: dismissRollover }], {
       onDismiss: dismissRollover,
     });
-  }, [pendingRollover, dismissRollover]);
+  }, [pendingRollover, dismissRollover, journeyOver]);
 
   // Modals state
   const [showMealModal, setShowMealModal] = useState(false);
@@ -113,10 +119,11 @@ export default function FoodyMonHomeScreen() {
 
         {/* Top Badges & History */}
         <TopStatsHeader onOpenHistory={() => setShowHistoryModal(true)} />
-        {state.onboarded && <GoalCard />}
+        {day !== null && !journeyOver && <Text style={styles.dayPill}>{JOURNEY_DAYS}일 중 {day}일차</Text>}
+        {state.onboarded && !journeyOver && <GoalCard />}
 
         {/* S25: offer to fill in a missed yesterday */}
-        {backfillOffer && (
+        {backfillOffer && !journeyOver && (
           <View style={styles.backfillCard}>
             <Text style={styles.backfillText}>어제 기록을 완료하지 못했어요. 지금 복구할까요?</Text>
             <View style={styles.backfillActions}>
@@ -137,10 +144,16 @@ export default function FoodyMonHomeScreen() {
           style={styles.petScroll}
           contentContainerStyle={styles.petSection}
           showsVerticalScrollIndicator={false}>
-          <PetAvatar onOpenChat={() => setShowDiaryModal(true)} interactionLabel="오늘의 일기 쓰기" />
+          <PetAvatar
+            onOpenChat={journeyOver ? undefined : () => setShowDiaryModal(true)}
+            interactionLabel="오늘의 일기 쓰기"
+          />
         </ScrollView>
 
         {/* Bottom Action Dock */}
+        {journeyOver ? (
+          <JourneyComplete />
+        ) : (
         <ActionDock
           onOpenMeal={() => {
             track('sheet_open', 'meal');
@@ -157,6 +170,7 @@ export default function FoodyMonHomeScreen() {
           onOpenBag={() => router.push('/dressroom')}
           onNextDay={handleNextDaySimulation}
         />
+        )}
       </SafeAreaView>
 
       {/* Feature Modals */}
@@ -193,6 +207,18 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     justifyContent: 'space-between',
+  },
+  dayPill: {
+    alignSelf: 'center',
+    marginTop: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    color: '#17765D',
+    fontSize: 13,
+    fontWeight: '900',
+    overflow: 'hidden',
   },
   syncBanner: {
     marginHorizontal: 16,

@@ -160,6 +160,35 @@ export function MealModal({ visible, onClose }: MealModalProps) {
               ))}
             </View>
 
+            {/* Up here so it's seen without scrolling; a meal that wasn't eaten clears the photo. */}
+            {(status === null || eaten) && (
+              <>
+                <Text style={styles.label}>사진 (선택)</Text>
+                {photoUri ? (
+                  <View style={styles.photoPreview}>
+                    <Image source={{ uri: photoUri }} style={styles.photo} contentFit="cover" />
+                    <TouchableOpacity
+                      style={styles.photoRemove}
+                      onPress={() => setPhotoUri(null)}
+                      accessibilityLabel="사진 빼기">
+                      <Ionicons name="close" size={16} color="#FFFFFF" />
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View style={styles.photoRow}>
+                    <TouchableOpacity style={styles.photoBtn} onPress={() => pickPhoto(true)}>
+                      <Ionicons name="camera" size={18} color="#1B7F66" />
+                      <Text style={styles.photoBtnText}>{saved?.photoPath ? '다시 찍기' : '지금 찍기'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.photoBtn} onPress={() => pickPhoto(false)}>
+                      <Ionicons name="images" size={18} color="#1B7F66" />
+                      <Text style={styles.photoBtnText}>갤러리</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </>
+            )}
+
             {eaten && (
               <>
                 <Text style={styles.label}>무엇을 먹었어? (선택)</Text>
@@ -186,29 +215,6 @@ export function MealModal({ visible, onClose }: MealModalProps) {
                   multiline
                 />
 
-                <Text style={styles.label}>사진 (선택)</Text>
-                {photoUri ? (
-                  <View style={styles.photoPreview}>
-                    <Image source={{ uri: photoUri }} style={styles.photo} contentFit="cover" />
-                    <TouchableOpacity
-                      style={styles.photoRemove}
-                      onPress={() => setPhotoUri(null)}
-                      accessibilityLabel="사진 빼기">
-                      <Ionicons name="close" size={16} color="#FFFFFF" />
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <View style={styles.photoRow}>
-                    <TouchableOpacity style={styles.photoBtn} onPress={() => pickPhoto(true)}>
-                      <Ionicons name="camera" size={18} color="#1B7F66" />
-                      <Text style={styles.photoBtnText}>{saved?.photoPath ? '다시 찍기' : '지금 찍기'}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.photoBtn} onPress={() => pickPhoto(false)}>
-                      <Ionicons name="images" size={18} color="#1B7F66" />
-                      <Text style={styles.photoBtnText}>갤러리</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
               </>
             )}
 

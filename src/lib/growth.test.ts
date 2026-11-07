@@ -59,7 +59,7 @@ test('dayPoints matches the SQL rules (same cases as supabase/tests/growth.test.
 });
 
 test('growthProgress shows the distance to the next stage', () => {
-  assert.deepEqual(growthProgress(3, 100), { next: 200, remaining: 100, ratio: 0.5 });
-  assert.deepEqual(growthProgress(4, 300), { next: 400, remaining: 100, ratio: 0.5 });
-  assert.deepEqual(growthProgress(6, 700), { next: null, remaining: 0, ratio: 1 });
+  assert.deepEqual(growthProgress(3, 250), { next: 500, remaining: 250, ratio: 0.5 });
+  assert.deepEqual(growthProgress(4, 1150), { next: 1800, remaining: 650, ratio: 0.5 });
+  assert.deepEqual(growthProgress(6, 4100), { next: null, remaining: 0, ratio: 1 });
 });

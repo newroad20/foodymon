@@ -15,7 +15,7 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
     create function auth.uid() returns uuid language sql stable as
       $$ select nullif(current_setting('test.uid', true), '')::uuid $$;
   `);
-  for (const f of ['schema.sql', '002_game_rpc.sql', '004_birth_year.sql', '005_growth.sql', '005_growth.sql', '006_day_detail.sql', '006_day_detail.sql', '009_slow_growth.sql', '009_slow_growth.sql', '011_daily_diary_and_sleep_rhythm.sql', '011_daily_diary_and_sleep_rhythm.sql']) {
+  for (const f of ['schema.sql', '002_game_rpc.sql', '004_birth_year.sql', '005_growth.sql', '005_growth.sql', '006_day_detail.sql', '006_day_detail.sql', '009_slow_growth.sql', '009_slow_growth.sql', '011_daily_diary_and_sleep_rhythm.sql', '011_daily_diary_and_sleep_rhythm.sql', '012_hundred_days.sql', '012_hundred_days.sql']) {
     await db.exec(sql(f));
   }
   const U = '11111111-1111-1111-1111-111111111111';
@@ -87,21 +87,25 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
   r = await sync();
   assert.deepEqual([r.total, r.level, r.evolved], [100, 3, false]);
 
-  // A second complete day reaches 200 and grants exactly one level.
-  await q(`insert into public.sleep_records(user_id,log_date,bed_time,wake_time) values ($1,$2::date - 1,'21:30','05:30')`, [U, today]);
-  await q(`insert into public.meal_records(user_id,log_date,slot,status)
-           select $1, $2::date - 1, s, 'ate' from generate_series(0,5) s`, [U, today]);
-  await q(`insert into public.mind_records(user_id,log_date,emotion,situation,note)
-           values ($1,$2::date - 1,'okay','school','괜찮은 하루')`, [U, today]);
+  // Four more complete days reach 500 and grant exactly one level.
+  await db.exec(`set session_replication_role = replica`); // past days are refused by check_record_write
+  for (const back of [1, 2, 3, 4]) {
+    await q(`insert into public.sleep_records(user_id,log_date,bed_time,wake_time) values ($1,$2::date - $3::int,'21:30','05:30')`, [U, today, back]);
+    await q(`insert into public.meal_records(user_id,log_date,slot,status)
+             select $1, $2::date - $3::int, s, 'ate' from generate_series(0,5) s`, [U, today, back]);
+    await q(`insert into public.mind_records(user_id,log_date,emotion,situation,note)
+             values ($1,$2::date - $3::int,'okay','school','괜찮은 하루')`, [U, today, back]);
+  }
+  await db.exec(`set session_replication_role = origin`);
   r = await sync();
-  assert.deepEqual([r.total, r.level, r.evolved], [200, 4, true]);
+  assert.deepEqual([r.total, r.level, r.evolved], [500, 4, true]);
   r = await sync();
   assert.deepEqual([r.level, r.evolved], [4, false]);
 
   // deleting records lowers points but never the level
   await q(`delete from public.meal_records where user_id=$1`, [U]);
   r = await sync();
-  assert.ok(r.total < 200);
+  assert.ok(r.total < 500);
   assert.equal(r.level, 4);
 
   // ---------- small goals (second user, observe_days = 1) ----------
@@ -165,6 +169,11 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
     [2, 2, 3, 3, 1, '조금 덜 불안해졌어']
   );
   assert.equal(j.level, 3);
+
+  // get_journey counts only the current 100 days
+  await q(`update public.profiles set journey_start = $2::date + 1 where id=$1`, [V, today]);
+  assert.equal((await q(`select public.get_journey() r`))[0].r.recorded_days, 0);
+  await q(`update public.profiles set journey_start = null where id=$1`, [V]);
 
   // daily diary is one auto-saved entry per date and keeps text within the app limit
   await q(`insert into public.daily_reflections(user_id,log_date,text) values ($1,$2,'오늘은 한 끼를 더 챙겼다')`, [V, today]);

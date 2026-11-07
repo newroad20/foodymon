@@ -5,6 +5,13 @@ import { upcomingReminders } from '@/lib/reminderQuestions';
 
 const DAYS_AHEAD = 14;
 
+let reminderEnd: Date | null = null;
+
+/** No reminders are queued from this moment on (the end of the 100 days). */
+export function setReminderEnd(end: Date | null) {
+  reminderEnd = end;
+}
+
 // shortcut: local notifications only (no web, no server push); fine for daily nudges.
 export const remindersSupported = Platform.OS !== 'web';
 
@@ -40,6 +47,7 @@ export async function refreshReminders(): Promise<void> {
 async function scheduleUpcoming() {
   await Notifications.cancelAllScheduledNotificationsAsync();
   for (const r of upcomingReminders(new Date(), DAYS_AHEAD)) {
+    if (reminderEnd && r.date >= reminderEnd) break;
     await Notifications.scheduleNotificationAsync({
       identifier: `reminder-${r.date.getTime()}`, // same slot replaces, so overlapping calls can't double up
       content: { title: '푸디몬', body: r.body },

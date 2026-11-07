@@ -17,6 +17,7 @@ export interface ProfileRow {
   target_meals: number;
   usual_meal_size: number | string;
   birth_year?: number | null;
+  journey_start?: string | null;
   jelly_balance: number;
   streak: number;
   shields: number;
@@ -141,6 +142,7 @@ export function buildUserState(rows: {
     targetMeals: profile.target_meals,
     usualMealSize: Number(profile.usual_meal_size),
     birthYear: profile.birth_year ?? null,
+    journeyStart: profile.journey_start ?? null,
 
     streak: profile.streak,
     shields: profile.shields,

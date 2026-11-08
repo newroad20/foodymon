@@ -115,7 +115,7 @@ export default function MyPageScreen() {
           style: 'destructive',
           onPress: async () => {
             const { error } = await deleteAccount();
-            if (error) Alert.alert('탈퇴하지 못했어요', '네트워크를 확인하고 다시 시도해 주세요.');
+            if (error && error !== 'canceled') Alert.alert('탈퇴하지 못했어요', '네트워크를 확인하고 다시 시도해 주세요.');
           },
         },
       ]

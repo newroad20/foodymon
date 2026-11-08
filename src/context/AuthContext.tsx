@@ -179,6 +179,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const deleteAccount = async () => {
     const uid = session?.user.id;
     if (!uid) return { error: 'not signed in' };
+    // Disconnect Kakao and Apple first; Apple shows its sheet once more so there is a code to revoke.
+    const providers = session?.user.identities?.map((i) => i.provider) ?? [];
+    if (providers.includes('kakao') || providers.includes('apple')) {
+      let appleAuthorizationCode: string | undefined;
+      if (providers.includes('apple') && Platform.OS === 'ios') {
+        try {
+          appleAuthorizationCode = (await AppleAuthentication.signInAsync()).authorizationCode ?? undefined;
+        } catch (e: any) {
+          if (e?.code === 'ERR_REQUEST_CANCELED') return { error: 'canceled' };
+        }
+      }
+      // A failed unlink must not trap the user in an account they want gone; it is logged instead.
+      const { data, error } = await supabase.functions.invoke('unlink-social', { body: { appleAuthorizationCode } });
+      if (error) console.error('Failed to unlink social accounts:', error);
+      else console.log('Social unlink:', data);
+    }
     // Photos live in Storage, which the account delete doesn't cascade to; stop if they can't go.
     try {
       await deleteAllMealPhotos(uid);

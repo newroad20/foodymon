@@ -70,7 +70,7 @@ def make(base, cfg, kind):
         holes.append((x0 - 9, y0 - 9, x1 + 9, y1 + 9))
         if 'nose' in cfg:  # erase with the mouth so its pink can't bleed down, then put it back
             nx, ny, nr = cfg['nose']; holes.append((nx - nr - 8, ny - nr - 8, nx + nr + 8, ny + nr + 8))
-    if kind in ('eat_yum', 'sleep', 'very_good', 'tired', 'very_hard'):
+    if kind in ('eat_yum', 'sleep', 'very_good', 'good', 'tired', 'very_hard'):
         # eye_holes (x, y, rx, ry) cover big anime eyes with their lashes; plain dot eyes use er
         holes += [(x - rx, y - ry, x + rx, y + ry) for (x, y, rx, ry) in cfg.get('eye_holes', [])] or [
             (x - er, y - er, x + er, y + er) for (x, y) in cfg['eyes']]
@@ -80,13 +80,16 @@ def make(base, cfg, kind):
             nx, ny, nr = cfg['nose']
             m = Image.new('L', img.size, 0); ImageDraw.Draw(m).ellipse((nx - nr, ny - nr, nx + nr, ny + nr), fill=255)
             img.paste(base, (0, 0), m.filter(ImageFilter.GaussianBlur(2)))
-    if (cfg['blush'] and kind in ('eat_chew', 'eat_yum', 'good')) or kind == 'very_good':
+    if (cfg['blush'] and kind in ('eat_chew', 'eat_yum')) or kind in ('very_good', 'good'):
         layer = Image.new('RGBA', img.size, BLUSH + (0,)); m = Image.new('L', img.size, 0)
         for (x, y) in cfg['eyes']:
             bx = x - 50 if x < cx else x + 50
             ImageDraw.Draw(m).ellipse((bx - 40, y + 50, bx + 40, y + 88), fill=120)
         layer.putalpha(m.filter(ImageFilter.GaussianBlur(9))); img.alpha_composite(layer)
-    d = ImageDraw.Draw(img)
+    ink = Image.new('RGBA', img.size, (0, 0, 0, 0))  # features go on their own layer, then get the clay look
+    d = ImageDraw.Draw(ink)
+    def open_smile(hw, h):  # D-shaped open mouth: flat top, round bottom, dark inside
+        d.chord(B(-hw, -h * 0.3, hw, h * 1.3), 0, 180, fill=(40, 70, 60, 70), outline=INK, width=W(9))
     def happy_eyes():
         for (x, y) in cfg['eyes']:
             r = er * 0.55; d.arc((x - r, y - r * 0.5, x + r, y + r), 200, 340, fill=INK, width=W(8))
@@ -102,17 +105,19 @@ def make(base, cfg, kind):
     elif kind == 'sleep':
         closed_eyes(); d.ellipse(B(-11, 1, 11, 23), outline=INK, width=W(6))
     # Mood faces: drawn big and plain, like phone emoji, so the feeling reads even in a small circle.
-    elif kind == 'very_good':  # 🥰 squinting smile, open laugh, hearts
-        for (x, y) in cfg['eyes']:
-            r = er * 0.62; d.arc((x - r, y - r * 0.4, x + r, y + r * 1.1), 200, 340, fill=INK, width=W(10))
-        d.chord(B(-48, -26, 48, 62), 0, 180, fill=MOUTH); d.chord(B(-22, 22, 22, 62), 0, 180, fill=TONGUE)
+    # Mood faces follow the team's reference (2026-11): thick rounded clay lines, the same on every stage.
+    elif kind == 'very_good':  # >< eyes, big open laugh
         (lx, ly), (rx, ry) = cfg['eyes']
-        for hx, hy, hr in ((lx - er * 1.6, ly - er * 1.4, 22 * s), (rx + er * 1.5, ry - er * 1.7, 26 * s), (rx + er * 2.0, ry + er * 0.2, 16 * s)):
-            heart(d, hx, hy, hr)
-    elif kind == 'good':  # 🙂 wide closed smile
-        d.arc(B(-44, -36, 44, 30), 20, 160, fill=INK, width=W(10))
-    elif kind == 'okay':  # 😐 flat mouth
-        d.line([P(-30, 6), P(30, 6)], fill=INK, width=W(9))
+        r = er * 0.95
+        d.line([(lx - r, ly - r * 0.6), (lx + r * 0.6, ly), (lx - r, ly + r * 0.6)], fill=INK, width=W(11), joint='curve')
+        d.line([(rx + r, ry - r * 0.6), (rx - r * 0.6, ry), (rx + r, ry + r * 0.6)], fill=INK, width=W(11), joint='curve')
+        open_smile(52, 64)
+    elif kind == 'good':  # ^^ eyes, open smile
+        for (x, y) in cfg['eyes']:
+            r = er * 0.95; d.arc((x - r, y - r * 0.5, x + r, y + r * 1.3), 200, 340, fill=INK, width=W(11))
+        open_smile(44, 52)
+    elif kind == 'okay':  # the everyday soft smile
+        d.arc(B(-42, -34, 42, 22), 25, 155, fill=INK, width=W(10))
     elif kind == 'tired':  # 😩 heavy lids, frown, sweat drop
         for (x, y) in cfg['eyes']:
             r = er * 0.55; d.chord((x - r, y - r * 0.3, x + r, y + r), 0, 180, fill=INK)
@@ -136,7 +141,22 @@ def make(base, cfg, kind):
         d.line([P(-38, 4), P(38, 4)], fill=INK, width=W(8))
         for dx in range(-32, 36, 10): d.line([P(dx, -6), P(dx, 14)], fill=INK, width=W(4))
         d.rounded_rectangle(B(36, -2, 54, 26), radius=4 * s, fill=(170, 170, 185, 255), outline=INK, width=W(3))
+    clay(img, ink)
     return img
+
+def clay(img, ink):
+    """Composite the drawn features with a soft shadow below and a shine on top, like moulded clay."""
+    a = ink.getchannel('A')
+    shadow = Image.new('RGBA', img.size, (20, 40, 35, 0))
+    shadow.putalpha(a.point(lambda v: v * 0.35).filter(ImageFilter.GaussianBlur(3)).transform(
+        img.size, Image.AFFINE, (1, 0, -2, 0, 1, -4)))
+    img.alpha_composite(shadow)
+    img.alpha_composite(ink)
+    inner = a.filter(ImageFilter.MinFilter(7))
+    shine = Image.new('RGBA', img.size, (255, 255, 255, 0))
+    shine.putalpha(Image.fromarray((np.array(inner, float) * 0.22 * (np.array(
+        inner.transform(img.size, Image.AFFINE, (1, 0, 3, 0, 1, 3))) == 0)).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.5)))
+    img.alpha_composite(shine)
 
 KINDS = ['eat_open', 'eat_chew', 'eat_yum', 'sleep', 'very_good', 'good', 'tired', 'very_hard', 'okay', 'unsure', 'no_answer']
 images, outroot = sys.argv[1], sys.argv[2]

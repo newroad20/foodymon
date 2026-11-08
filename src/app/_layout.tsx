@@ -100,6 +100,16 @@ function AppContent() {
               }}
             />
             <Stack.Screen
+              name="journey"
+              options={{
+                headerShown: true,
+                title: '100일 여정',
+                headerBackTitle: '홈',
+                headerStyle: { backgroundColor: '#FDF5F5' },
+                headerShadowVisible: false,
+              }}
+            />
+            <Stack.Screen
               name="help"
               options={{
                 headerShown: true,

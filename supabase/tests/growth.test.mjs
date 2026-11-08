@@ -15,7 +15,7 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
     create function auth.uid() returns uuid language sql stable as
       $$ select nullif(current_setting('test.uid', true), '')::uuid $$;
   `);
-  for (const f of ['schema.sql', '002_game_rpc.sql', '004_birth_year.sql', '005_growth.sql', '005_growth.sql', '006_day_detail.sql', '006_day_detail.sql', '009_slow_growth.sql', '009_slow_growth.sql', '011_daily_diary_and_sleep_rhythm.sql', '011_daily_diary_and_sleep_rhythm.sql', '012_hundred_days.sql', '012_hundred_days.sql']) {
+  for (const f of ['schema.sql', '002_game_rpc.sql', '004_birth_year.sql', '005_growth.sql', '005_growth.sql', '006_day_detail.sql', '006_day_detail.sql', '009_slow_growth.sql', '009_slow_growth.sql', '011_daily_diary_and_sleep_rhythm.sql', '011_daily_diary_and_sleep_rhythm.sql', '012_hundred_days.sql', '012_hundred_days.sql', '013_stage_one.sql', '013_stage_one.sql']) {
     await db.exec(sql(f));
   }
   const U = '11111111-1111-1111-1111-111111111111';
@@ -72,9 +72,9 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
     /invalid date/
   );
 
-  // Evolution now needs roughly two complete 100-point days.
+  // New pets hatch at stage 1 and need 100 points for stage 2.
   let r = await sync();
-  assert.deepEqual([r.total, r.level, r.evolved, r.today.total], [68, 3, false, 68]);
+  assert.deepEqual([r.total, r.level, r.evolved, r.today.total], [68, 1, false, 68]);
 
   // Complete today: sleep 30 + six meals 40 + mind 10 + observation goal 20 = 100.
   await q(`update public.sleep_records set bed_time='21:30', wake_time='05:30' where user_id=$1 and log_date=$2`, [U, today]);
@@ -85,9 +85,9 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
   }
   assert.equal((await points()).total, 100);
   r = await sync();
-  assert.deepEqual([r.total, r.level, r.evolved], [100, 3, false]);
+  assert.deepEqual([r.total, r.level, r.evolved], [100, 2, true]);
 
-  // Four more complete days reach 500 and grant exactly one level.
+  // Four more complete days reach 500, but a pet grows at most one stage a day.
   await db.exec(`set session_replication_role = replica`); // past days are refused by check_record_write
   for (const back of [1, 2, 3, 4]) {
     await q(`insert into public.sleep_records(user_id,log_date,bed_time,wake_time) values ($1,$2::date - $3::int,'21:30','05:30')`, [U, today, back]);
@@ -98,9 +98,14 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
   }
   await db.exec(`set session_replication_role = origin`);
   r = await sync();
-  assert.deepEqual([r.total, r.level, r.evolved], [500, 4, true]);
-  r = await sync();
-  assert.deepEqual([r.level, r.evolved], [4, false]);
+  assert.deepEqual([r.total, r.level, r.evolved], [500, 2, false]);
+  const nextDay = () => q(`update public.profiles set last_evolved_date = $2::date - 1 where id=$1`, [U, today]);
+  await nextDay(); r = await sync();
+  assert.deepEqual([r.level, r.evolved], [3, true]);
+  await nextDay(); r = await sync();
+  assert.deepEqual([r.level, r.evolved], [4, true]);
+  await nextDay(); r = await sync();
+  assert.deepEqual([r.level, r.evolved], [4, false]); // stage 5 needs 1800
 
   // deleting records lowers points but never the level
   await q(`delete from public.meal_records where user_id=$1`, [U]);
@@ -168,7 +173,7 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
     [j.recorded_days, j.sleep_count, j.meal_count, j.mind_count, j.goals_done, j.reflection],
     [2, 2, 3, 3, 1, '조금 덜 불안해졌어']
   );
-  assert.equal(j.level, 3);
+  assert.equal(j.level, 1);
 
   // get_journey counts only the current 100 days
   await q(`update public.profiles set journey_start = $2::date + 1 where id=$1`, [V, today]);

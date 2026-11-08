@@ -169,7 +169,7 @@ export function buildUserState(rows: {
 
     currentDailyScore: 0,
     averageScore: 50,
-    level: profile.evolution_stage ?? 3,
+    level: profile.evolution_stage ?? 1,
     logs: logs.map((l) => ({
       id: l.id,
       time: formatLogTime(new Date(l.created_at)),

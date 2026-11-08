@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import { Session, User } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,6 +32,15 @@ async function handleAuthLink(url: string | null, onRecovery: () => void) {
   }
 }
 
+export type SocialProvider = 'kakao' | 'google' | 'apple';
+
+// Proof of the two required consents (sign-up screen, or the consent screen after a social login).
+const consentData = () => ({
+  consent_privacy_at: new Date().toISOString(),
+  consent_sensitive_at: new Date().toISOString(),
+  privacy_version: EFFECTIVE_DATE,
+});
+
 interface AuthContextType {
   session: Session | null;
   user: User | null;
@@ -37,6 +48,10 @@ interface AuthContextType {
   /** needsConfirmation: false when Supabase signed the user in right away (email confirmation off). */
   signUp: (email: string, password: string) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  /** Kakao/Google open the provider's page; Apple uses the native sheet on iOS. */
+  signInWithProvider: (provider: SocialProvider) => Promise<{ error: string | null }>;
+  /** Saves the two required consents for accounts made through a social login. */
+  recordConsent: () => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   /** True after a password-reset link signed the user in; the app asks for a new password. */
   recovering: boolean;
@@ -90,8 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         emailRedirectTo,
-        // Proof of the two required consents ticked on the sign-up screen.
-        data: { consent_privacy_at: new Date().toISOString(), consent_sensitive_at: new Date().toISOString(), privacy_version: EFFECTIVE_DATE },
+        data: consentData(),
       },
     });
 
@@ -107,6 +121,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { error: error.message };
     return { error: null };
+  };
+
+  const signInWithProvider = async (provider: SocialProvider) => {
+    try {
+      if (provider === 'apple' && Platform.OS === 'ios') {
+        const cred = await AppleAuthentication.signInAsync({
+          requestedScopes: [
+            AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+            AppleAuthentication.AppleAuthenticationScope.EMAIL,
+          ],
+        });
+        if (!cred.identityToken) return { error: 'Apple did not return a token' };
+        const { error } = await supabase.auth.signInWithIdToken({ provider: 'apple', token: cred.identityToken });
+        return { error: error?.message ?? null };
+      }
+      // The web follows the redirect itself; apps open a browser sheet and read the tokens it returns.
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: emailRedirectTo, skipBrowserRedirect: Platform.OS !== 'web' },
+      });
+      if (error) return { error: error.message };
+      if (Platform.OS !== 'web') {
+        const res = await WebBrowser.openAuthSessionAsync(data.url, emailRedirectTo);
+        if (res.type === 'success') await handleAuthLink(res.url, () => {});
+      }
+      return { error: null };
+    } catch (e: any) {
+      // Closing the Apple sheet is not an error.
+      if (e?.code === 'ERR_REQUEST_CANCELED') return { error: null };
+      return { error: e instanceof Error ? e.message : 'sign-in failed' };
+    }
+  };
+
+  const recordConsent = async () => {
+    const { error } = await supabase.auth.updateUser({ data: consentData() });
+    return { error: error?.message ?? null };
   };
 
   const signOut = async () => {
@@ -154,6 +204,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         recovering,
         signUp,
         signIn,
+        signInWithProvider,
+        recordConsent,
         signOut,
         requestPasswordReset,
         updatePassword,

@@ -6,11 +6,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
   Image,
 } from 'react-native';
+import { HintInput } from '@/components/HintInput';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData } from '@/constants/foodymonData';
@@ -118,7 +118,7 @@ export function PetChatModal({ onClose }: PetChatModalProps) {
           </ScrollView>
 
           <View style={styles.inputRow}>
-            <TextInput
+            <HintInput
               style={styles.input}
               value={draft}
               onChangeText={setDraft}

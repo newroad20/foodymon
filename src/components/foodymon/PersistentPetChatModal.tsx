@@ -9,10 +9,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { HintInput } from '@/components/HintInput';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData } from '@/constants/foodymonData';
@@ -292,7 +292,7 @@ export function PersistentPetChatModal({ onClose }: PetChatModalProps) {
                 ))}
               </ScrollView>
               <View style={styles.inputRow}>
-                <TextInput
+                <HintInput
                   style={styles.input}
                   value={draft}
                   onChangeText={setDraft}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { HintInput } from '@/components/HintInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthContext';
 
@@ -32,7 +33,7 @@ export function NewPasswordScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.card}>
         <Text style={styles.title}>새 비밀번호 정하기</Text>
-        <TextInput
+        <HintInput
           style={styles.input}
           placeholder="새 비밀번호 (6자 이상)"
           placeholderTextColor="#94A3B8"
@@ -40,7 +41,7 @@ export function NewPasswordScreen() {
           onChangeText={setPassword}
           secureTextEntry
         />
-        <TextInput
+        <HintInput
           style={styles.input}
           placeholder="새 비밀번호 다시 입력"
           placeholderTextColor="#94A3B8"

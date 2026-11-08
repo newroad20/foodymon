@@ -5,11 +5,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   ScrollView,
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { HintInput } from '@/components/HintInput';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -196,7 +196,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
             {eaten && (
               <>
                 <Text style={styles.label}>무엇을 먹었어? (선택)</Text>
-                <TextInput
+                <HintInput
                   style={styles.input}
                   placeholder="예: 김밥, 우유"
                   placeholderTextColor="#94A3B8"
@@ -209,7 +209,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
                 <View style={styles.quizBox}>
                   <Text style={styles.quizQuestion}>{quiz.q}</Text>
                 </View>
-                <TextInput
+                <HintInput
                   style={[styles.input, styles.multiline]}
                   placeholder="떠오르는 대로 편하게"
                   placeholderTextColor="#94A3B8"
@@ -228,7 +228,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
                   <Text style={styles.followUpEyebrow}>푸디몬의 다음 질문</Text>
                   <Text style={styles.followUpQuestion}>{followUp?.question}</Text>
                 </View>
-                <TextInput
+                <HintInput
                   style={[styles.input, styles.multiline]}
                   placeholder={followUp?.placeholder}
                   placeholderTextColor="#94A3B8"

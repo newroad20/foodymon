@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   Image,
   Alert,
@@ -12,6 +11,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
+import { HintInput } from '@/components/HintInput';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth, type SocialProvider } from '@/context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -96,7 +96,7 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
 
             <View style={styles.inputWrap}>
               <Ionicons name="mail-outline" size={19} color="#5E806F" />
-              <TextInput
+              <HintInput
                 style={styles.input}
                 placeholder="이메일"
                 placeholderTextColor="#9AA8A1"
@@ -109,7 +109,7 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
             </View>
             <View style={styles.inputWrap}>
               <Ionicons name="lock-closed-outline" size={19} color="#5E806F" />
-              <TextInput
+              <HintInput
                 style={styles.input}
                 placeholder="비밀번호"
                 placeholderTextColor="#9AA8A1"

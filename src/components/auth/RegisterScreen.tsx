@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   Alert,
   KeyboardAvoidingView,
@@ -12,6 +11,7 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native';
+import { HintInput } from '@/components/HintInput';
 import { useAuth } from '@/context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { PrivacyPolicy } from '@/app/privacy';
@@ -101,7 +101,7 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
             <Ionicons name="mail-outline" size={15} color="#5E806F" />
             <Text style={styles.label}>이메일</Text>
           </View>
-          <TextInput
+          <HintInput
             style={styles.input}
             placeholder="예: example@email.com"
             placeholderTextColor={PLACEHOLDER_COLOR}
@@ -116,7 +116,7 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
             <Ionicons name="lock-closed-outline" size={15} color="#5E806F" />
             <Text style={styles.label}>비밀번호</Text>
           </View>
-          <TextInput
+          <HintInput
             style={styles.input}
             placeholder="예: 6자 이상 입력"
             placeholderTextColor={PLACEHOLDER_COLOR}
@@ -129,7 +129,7 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
             <Ionicons name="checkmark-circle-outline" size={15} color="#5E806F" />
             <Text style={styles.label}>비밀번호 확인</Text>
           </View>
-          <TextInput
+          <HintInput
             style={styles.input}
             placeholder="예: 비밀번호 다시 입력"
             placeholderTextColor={PLACEHOLDER_COLOR}

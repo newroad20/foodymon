@@ -5,10 +5,10 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   Alert,
   ScrollView,
 } from 'react-native';
+import { HintInput } from '@/components/HintInput';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {
@@ -141,9 +141,10 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               <Text style={styles.dialogueText}>
                 "고마워! 내가 너를 뭐라고 부르면 될까?"
               </Text>
-              <TextInput
+              <HintInput
                 style={styles.input}
-                placeholder="마스터의 닉네임 입력 (예: 새길)"
+                placeholder="마스터의 닉네임 입력 (예: 김푸디)"
+                placeholderTextColor="#94A3B8"
                 value={name}
                 onChangeText={setName}
                 autoFocus
@@ -160,9 +161,10 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               <Text style={styles.dialogueText}>
                 "{name} 마스터, 반가워!{'\n'}몇 년에 태어났는지 알려 줄래?{'\n'}나이에 맞는 잠 시간을 알려 주려고 물어보는 거야."
               </Text>
-              <TextInput
+              <HintInput
                 style={styles.input}
                 placeholder="태어난 연도 (예: 2012)"
+                placeholderTextColor="#94A3B8"
                 value={birthText}
                 onChangeText={setBirthText}
                 keyboardType="number-pad"
@@ -180,16 +182,18 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               <Text style={styles.dialogueText}>
                 "만 14세 미만 친구는 보호자의 동의가 있어야 함께할 수 있어.{'\n'}부모님이나 보호자에게 이 화면을 보여 줄래?"
               </Text>
-              <TextInput
+              <HintInput
                 style={styles.input}
                 placeholder="보호자 이름"
+                placeholderTextColor="#94A3B8"
                 value={guardianName}
                 onChangeText={setGuardianName}
                 maxLength={50}
               />
-              <TextInput
+              <HintInput
                 style={styles.input}
                 placeholder="보호자 연락처 (전화번호 또는 이메일)"
+                placeholderTextColor="#94A3B8"
                 value={guardianContact}
                 onChangeText={setGuardianContact}
                 autoCapitalize="none"

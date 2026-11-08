@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { HintInput } from '@/components/HintInput';
 import { useFocusEffect } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData } from '@/constants/foodymonData';
@@ -56,7 +57,7 @@ export function JourneyCard() {
       </Text>
 
       <Text style={styles.label}>내가 느낀 변화</Text>
-      <TextInput
+      <HintInput
         style={styles.input}
         value={text}
         onChangeText={setText}

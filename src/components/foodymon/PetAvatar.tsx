@@ -296,22 +296,47 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
             ? `최고 단계, 누적 ${state.growthTotal}점`
             : `다음 성장까지 ${progress.remaining}점, 누적 ${state.growthTotal}점 중 ${progress.next}점`
         }>
-        <View style={styles.scoreHeader}>
-          <Text style={styles.scoreLabel}>
-            {progress.next === null ? '최고 단계에 도착했어요!' : `다음 성장까지 ${progress.remaining}점`}
-          </Text>
-          <Text style={styles.scoreValue}>
-            {progress.next === null ? `${state.growthTotal}점` : `${state.growthTotal} / ${progress.next}점`}
-          </Text>
+        {/* Today's stage on the left, the next one as a mystery silhouette on the right */}
+        <View style={styles.growthRow}>
+          <Image source={petImage(state.level, null)} style={styles.stagePet} resizeMode="contain" />
+          <View style={styles.growthMid}>
+            <Text style={styles.scoreLabel}>
+              {progress.next === null ? '최고 단계에 도착했어요!' : `Lv.${state.level + 1}까지 ${progress.remaining}점`}
+            </Text>
+            <View style={styles.progressBarTrack}>
+              <View style={[styles.progressBarFill, { width: `${Math.max(4, Math.round(progress.ratio * 100))}%` }]}>
+                <View style={styles.progressShine} />
+              </View>
+            </View>
+            <Text style={styles.scoreValue}>
+              {progress.next === null ? `누적 ${state.growthTotal}점` : `${state.growthTotal} / ${progress.next}점`}
+            </Text>
+          </View>
+          {progress.next !== null ? (
+            <View style={styles.nextStage}>
+              <Image source={petImage(state.level + 1, null)} style={styles.stagePet} resizeMode="contain" tintColor="#B9C7C0" />
+              <Text style={styles.nextMark}>?</Text>
+            </View>
+          ) : (
+            <Ionicons name="trophy" size={34} color="#F5B700" />
+          )}
         </View>
-        <View style={styles.progressBarTrack}>
-          <View style={[styles.progressBarFill, { width: `${Math.round(progress.ratio * 100)}%` }]} />
+        <View style={styles.todayRow}>
+          <Text style={styles.todayPoints}>오늘 +{state.todayPoints.total}</Text>
+          <Chip icon="moon" color="#8E7CF0" n={state.records.sleep ? 1 : 0} />
+          <Chip icon="restaurant" color="#FF9600" n={state.records.meals.length} />
+          <Chip icon="happy" color="#FF6FA8" n={state.records.minds.length} />
         </View>
-        <Text style={styles.scoreMeta}>
-          오늘 +{state.todayPoints.total}점 · 수면 {state.records.sleep ? 1 : 0} · 식사{' '}
-          {state.records.meals.length} · 마음 {state.records.minds.length}
-        </Text>
       </View>
+    </View>
+  );
+}
+
+function Chip({ icon, color, n }: { icon: 'moon' | 'restaurant' | 'happy'; color: string; n: number }) {
+  return (
+    <View style={styles.chip}>
+      <Ionicons name={icon} size={14} color={color} />
+      <Text style={styles.chipText}>{n}</Text>
     </View>
   );
 }
@@ -444,51 +469,95 @@ const styles = StyleSheet.create({
     maxWidth: 360,
     marginTop: 12,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    padding: 13,
+    paddingHorizontal: 13,
+    paddingVertical: 10,
     borderRadius: 19,
-    borderWidth: 1,
+    borderWidth: 2,
+    borderBottomWidth: 4,
     borderColor: '#D8E8E0',
     shadowColor: '#476657',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
   },
-  scoreHeader: {
+  growthRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
+    gap: 10,
+  },
+  growthMid: {
+    flex: 1,
+    gap: 5,
+  },
+  stagePet: {
+    width: 38,
+    height: 38,
+  },
+  nextStage: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nextMark: {
+    position: 'absolute',
+    fontSize: 20,
+    color: '#FFFFFF',
+    fontWeight: '900',
   },
   scoreLabel: {
-    flex: 1,
-    fontSize: 12,
-    color: '#718096',
-    fontWeight: '700',
+    fontSize: 13,
+    color: '#334155',
+    fontWeight: '900',
   },
   scoreValue: {
-    flexShrink: 0,
-    fontSize: 13,
-    color: '#4A5568',
+    fontSize: 11,
+    color: '#64748B',
     fontWeight: '800',
+    textAlign: 'right',
   },
   progressBarTrack: {
-    height: 9,
+    height: 14,
     backgroundColor: '#E6EFEA',
     borderRadius: 8,
+    borderBottomWidth: 3,
+    borderBottomColor: '#D3E2DA',
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#4BAA85',
+    backgroundColor: '#22A07D',
     borderRadius: 8,
   },
-  scoreMeta: {
+  progressShine: {
+    marginTop: 3,
+    marginHorizontal: 6,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.45)',
+  },
+  todayRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     marginTop: 6,
+  },
+  todayPoints: {
+    flex: 1,
     fontSize: 12,
-    color: '#64748B',
-    fontWeight: '700',
-    lineHeight: 17,
-    textAlign: 'center',
+    color: '#17765D',
+    fontWeight: '900',
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 10,
+    backgroundColor: '#F1F5F9',
+  },
+  chipText: {
+    fontSize: 12,
+    color: '#334155',
+    fontWeight: '900',
   },
 });

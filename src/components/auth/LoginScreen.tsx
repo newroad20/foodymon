@@ -12,7 +12,8 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { useAuth } from '@/context/AuthContext';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import { useAuth, type SocialProvider } from '@/context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { WorldBackdrop } from '@/components/foodymon/WorldBackdrop';
 
@@ -21,7 +22,7 @@ interface LoginScreenProps {
 }
 
 export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
-  const { signIn, requestPasswordReset } = useAuth();
+  const { signIn, signInWithProvider, requestPasswordReset } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,6 +40,13 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
     if (error) {
       Alert.alert('로그인 실패', '이메일 또는 비밀번호를 확인해 주세요.');
     }
+  };
+
+  const handleSocial = async (provider: SocialProvider) => {
+    setLoading(true);
+    const { error } = await signInWithProvider(provider);
+    setLoading(false);
+    if (error) Alert.alert('로그인 실패', '잠시 후 다시 시도해 주세요.');
   };
 
   const handleForgot = async () => {
@@ -133,6 +141,41 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
               {forgotMsg}
             </Text>
           )}
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>간편 로그인</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <View style={styles.socialList}>
+            <TouchableOpacity
+              style={[styles.socialBtn, styles.kakaoBtn]}
+              onPress={() => handleSocial('kakao')}
+              disabled={loading}
+              accessibilityRole="button">
+              <Ionicons name="chatbubble" size={18} color="#191919" />
+              <Text style={styles.kakaoText}>카카오 로그인</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.socialBtn, styles.googleBtn]}
+              onPress={() => handleSocial('google')}
+              disabled={loading}
+              accessibilityRole="button">
+              <Ionicons name="logo-google" size={18} color="#1F1F1F" />
+              <Text style={styles.googleText}>Google로 계속하기</Text>
+            </TouchableOpacity>
+            {/* Apple's own button, as App Review expects; iOS only. */}
+            {Platform.OS === 'ios' && (
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
+                buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                cornerRadius={14}
+                style={styles.appleBtn}
+                onPress={() => handleSocial('apple')}
+              />
+            )}
+          </View>
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
@@ -340,6 +383,38 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#94A3B8',
     fontWeight: '600',
+  },
+  socialList: {
+    gap: 10,
+  },
+  socialBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 48,
+    borderRadius: 14,
+  },
+  kakaoBtn: {
+    backgroundColor: '#FEE500',
+  },
+  kakaoText: {
+    color: '#191919',
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  googleBtn: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#DADCE0',
+  },
+  googleText: {
+    color: '#1F1F1F',
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  appleBtn: {
+    height: 48,
   },
   secondaryBtn: {
     alignItems: 'center',

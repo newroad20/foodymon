@@ -12,6 +12,7 @@ import { refreshReminders } from '@/lib/reminders';
 import { LoginScreen } from '@/components/auth/LoginScreen';
 import { RegisterScreen } from '@/components/auth/RegisterScreen';
 import { NewPasswordScreen } from '@/components/auth/NewPasswordScreen';
+import { ConsentScreen } from '@/components/auth/ConsentScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -58,6 +59,9 @@ function AppContent() {
 
   // A password-reset link signed the user in: ask for the new password first.
   if (session && recovering) return <NewPasswordScreen />;
+
+  // Social sign-ups skip the sign-up screen, so they agree to the required items here (also older accounts).
+  if (session && !session.user.user_metadata?.consent_privacy_at) return <ConsentScreen />;
 
   // Not logged in — show Login or Register screen
   if (!session) {

@@ -2,7 +2,7 @@
 // 바뀐 처리 항목이 있으면 함께 고치고 EFFECTIVE_DATE 갱신.
 export const OPERATOR = '좋사놀자';
 export const CONTACT_EMAIL = 'whgtkshfwk@gmail.com';
-export const EFFECTIVE_DATE = '2026년 11월 7일';
+export const EFFECTIVE_DATE = '2026년 11월 8일';
 
 export const privacySections: { title: string; body: string[] }[] = [
   {
@@ -20,6 +20,7 @@ export const privacySections: { title: string; body: string[] }[] = [
     title: '2. 처리하는 개인정보 항목',
     body: [
       '· 필수: 이메일, 비밀번호(암호화되어 저장), 닉네임, 태어난 연도',
+      '· 간편 로그인(카카오·Google·Apple)을 쓰면: 해당 서비스가 보내 주는 이메일, 이름(닉네임), 서비스별 회원 식별자 (비밀번호는 받지 않음)',
       '· 만 14세 미만: 보호자 이름, 보호자 연락처(전화번호 또는 이메일), 보호자 동의 일시',
       '· 기록(이용 중 직접 입력): 잠든·일어난 시각, 식사 시간대·상태·메뉴·느낌·메모·사진, 감정·상황·이야기, 작은 목표, 날짜별 하루 일기, "내가 느낀 변화"',
       '· 생활 기준선: 요즘 수면 시간, 하루 끼니 수, 평소 식사량',

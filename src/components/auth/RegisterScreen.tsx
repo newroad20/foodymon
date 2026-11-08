@@ -184,7 +184,7 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
   );
 }
 
-function Consent({ checked, onToggle, label }: { checked: boolean; onToggle: () => void; label: string }) {
+export function Consent({ checked, onToggle, label }: { checked: boolean; onToggle: () => void; label: string }) {
   return (
     <TouchableOpacity
       style={styles.consent}

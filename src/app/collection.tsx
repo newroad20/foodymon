@@ -9,8 +9,8 @@ import { badgeDefs, computeCollection, DailyRecordRow, earnedBadges } from '@/li
 import { fetchDailyRecords } from '@/lib/gameApi';
 import { STAGE_POINTS } from '@/lib/growth';
 
-// FoodyMon hatches at stage 3 and grows to 6 on cumulative points; it never goes back.
-const STAGES = levelsData.filter((l) => l.level >= 3);
+// FoodyMon hatches at stage 1 and grows to 6 on cumulative points; it never goes back.
+const STAGES = levelsData;
 
 type Section = 'evolution' | 'items' | 'badges';
 

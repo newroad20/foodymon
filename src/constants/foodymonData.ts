@@ -25,7 +25,7 @@ export const emotionOptions = [
 
 // Faces for check-in reactions, per stage (same body, only the face changes). Stages without
 // art act reactions out with motion only. eat = [mouth open, chewing, swallowed and happy].
-// Faces are drawn over level3–6.png (face only, same body); replace with the designer's art when it arrives.
+// Faces are drawn over level1–6.png by scripts/pet-faces.py (face only, same body).
 export const petStateArt: Record<
   number,
   {
@@ -36,6 +36,50 @@ export const petStateArt: Record<
     face?: Partial<Record<Emotion, ImageSourcePropType>>;
   }
 > = {
+  1: {
+    sleep: require('@/assets/images/pet/level1/sleep.png'),
+    eat: [require('@/assets/images/pet/level1/eat_open.png'), require('@/assets/images/pet/level1/eat_chew.png'), require('@/assets/images/pet/level1/eat_yum.png')],
+    mood: {
+      very_good: require('@/assets/images/pet/level1/very_good.png'),
+      good: require('@/assets/images/pet/level1/good.png'),
+      okay: require('@/assets/images/pet/level1/okay.png'),
+      tired: require('@/assets/images/pet/level1/tired.png'),
+      very_hard: require('@/assets/images/pet/level1/very_hard.png'),
+      unsure: require('@/assets/images/pet/level1/unsure.png'),
+      no_answer: require('@/assets/images/pet/level1/no_answer.png'),
+    },
+    face: {
+      very_good: require('@/assets/images/pet/level1/face/very_good.png'),
+      good: require('@/assets/images/pet/level1/face/good.png'),
+      okay: require('@/assets/images/pet/level1/face/okay.png'),
+      tired: require('@/assets/images/pet/level1/face/tired.png'),
+      very_hard: require('@/assets/images/pet/level1/face/very_hard.png'),
+      unsure: require('@/assets/images/pet/level1/face/unsure.png'),
+      no_answer: require('@/assets/images/pet/level1/face/no_answer.png'),
+    },
+  },
+  2: {
+    sleep: require('@/assets/images/pet/level2/sleep.png'),
+    eat: [require('@/assets/images/pet/level2/eat_open.png'), require('@/assets/images/pet/level2/eat_chew.png'), require('@/assets/images/pet/level2/eat_yum.png')],
+    mood: {
+      very_good: require('@/assets/images/pet/level2/very_good.png'),
+      good: require('@/assets/images/pet/level2/good.png'),
+      okay: require('@/assets/images/pet/level2/okay.png'),
+      tired: require('@/assets/images/pet/level2/tired.png'),
+      very_hard: require('@/assets/images/pet/level2/very_hard.png'),
+      unsure: require('@/assets/images/pet/level2/unsure.png'),
+      no_answer: require('@/assets/images/pet/level2/no_answer.png'),
+    },
+    face: {
+      very_good: require('@/assets/images/pet/level2/face/very_good.png'),
+      good: require('@/assets/images/pet/level2/face/good.png'),
+      okay: require('@/assets/images/pet/level2/face/okay.png'),
+      tired: require('@/assets/images/pet/level2/face/tired.png'),
+      very_hard: require('@/assets/images/pet/level2/face/very_hard.png'),
+      unsure: require('@/assets/images/pet/level2/face/unsure.png'),
+      no_answer: require('@/assets/images/pet/level2/face/no_answer.png'),
+    },
+  },
   3: {
     sleep: require('@/assets/images/pet/level3/sleep.png'),
     eat: [require('@/assets/images/pet/level3/eat_open.png'), require('@/assets/images/pet/level3/eat_chew.png'), require('@/assets/images/pet/level3/eat_yum.png')],

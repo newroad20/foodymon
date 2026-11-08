@@ -74,7 +74,7 @@ const defaultState: UserState = {
 
   currentDailyScore: 0,
   averageScore: 50,
-  level: 3,
+  level: 1,
   logs: [],
   lastActiveDate: null,
   backfill: null,

@@ -50,7 +50,7 @@ test('buildUserState maps rows and converts numeric strings', () => {
   assert.equal(s.lastActiveDate, '2026-10-11');
   assert.equal(s.logs[0].id, 'a');
   assert.equal(s.logs[0].photoPath, 'u1/1.jpg');
-  assert.equal(s.level, 3); // no evolution_stage yet
+  assert.equal(s.level, 1); // no evolution_stage yet
 });
 
 test('buildUserState scores today from the records and takes the stage from the server', () => {

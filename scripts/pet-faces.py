@@ -7,6 +7,11 @@ from PIL import Image, ImageDraw, ImageFilter
 # 1024px coordinates per stage: eye centres, eye cover radius, mouth cover box, mouth centre, line scale,
 # add blush?, nose (x, y, r) to keep.
 STAGES = {
+    # Team art (2026-11): extras = sweat, brows and queasy squiggles, wiped so every mood face reads clean.
+    1: dict(eyes=[(387, 473), (628, 468)], er=34, mouth=(464, 499, 549, 513), mc=(506, 506), s=1.15, blush=False,
+            extras=[(674, 335, 723, 408), (720, 387, 759, 446)]),
+    2: dict(eyes=[(362, 453), (613, 449)], er=36, mouth=(442, 458, 531, 504), mc=(487, 481), s=1.15, blush=False,
+            extras=[(312, 366, 394, 418), (577, 366, 659, 418), (676, 336, 744, 410), (466, 570, 605, 734)]),
     3: dict(eyes=[(375, 428), (648, 428)], er=36, mouth=(452, 456, 574, 488), mc=(512, 472), s=1.25, blush=True),
     4: dict(eyes=[(402, 407), (702, 382)], er=62, mouth=(495, 432, 652, 535), mc=(570, 486), s=1.4, blush=False, nose=(570, 428, 16),
             eye_holes=[(402, 407, 80, 68), (705, 382, 74, 66)]),
@@ -28,7 +33,7 @@ def drop(d, x, y, r):
     d.ellipse((x - r, y - r, x + r, y + r), fill=TEAR)
 
 # Square around the head (1024px) for the face-only crops used by the mood picker.
-FACE_BOX = {3: (232, 160, 792, 720), 4: (275, 150, 835, 710), 5: (275, 180, 835, 740), 6: (290, 190, 850, 750)}
+FACE_BOX = {1: (228, 202, 788, 762), 2: (207, 180, 767, 740), 3: (232, 160, 792, 720), 4: (275, 150, 835, 710), 5: (275, 180, 835, 740), 6: (290, 190, 850, 750)}
 MOODS = ['very_good', 'good', 'okay', 'tired', 'very_hard', 'unsure', 'no_answer']
 
 def erase(img, ellipses):
@@ -38,7 +43,10 @@ def erase(img, ellipses):
         gx, gy = (x1 - x0) * 0.12, (y1 - y0) * 0.12  # grown, so the eye's soft shadow goes too (no ghost ring)
         ImageDraw.Draw(mask).ellipse((x0 - gx, y0 - gy, x1 + gx, y1 + gy), fill=255)
     bgr = np.array(img.convert('RGB'))[:, :, ::-1].copy()
-    filled = cv2.inpaint(bgr, np.array(mask), 25, cv2.INPAINT_TELEA)
+    a = np.array(img.getchannel('A'))
+    # transparent pixels next to the hole are not skin: let inpainting fill them too instead of reading black
+    unknown = np.array(mask) | ((a < 20).astype(np.uint8) * 255 & cv2.dilate(np.array(mask), np.ones((61, 61), np.uint8)))
+    filled = cv2.inpaint(bgr, unknown, 25, cv2.INPAINT_TELEA)
     filled = cv2.GaussianBlur(filled, (0, 0), 7)  # smooth the inpainting streaks; skin/fur here is soft anyway
     out = Image.fromarray(filled[:, :, ::-1].copy()).convert('RGBA')
     out.putalpha(img.getchannel('A'))
@@ -51,6 +59,12 @@ def make(base, cfg, kind):
     B = lambda x0, y0, x1, y1: (cx + x0 * s, cy + y0 * s, cx + x1 * s, cy + y1 * s)
     W = lambda w: max(3, round(w * s))
     holes = []
+    if 'extras' in cfg:  # wipe them with the eyes hidden too, so no eye ink bleeds in, then put the eyes back
+        eyes = [(x - er * 1.1, y - er * 1.1, x + er * 1.1, y + er * 1.1) for (x, y) in cfg['eyes']]
+        erase(img, cfg['extras'] + eyes)
+        m = Image.new('L', img.size, 0)
+        for e in eyes: ImageDraw.Draw(m).ellipse(e, fill=255)
+        img.paste(base, (0, 0), m.filter(ImageFilter.GaussianBlur(3)))
     if True:
         x0, y0, x1, y1 = cfg['mouth']
         holes.append((x0 - 9, y0 - 9, x1 + 9, y1 + 9))

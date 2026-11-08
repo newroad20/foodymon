@@ -16,17 +16,33 @@ STAGES = {
             eye_holes=[(445, 445, 72, 62), (692, 417, 66, 60)]),
 }
 INK, MOUTH, TONGUE, BLUSH = (45, 30, 50, 255), (70, 30, 45, 255), (240, 120, 140, 255), (255, 150, 160)
+TEAR, HEART = (110, 175, 245, 235), (245, 85, 125, 255)
+
+def heart(d, x, y, r):
+    d.ellipse((x - r, y - r * 0.7, x, y + r * 0.3), fill=HEART)
+    d.ellipse((x, y - r * 0.7, x + r, y + r * 0.3), fill=HEART)
+    d.polygon([(x - r * 0.97, y - r * 0.1), (x + r * 0.97, y - r * 0.1), (x, y + r * 1.1)], fill=HEART)
+
+def drop(d, x, y, r):
+    d.polygon([(x, y - r * 1.8), (x - r * 0.85, y), (x + r * 0.85, y)], fill=TEAR)
+    d.ellipse((x - r, y - r, x + r, y + r), fill=TEAR)
+
+# Square around the head (1024px) for the face-only crops used by the mood picker.
+FACE_BOX = {3: (232, 160, 792, 720), 4: (275, 150, 835, 710), 5: (275, 180, 835, 740), 6: (290, 190, 850, 750)}
+MOODS = ['very_good', 'good', 'okay', 'tired', 'very_hard', 'unsure', 'no_answer']
 
 def erase(img, ellipses):
     """Fill the given ellipses from the surrounding skin/fur (OpenCV inpainting)."""
     mask = Image.new('L', img.size, 0)
-    for box in ellipses:
-        ImageDraw.Draw(mask).ellipse(box, fill=255)
+    for (x0, y0, x1, y1) in ellipses:
+        gx, gy = (x1 - x0) * 0.12, (y1 - y0) * 0.12  # grown, so the eye's soft shadow goes too (no ghost ring)
+        ImageDraw.Draw(mask).ellipse((x0 - gx, y0 - gy, x1 + gx, y1 + gy), fill=255)
     bgr = np.array(img.convert('RGB'))[:, :, ::-1].copy()
     filled = cv2.inpaint(bgr, np.array(mask), 25, cv2.INPAINT_TELEA)
+    filled = cv2.GaussianBlur(filled, (0, 0), 7)  # smooth the inpainting streaks; skin/fur here is soft anyway
     out = Image.fromarray(filled[:, :, ::-1].copy()).convert('RGBA')
     out.putalpha(img.getchannel('A'))
-    img.paste(out, (0, 0), mask.filter(ImageFilter.GaussianBlur(3)))
+    img.paste(out, (0, 0), mask.filter(ImageFilter.GaussianBlur(6)))
 
 def make(base, cfg, kind):
     img = base.copy()
@@ -35,22 +51,22 @@ def make(base, cfg, kind):
     B = lambda x0, y0, x1, y1: (cx + x0 * s, cy + y0 * s, cx + x1 * s, cy + y1 * s)
     W = lambda w: max(3, round(w * s))
     holes = []
-    if kind != 'okay':
+    if True:
         x0, y0, x1, y1 = cfg['mouth']
         holes.append((x0 - 9, y0 - 9, x1 + 9, y1 + 9))
         if 'nose' in cfg:  # erase with the mouth so its pink can't bleed down, then put it back
             nx, ny, nr = cfg['nose']; holes.append((nx - nr - 8, ny - nr - 8, nx + nr + 8, ny + nr + 8))
-    if kind in ('eat_yum', 'sleep', 'very_good', 'tired'):
+    if kind in ('eat_yum', 'sleep', 'very_good', 'tired', 'very_hard'):
         # eye_holes (x, y, rx, ry) cover big anime eyes with their lashes; plain dot eyes use er
         holes += [(x - rx, y - ry, x + rx, y + ry) for (x, y, rx, ry) in cfg.get('eye_holes', [])] or [
             (x - er, y - er, x + er, y + er) for (x, y) in cfg['eyes']]
     if holes:
         erase(img, holes)
-        if 'nose' in cfg and kind != 'okay':
+        if 'nose' in cfg:
             nx, ny, nr = cfg['nose']
             m = Image.new('L', img.size, 0); ImageDraw.Draw(m).ellipse((nx - nr, ny - nr, nx + nr, ny + nr), fill=255)
             img.paste(base, (0, 0), m.filter(ImageFilter.GaussianBlur(2)))
-    if cfg['blush'] and kind in ('eat_chew', 'eat_yum', 'very_good', 'good'):
+    if (cfg['blush'] and kind in ('eat_chew', 'eat_yum', 'good')) or kind == 'very_good':
         layer = Image.new('RGBA', img.size, BLUSH + (0,)); m = Image.new('L', img.size, 0)
         for (x, y) in cfg['eyes']:
             bx = x - 50 if x < cx else x + 50
@@ -71,34 +87,52 @@ def make(base, cfg, kind):
         happy_eyes(); d.arc(B(-35, -29, 35, 27), 20, 160, fill=INK, width=W(7))
     elif kind == 'sleep':
         closed_eyes(); d.ellipse(B(-11, 1, 11, 23), outline=INK, width=W(6))
-    elif kind == 'very_good':
-        happy_eyes(); d.chord(B(-37, -23, 39, 47), 0, 180, fill=MOUTH); d.chord(B(-17, 19, 19, 47), 0, 180, fill=TONGUE)
-    elif kind == 'good':
-        d.arc(B(-35, -29, 35, 27), 20, 160, fill=INK, width=W(7))
-    elif kind == 'tired':
+    # Mood faces: drawn big and plain, like phone emoji, so the feeling reads even in a small circle.
+    elif kind == 'very_good':  # 🥰 squinting smile, open laugh, hearts
         for (x, y) in cfg['eyes']:
-            r = er * 0.5; d.chord((x - r, y - r * 0.4, x + r, y + r), 0, 180, fill=INK)
-        d.line([P(-27, 3), P(27, 3)], fill=INK, width=W(7))
-    elif kind == 'very_hard':
+            r = er * 0.62; d.arc((x - r, y - r * 0.4, x + r, y + r * 1.1), 200, 340, fill=INK, width=W(10))
+        d.chord(B(-48, -26, 48, 62), 0, 180, fill=MOUTH); d.chord(B(-22, 22, 22, 62), 0, 180, fill=TONGUE)
         (lx, ly), (rx, ry) = cfg['eyes']
-        d.line([(lx - er * 0.6, ly - er * 0.95), (lx + er * 0.45, ly - er * 1.2)], fill=INK, width=W(7))
-        d.line([(rx - er * 0.45, ry - er * 1.2), (rx + er * 0.6, ry - er * 0.95)], fill=INK, width=W(7))
-        d.arc(B(-33, 1, 33, 49), 200, 340, fill=INK, width=W(7))
-        d.ellipse((lx + er * 0.2, ly + er * 1.0, lx + er * 0.2 + 16 * s, ly + er * 1.0 + 28 * s), fill=(120, 180, 240, 255))
-    elif kind == 'unsure':
+        for hx, hy, hr in ((lx - er * 1.6, ly - er * 1.4, 22 * s), (rx + er * 1.5, ry - er * 1.7, 26 * s), (rx + er * 2.0, ry + er * 0.2, 16 * s)):
+            heart(d, hx, hy, hr)
+    elif kind == 'good':  # 🙂 wide closed smile
+        d.arc(B(-44, -36, 44, 30), 20, 160, fill=INK, width=W(10))
+    elif kind == 'okay':  # 😐 flat mouth
+        d.line([P(-30, 6), P(30, 6)], fill=INK, width=W(9))
+    elif kind == 'tired':  # 😩 heavy lids, frown, sweat drop
+        for (x, y) in cfg['eyes']:
+            r = er * 0.55; d.chord((x - r, y - r * 0.3, x + r, y + r), 0, 180, fill=INK)
+            d.line([(x - r * 1.1, y - r * 0.5), (x + r * 1.1, y - r * 0.5)], fill=INK, width=W(7))
+        d.arc(B(-30, 6, 30, 46), 200, 340, fill=INK, width=W(9))
         (rx, ry) = cfg['eyes'][1]
-        d.line([(rx - er * 0.8, ry - er * 1.25), (rx + er * 0.9, ry - er * 1.45)], fill=INK, width=W(7))
-        d.line([P(-29, 7), P(-15, -1), P(0, 7), P(15, -1), P(29, 7)], fill=INK, width=W(6), joint='curve')
-    elif kind == 'no_answer':
-        d.line([P(-29, 1), P(29, 1)], fill=INK, width=W(7))
-        for dx in range(-21, 27, 12): d.line([P(dx, -7), P(dx, 9)], fill=INK, width=W(4))
-    return img.resize((512, 512), Image.LANCZOS)
+        drop(d, rx + er * 1.3, ry - er * 1.2, 15 * s)
+    elif kind == 'very_hard':  # 😭 squeezed eyes, streaming tears, open cry
+        (lx, ly), (rx, ry) = cfg['eyes']
+        r = er * 0.6
+        d.line([(lx - r, ly - r * 0.6), (lx + r * 0.6, ly), (lx - r, ly + r * 0.6)], fill=INK, width=W(10), joint='curve')
+        d.line([(rx + r, ry - r * 0.6), (rx - r * 0.6, ry), (rx + r, ry + r * 0.6)], fill=INK, width=W(10), joint='curve')
+        for (x, y) in cfg['eyes']:
+            d.rounded_rectangle((x - 13 * s, y + r * 0.7, x + 13 * s, y + r * 0.7 + 120 * s), radius=13 * s, fill=TEAR)
+        d.chord(B(-36, 0, 36, 70), 180, 360, fill=MOUTH)
+    elif kind == 'unsure':  # 🤨 one brow up, slanted mouth
+        (rx, ry) = cfg['eyes'][1]
+        d.line([(rx - er * 0.8, ry - er * 1.25), (rx + er * 0.9, ry - er * 1.55)], fill=INK, width=W(9))
+        d.line([P(-30, 12), P(-10, 4), P(10, 10), P(30, -6)], fill=INK, width=W(8), joint='curve')
+    elif kind == 'no_answer':  # 🤐 zipped mouth
+        d.line([P(-38, 4), P(38, 4)], fill=INK, width=W(8))
+        for dx in range(-32, 36, 10): d.line([P(dx, -6), P(dx, 14)], fill=INK, width=W(4))
+        d.rounded_rectangle(B(36, -2, 54, 26), radius=4 * s, fill=(170, 170, 185, 255), outline=INK, width=W(3))
+    return img
 
-KINDS = ['eat_open', 'eat_chew', 'eat_yum', 'sleep', 'very_good', 'good', 'tired', 'very_hard', 'unsure', 'no_answer']
+KINDS = ['eat_open', 'eat_chew', 'eat_yum', 'sleep', 'very_good', 'good', 'tired', 'very_hard', 'okay', 'unsure', 'no_answer']
 images, outroot = sys.argv[1], sys.argv[2]
 for lv in map(int, sys.argv[3:]):
     base = Image.open(os.path.join(images, f'level{lv}.png')).convert('RGBA')
     out = os.path.join(outroot, f'level{lv}'); os.makedirs(out, exist_ok=True)
+    os.makedirs(os.path.join(out, 'face'), exist_ok=True)
     for k in KINDS:
-        make(base, STAGES[lv], k).save(os.path.join(out, f'{k}.png'), optimize=True)
+        img = make(base, STAGES[lv], k)
+        img.resize((512, 512), Image.LANCZOS).save(os.path.join(out, f'{k}.png'), optimize=True)
+        if k in MOODS:
+            img.crop(FACE_BOX[lv]).resize((256, 256), Image.LANCZOS).save(os.path.join(out, 'face', f'{k}.png'), optimize=True)
 print('ok')

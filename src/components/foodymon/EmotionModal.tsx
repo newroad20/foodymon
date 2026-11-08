@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Image } from 'expo-image';
 import {
   Modal,
   View,
@@ -11,7 +13,7 @@ import {
   Alert,
 } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
-import { mindEmotions, mindSituations } from '@/constants/foodymonData';
+import { mindEmotions, mindSituations, petStateArt } from '@/constants/foodymonData';
 import { MAX_MIND_RECORDS, type Emotion, type Situation } from '@/lib/growth';
 import { emotionFollowUp } from '@/lib/followUp';
 
@@ -26,9 +28,13 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
   const [emotion, setEmotion] = useState<Emotion | null>(null);
   const [situation, setSituation] = useState<Situation | null>(null);
   const [note, setNote] = useState('');
+  // The feeling shown big on the first step; starts at '보통' so no answer is suggested.
+  const [focus, setFocus] = useState(2);
   const [saving, setSaving] = useState(false);
 
   const used = state.records.minds.length;
+  // Faces drawn on the user's own FoodyMon; the emoji is the fallback for stages without them.
+  const faces = petStateArt[state.level]?.face;
   const full = used >= MAX_MIND_RECORDS;
 
   useEffect(() => {
@@ -36,6 +42,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
     setEmotion(null);
     setSituation(null);
     setNote('');
+    setFocus(2);
   }, [visible]);
 
   const save = async (e: Emotion) => {
@@ -83,24 +90,56 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
               오늘은 마음을 {MAX_MIND_RECORDS}번 나눠 줬어. 내일 또 들려줘! 이야기가 더 있으면 기록장을 열어 봐도 좋아.
             </Text>
           ) : !chosen ? (
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <View>
               <Text style={styles.subtitle}>
                 지금 마음의 날씨는 어때? 어떤 마음이든 정답은 없어. (오늘 {used}/{MAX_MIND_RECORDS})
               </Text>
-              <View style={styles.list}>
-                {mindEmotions.map((m) => (
+              <View style={styles.pickerCard}>
+                <TouchableOpacity
+                  style={styles.arrow}
+                  onPress={() => setFocus((focus + mindEmotions.length - 1) % mindEmotions.length)}
+                  accessibilityLabel="이전 마음">
+                  <Ionicons name="chevron-back" size={26} color="#64748B" />
+                </TouchableOpacity>
+                <View style={styles.pickerCenter} accessibilityLiveRegion="polite">
+                  {faces?.[mindEmotions[focus].id] ? (
+                    <Image source={faces[mindEmotions[focus].id]} style={styles.bigFace} contentFit="contain" />
+                  ) : (
+                    <Text style={styles.bigEmoji}>{mindEmotions[focus].emoji}</Text>
+                  )}
+                  <Text style={styles.bigLabel}>{mindEmotions[focus].label}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.arrow}
+                  onPress={() => setFocus((focus + 1) % mindEmotions.length)}
+                  accessibilityLabel="다음 마음">
+                  <Ionicons name="chevron-forward" size={26} color="#64748B" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.dotRow}>
+                {mindEmotions.map((m, i) => (
                   <TouchableOpacity
                     key={m.id}
-                    style={styles.emotionCard}
-                    activeOpacity={0.7}
-                    disabled={saving}
-                    onPress={() => pickEmotion(m.id)}>
-                    <Text style={styles.emoji}>{m.emoji}</Text>
-                    <Text style={styles.label}>{m.label}</Text>
+                    style={[styles.dot, i === focus && styles.dotActive]}
+                    onPress={() => setFocus(i)}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: i === focus }}
+                    accessibilityLabel={m.label}>
+                    {faces?.[m.id] ? (
+                      <Image source={faces[m.id]} style={styles.dotFace} contentFit="contain" />
+                    ) : (
+                      <Text style={styles.dotEmoji}>{m.emoji}</Text>
+                    )}
                   </TouchableOpacity>
                 ))}
               </View>
-            </ScrollView>
+              <TouchableOpacity
+                style={[styles.primaryBtn, saving && styles.primaryBtnOff]}
+                disabled={saving}
+                onPress={() => pickEmotion(mindEmotions[focus].id)}>
+                <Text style={styles.primaryBtnText}>이 마음이야</Text>
+              </TouchableOpacity>
+            </View>
           ) : (
             <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
               <Text style={styles.subtitle}>
@@ -213,27 +252,65 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     lineHeight: 20,
   },
-  list: {
-    gap: 10,
-    marginBottom: 12,
-  },
-  emotionCard: {
+  // One neutral colour for every feeling: no answer looks better than another.
+  pickerCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    padding: 12,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    gap: 14,
+    justifyContent: 'space-between',
+    paddingVertical: 22,
+    paddingHorizontal: 8,
+    borderRadius: 24,
+    backgroundColor: '#F8F5F0',
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: '#EDE6DC',
   },
-  emoji: {
-    fontSize: 28,
+  arrow: {
+    padding: 10,
   },
-  label: {
-    fontSize: 16,
+  pickerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 6,
+  },
+  bigEmoji: {
+    fontSize: 84,
+  },
+  bigLabel: {
+    fontSize: 20,
     color: '#1E293B',
-    fontWeight: '800',
+    fontWeight: '900',
+  },
+  dotRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 14,
+  },
+  bigFace: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+  },
+  dot: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  dotActive: {
+    borderColor: '#1B7F66',
+    backgroundColor: '#E3F6EF',
+  },
+  dotEmoji: {
+    fontSize: 22,
+  },
+  dotFace: {
+    width: 44,
+    height: 44,
   },
   chipRow: {
     flexDirection: 'row',

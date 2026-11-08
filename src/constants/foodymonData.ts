@@ -32,6 +32,8 @@ export const petStateArt: Record<
     sleep?: ImageSourcePropType;
     eat?: [ImageSourcePropType, ImageSourcePropType, ImageSourcePropType];
     mood?: Partial<Record<Emotion, ImageSourcePropType>>;
+    /** Face-only crops of the mood faces, for the mood picker. */
+    face?: Partial<Record<Emotion, ImageSourcePropType>>;
   }
 > = {
   3: {
@@ -40,10 +42,20 @@ export const petStateArt: Record<
     mood: {
       very_good: require('@/assets/images/pet/level3/very_good.png'),
       good: require('@/assets/images/pet/level3/good.png'),
+      okay: require('@/assets/images/pet/level3/okay.png'),
       tired: require('@/assets/images/pet/level3/tired.png'),
       very_hard: require('@/assets/images/pet/level3/very_hard.png'),
       unsure: require('@/assets/images/pet/level3/unsure.png'),
       no_answer: require('@/assets/images/pet/level3/no_answer.png'),
+    },
+    face: {
+      very_good: require('@/assets/images/pet/level3/face/very_good.png'),
+      good: require('@/assets/images/pet/level3/face/good.png'),
+      okay: require('@/assets/images/pet/level3/face/okay.png'),
+      tired: require('@/assets/images/pet/level3/face/tired.png'),
+      very_hard: require('@/assets/images/pet/level3/face/very_hard.png'),
+      unsure: require('@/assets/images/pet/level3/face/unsure.png'),
+      no_answer: require('@/assets/images/pet/level3/face/no_answer.png'),
     },
   },
   4: {
@@ -52,10 +64,20 @@ export const petStateArt: Record<
     mood: {
       very_good: require('@/assets/images/pet/level4/very_good.png'),
       good: require('@/assets/images/pet/level4/good.png'),
+      okay: require('@/assets/images/pet/level4/okay.png'),
       tired: require('@/assets/images/pet/level4/tired.png'),
       very_hard: require('@/assets/images/pet/level4/very_hard.png'),
       unsure: require('@/assets/images/pet/level4/unsure.png'),
       no_answer: require('@/assets/images/pet/level4/no_answer.png'),
+    },
+    face: {
+      very_good: require('@/assets/images/pet/level4/face/very_good.png'),
+      good: require('@/assets/images/pet/level4/face/good.png'),
+      okay: require('@/assets/images/pet/level4/face/okay.png'),
+      tired: require('@/assets/images/pet/level4/face/tired.png'),
+      very_hard: require('@/assets/images/pet/level4/face/very_hard.png'),
+      unsure: require('@/assets/images/pet/level4/face/unsure.png'),
+      no_answer: require('@/assets/images/pet/level4/face/no_answer.png'),
     },
   },
   5: {
@@ -64,10 +86,20 @@ export const petStateArt: Record<
     mood: {
       very_good: require('@/assets/images/pet/level5/very_good.png'),
       good: require('@/assets/images/pet/level5/good.png'),
+      okay: require('@/assets/images/pet/level5/okay.png'),
       tired: require('@/assets/images/pet/level5/tired.png'),
       very_hard: require('@/assets/images/pet/level5/very_hard.png'),
       unsure: require('@/assets/images/pet/level5/unsure.png'),
       no_answer: require('@/assets/images/pet/level5/no_answer.png'),
+    },
+    face: {
+      very_good: require('@/assets/images/pet/level5/face/very_good.png'),
+      good: require('@/assets/images/pet/level5/face/good.png'),
+      okay: require('@/assets/images/pet/level5/face/okay.png'),
+      tired: require('@/assets/images/pet/level5/face/tired.png'),
+      very_hard: require('@/assets/images/pet/level5/face/very_hard.png'),
+      unsure: require('@/assets/images/pet/level5/face/unsure.png'),
+      no_answer: require('@/assets/images/pet/level5/face/no_answer.png'),
     },
   },
   6: {
@@ -76,10 +108,20 @@ export const petStateArt: Record<
     mood: {
       very_good: require('@/assets/images/pet/level6/very_good.png'),
       good: require('@/assets/images/pet/level6/good.png'),
+      okay: require('@/assets/images/pet/level6/okay.png'),
       tired: require('@/assets/images/pet/level6/tired.png'),
       very_hard: require('@/assets/images/pet/level6/very_hard.png'),
       unsure: require('@/assets/images/pet/level6/unsure.png'),
       no_answer: require('@/assets/images/pet/level6/no_answer.png'),
+    },
+    face: {
+      very_good: require('@/assets/images/pet/level6/face/very_good.png'),
+      good: require('@/assets/images/pet/level6/face/good.png'),
+      okay: require('@/assets/images/pet/level6/face/okay.png'),
+      tired: require('@/assets/images/pet/level6/face/tired.png'),
+      very_hard: require('@/assets/images/pet/level6/face/very_hard.png'),
+      unsure: require('@/assets/images/pet/level6/face/unsure.png'),
+      no_answer: require('@/assets/images/pet/level6/face/no_answer.png'),
     },
   },
 };

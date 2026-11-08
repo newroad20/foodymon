@@ -8,10 +8,10 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   ScrollView,
   Alert,
 } from 'react-native';
+import { HintInput } from '@/components/HintInput';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { mindEmotions, mindSituations, petStateArt } from '@/constants/foodymonData';
 import { MAX_MIND_RECORDS, type Emotion, type Situation } from '@/lib/growth';
@@ -165,7 +165,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
                   </TouchableOpacity>
                 ))}
               </View>
-              <TextInput
+              <HintInput
                 style={styles.input}
                 placeholder={followUp?.placeholder}
                 placeholderTextColor="#94A3B8"

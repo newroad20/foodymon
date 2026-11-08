@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -11,6 +10,7 @@ import {
   ActivityIndicator,
   Switch,
 } from 'react-native';
+import { HintInput } from '@/components/HintInput';
 import { Image } from 'expo-image';
 import Constants from 'expo-constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -153,7 +153,7 @@ export default function MyPageScreen() {
           <Text style={styles.sectionTitle}>내 정보 · 요즘 내 생활</Text>
 
           <Text style={styles.label}>이름</Text>
-          <TextInput
+          <HintInput
             style={styles.input}
             value={nickname}
             onChangeText={setNickname}
@@ -164,7 +164,7 @@ export default function MyPageScreen() {
           />
 
           <Text style={styles.label}>태어난 연도</Text>
-          <TextInput
+          <HintInput
             style={styles.input}
             value={birthText}
             onChangeText={setBirthText}

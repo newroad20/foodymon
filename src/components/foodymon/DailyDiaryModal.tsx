@@ -7,10 +7,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { HintInput } from '@/components/HintInput';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { mindEmotions } from '@/constants/foodymonData';
 import { fetchDailyReflections, saveDailyReflection, type DailyReflection } from '@/lib/gameApi';
@@ -150,7 +150,7 @@ export function DailyDiaryModal({ onClose }: DailyDiaryModalProps) {
             </ScrollView>
 
             <View style={styles.editorCard}>
-              <TextInput
+              <HintInput
                 style={styles.input}
                 value={draft}
                 onChangeText={setDraft}

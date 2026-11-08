@@ -29,6 +29,8 @@ async function handleAuthLink(url: string | null, onRecovery: () => void) {
     });
     if (error) Alert.alert('이메일 인증', describeAuthLinkError(error.message));
     else if (result.recovery) onRecovery();
+    // Keep the tokens out of the address bar and browser history.
+    if (Platform.OS === 'web') window.history.replaceState(null, '', window.location.pathname);
   }
 }
 

@@ -3,7 +3,7 @@
 
 export const MEAL_SLOTS = ['아침', '오전 간식', '점심', '오후 간식', '저녁', '저녁 간식'] as const;
 
-export type MealStatus = 'ate' | 'little' | 'hard' | 'skipped' | 'no_answer';
+export type MealStatus = 'ate' | 'much' | 'little' | 'hard' | 'skipped' | 'no_answer';
 export type Emotion = 'very_good' | 'good' | 'okay' | 'tired' | 'very_hard' | 'unsure' | 'no_answer';
 export type Situation = 'meal' | 'body' | 'school' | 'family' | 'sleep_health' | 'unknown' | 'custom';
 
@@ -95,7 +95,7 @@ export function sleepMinutes(r: SleepRecord): number {
   return (((toMinutes(r.wakeTime) - toMinutes(r.bedTime)) % 1440) + 1440) % 1440;
 }
 
-const EATEN: MealStatus[] = ['ate', 'little', 'hard'];
+const EATEN: MealStatus[] = ['ate', 'much', 'little', 'hard'];
 const MEAL_POINTS = [0, 10, 20, 28, 34, 38, 40];
 
 /** One day's growth points; `year` is the calendar year of that day. */

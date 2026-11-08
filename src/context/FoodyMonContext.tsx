@@ -424,7 +424,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         photoPath,
       }
     );
-    if (saved && ['ate', 'little', 'hard'].includes(record.status)) {
+    if (saved && ['ate', 'much', 'little', 'hard'].includes(record.status)) {
       setPetReaction({ id: Date.now(), kind: 'eat', photoUri: photoUri ?? null, emoji: foodEmoji(record.menu) });
     }
     return { saved, photoFailed };

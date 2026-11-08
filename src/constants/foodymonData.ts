@@ -194,6 +194,7 @@ export const mindSituations: { id: Situation; label: string }[] = [
 // Meal status per slot; skipping or finding it hard is recorded without judgement.
 export const mealStatuses: { id: MealStatus; label: string }[] = [
   { id: 'ate', label: '먹었어' },
+  { id: 'much', label: '많이 먹었어' },
   { id: 'little', label: '조금 먹었어' },
   { id: 'hard', label: '먹기 어려웠어' },
   { id: 'skipped', label: '건너뛰었어' },

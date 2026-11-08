@@ -34,7 +34,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
 
   const used = state.records.minds.length;
   // Faces drawn on the user's own FoodyMon; the emoji is the fallback for stages without them.
-  const faces = petStateArt[state.level]?.mood;
+  const faces = petStateArt[state.level]?.face;
   const full = used >= MAX_MIND_RECORDS;
 
   useEffect(() => {
@@ -289,6 +289,7 @@ const styles = StyleSheet.create({
   bigFace: {
     width: 150,
     height: 150,
+    borderRadius: 75,
   },
   dot: {
     width: 44,
@@ -307,13 +308,9 @@ const styles = StyleSheet.create({
   dotEmoji: {
     fontSize: 22,
   },
-  // Zoomed on the face so the small circles show the expression, not the whole body.
   dotFace: {
-    position: 'absolute',
-    width: 100,
-    height: 100,
-    left: -33,
-    top: -23,
+    width: 44,
+    height: 44,
   },
   chipRow: {
     flexDirection: 'row',

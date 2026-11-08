@@ -50,8 +50,9 @@ test('growth: day_points, record limits, sync_growth evolution', async () => {
   await q(`update public.sleep_records set bed_time='01:00', wake_time='06:30' where user_id=$1`, [U]); // 5.5h
   assert.equal((await points()).sleep, 10);
 
-  // meals: only eaten slots count (ate/little/hard), 3 eaten -> 28
-  for (const [slot, status] of [[0, 'ate'], [2, 'little'], [4, 'hard'], [1, 'skipped'], [5, 'no_answer']]) {
+  // meals: only eaten slots count (ate/much/little/hard), 3 eaten -> 28
+  await db.exec(sql('014_meal_much.sql'));
+  for (const [slot, status] of [[0, 'much'], [2, 'little'], [4, 'hard'], [1, 'skipped'], [5, 'no_answer']]) {
     await q(`insert into public.meal_records(user_id,log_date,slot,status) values ($1,$2,$3,$4)`, [U, today, slot, status]);
   }
   assert.equal((await points()).meal, 28);

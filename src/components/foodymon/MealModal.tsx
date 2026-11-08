@@ -24,7 +24,7 @@ interface MealModalProps {
   onClose: () => void;
 }
 
-const EATEN: MealStatus[] = ['ate', 'little', 'hard'];
+const EATEN: MealStatus[] = ['ate', 'much', 'little', 'hard'];
 
 /** Meal check-in: one of six slots, how it went, and optional menu, feeling, photo and memo. */
 export function MealModal({ visible, onClose }: MealModalProps) {

@@ -43,7 +43,7 @@ test('dayPoints matches the SQL rules (same cases as supabase/tests/growth.test.
 
   const day: DayRecords = {
     sleep: { bedTime: '01:00', wakeTime: '06:30' },
-    meals: [meal(0, 'ate'), meal(2, 'little'), meal(4, 'hard'), meal(1, 'skipped'), meal(5, 'no_answer')],
+    meals: [meal(0, 'much'), meal(2, 'little'), meal(4, 'hard'), meal(1, 'skipped'), meal(5, 'no_answer')],
     minds: [
       { emotion: 'very_hard', situation: null, note: '' },
       { emotion: 'very_hard', situation: 'school', note: '' },

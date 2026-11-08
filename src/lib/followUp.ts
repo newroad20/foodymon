@@ -10,6 +10,10 @@ const MEAL_FOLLOW_UPS: Record<MealStatus, FollowUpCopy> = {
     question: '먹고 나서 몸이나 기분은 어떻게 달라졌어?',
     placeholder: '예: 든든해졌어, 기분이 편안해졌어',
   },
+  much: {
+    question: '많이 먹고 나서 몸이나 기분은 어땠어?',
+    placeholder: '예: 든든했어, 맛있어서 더 먹었어',
+  },
   little: {
     question: '조금만 먹게 된 이유가 있었어?',
     placeholder: '예: 시간이 부족했어, 입맛이 없었어',

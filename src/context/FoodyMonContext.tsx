@@ -101,11 +101,11 @@ interface FoodyMonContextType {
   /** Starts a new 100 days after the last one ended. */
   startNewJourney: () => Promise<void>;
   /** Saves (or replaces) today's sleep; growth points count once a day. */
-  saveSleep: (bedTime: string, wakeTime: string) => Promise<void>;
+  saveSleep: (bedTime: string, wakeTime: string) => Promise<boolean>;
   /** Saves (or replaces) one meal slot. photoFailed: the meal was saved without the picked photo. */
-  saveMeal: (record: Omit<MealRecord, 'photoPath'>, photoUri?: string | null) => Promise<{ photoFailed: boolean }>;
+  saveMeal: (record: Omit<MealRecord, 'photoPath'>, photoUri?: string | null) => Promise<{ saved: boolean; photoFailed: boolean }>;
   /** Adds a mind record; false when today's three are used up. */
-  addMind: (record: MindRecord) => Promise<boolean>;
+  addMind: (record: MindRecord) => Promise<'saved' | 'full' | 'failed'>;
   backfillYesterday: (day: {
     sleepHours: number | null;
     mealCount: number;
@@ -313,9 +313,13 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
       await refreshGrowth();
       await gameApi.saveCheckin(userId, stateRef.current, log);
       setSyncError(null);
+      return true;
     } catch (e) {
       console.error('Failed to save check-in:', e);
+      // Take the record back off the screen so nothing looks saved that isn't.
+      applyState(current);
       setSyncError(errorMessage(e));
+      return false;
     }
   };
 
@@ -391,7 +395,10 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         type: 'sleep',
         content: `수면 ${bedTime} → ${wakeTime} (${Math.floor(minutes / 60)}시간${minutes % 60 ? ` ${minutes % 60}분` : ''})`,
       }
-    ).then(done);
+    ).then((saved) => {
+      if (saved) done();
+      return saved;
+    });
   };
 
   const saveMeal = async (record: Omit<MealRecord, 'photoPath'>, photoUri?: string | null) => {
@@ -408,7 +415,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     }
     const full: MealRecord = { ...record, photoPath };
     const details = [record.menu, record.feeling && `"${record.feeling}"`, record.memo].filter(Boolean).join(' · ');
-    await recordCheckin(
+    const saved = await recordCheckin(
       (r) => ({ ...r, meals: [...r.meals.filter((m) => m.slot !== full.slot), full].sort((a, b) => a.slot - b.slot) }),
       (d) => gameApi.saveMealRecord(userId, d, full),
       {
@@ -417,21 +424,22 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
         photoPath,
       }
     );
-    if (['ate', 'little', 'hard'].includes(record.status)) {
+    if (saved && ['ate', 'little', 'hard'].includes(record.status)) {
       setPetReaction({ id: Date.now(), kind: 'eat', photoUri: photoUri ?? null, emoji: foodEmoji(record.menu) });
     }
-    return { photoFailed };
+    return { saved, photoFailed };
   };
 
   const addMind = async (record: MindRecord) => {
-    if (stateRef.current.records.minds.length >= MAX_MIND_RECORDS) return false;
-    await recordCheckin(
+    if (stateRef.current.records.minds.length >= MAX_MIND_RECORDS) return 'full';
+    const saved = await recordCheckin(
       (r) => ({ ...r, minds: [...r.minds, record] }),
       (d) => gameApi.addMindRecord(userId, d, record),
       { type: 'emotion', content: describeMind(record) }
     );
+    if (!saved) return 'failed';
     setPetReaction({ id: Date.now(), kind: 'mood', emotion: record.emotion });
-    return true;
+    return 'saved';
   };
 
   /** Fills in yesterday for jelly; the server restores the streak and any shield used (S25). */

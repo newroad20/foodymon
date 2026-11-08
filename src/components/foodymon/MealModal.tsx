@@ -87,11 +87,15 @@ export function MealModal({ visible, onClose }: MealModalProps) {
     }
     if (saving) return;
     setSaving(true);
-    const { photoFailed } = await saveMeal(
+    const { saved, photoFailed } = await saveMeal(
       { slot, status, menu: menu.trim(), feeling: feeling.trim(), memo: memo.trim() },
       photoUri
     );
     setSaving(false);
+    if (!saved) {
+      Alert.alert('저장하지 못했어요', '인터넷 연결을 확인하고 다시 눌러 주세요. 적은 내용은 그대로 있어요.');
+      return;
+    }
     onClose();
     Alert.alert(
       '감각 나누기',

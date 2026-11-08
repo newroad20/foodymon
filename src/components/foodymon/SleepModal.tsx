@@ -44,7 +44,10 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
   const bedtimeDistance = bedtimeDistanceMinutes(bedTime, guide);
 
   const handleSave = async () => {
-    await saveSleep(bedTime, wakeTime);
+    if (!(await saveSleep(bedTime, wakeTime))) {
+      Alert.alert('저장하지 못했어요', '인터넷 연결을 확인하고 다시 눌러 주세요. 적은 내용은 그대로 있어요.');
+      return;
+    }
     onClose();
     Alert.alert('숲의 밤', saved ? '수면 기록을 고쳤어. 점수도 새 시간으로 다시 계산했어.' : '잠 이야기 고마워. 숲에도 고요한 밤이 왔어.');
   };

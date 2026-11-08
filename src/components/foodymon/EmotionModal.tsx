@@ -48,12 +48,16 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
   const save = async (e: Emotion) => {
     if (saving) return;
     setSaving(true);
-    const ok = await addMind({ emotion: e, situation: e === 'no_answer' ? null : situation, note: note.trim() });
+    const result = await addMind({ emotion: e, situation: e === 'no_answer' ? null : situation, note: note.trim() });
     setSaving(false);
+    if (result === 'failed') {
+      Alert.alert('저장하지 못했어요', '인터넷 연결을 확인하고 다시 눌러 주세요. 적은 내용은 그대로 있어요.');
+      return;
+    }
     onClose();
     Alert.alert(
       '마음 날씨',
-      ok ? '알려 줘서 고마워. 어떤 마음이든 다 소중해.' : `오늘 마음 기록은 ${MAX_MIND_RECORDS}번까지 할 수 있어요.`
+      result === 'saved' ? '알려 줘서 고마워. 어떤 마음이든 다 소중해.' : `오늘 마음 기록은 ${MAX_MIND_RECORDS}번까지 할 수 있어요.`
     );
   };
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { Image } from 'expo-image';
 import {
   Modal,
   View,
@@ -12,7 +13,7 @@ import {
   Alert,
 } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
-import { mindEmotions, mindSituations } from '@/constants/foodymonData';
+import { mindEmotions, mindSituations, petStateArt } from '@/constants/foodymonData';
 import { MAX_MIND_RECORDS, type Emotion, type Situation } from '@/lib/growth';
 import { emotionFollowUp } from '@/lib/followUp';
 
@@ -32,6 +33,8 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
   const [saving, setSaving] = useState(false);
 
   const used = state.records.minds.length;
+  // Faces drawn on the user's own FoodyMon; the emoji is the fallback for stages without them.
+  const faces = petStateArt[state.level]?.mood;
   const full = used >= MAX_MIND_RECORDS;
 
   useEffect(() => {
@@ -99,7 +102,11 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
                   <Ionicons name="chevron-back" size={26} color="#64748B" />
                 </TouchableOpacity>
                 <View style={styles.pickerCenter} accessibilityLiveRegion="polite">
-                  <Text style={styles.bigEmoji}>{mindEmotions[focus].emoji}</Text>
+                  {faces?.[mindEmotions[focus].id] ? (
+                    <Image source={faces[mindEmotions[focus].id]} style={styles.bigFace} contentFit="contain" />
+                  ) : (
+                    <Text style={styles.bigEmoji}>{mindEmotions[focus].emoji}</Text>
+                  )}
                   <Text style={styles.bigLabel}>{mindEmotions[focus].label}</Text>
                 </View>
                 <TouchableOpacity
@@ -118,7 +125,11 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
                     accessibilityRole="radio"
                     accessibilityState={{ selected: i === focus }}
                     accessibilityLabel={m.label}>
-                    <Text style={styles.dotEmoji}>{m.emoji}</Text>
+                    {faces?.[m.id] ? (
+                      <Image source={faces[m.id]} style={styles.dotFace} contentFit="contain" />
+                    ) : (
+                      <Text style={styles.dotEmoji}>{m.emoji}</Text>
+                    )}
                   </TouchableOpacity>
                 ))}
               </View>
@@ -275,10 +286,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 14,
   },
+  bigFace: {
+    width: 150,
+    height: 150,
+  },
   dot: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -290,6 +306,14 @@ const styles = StyleSheet.create({
   },
   dotEmoji: {
     fontSize: 22,
+  },
+  // Zoomed on the face so the small circles show the expression, not the whole body.
+  dotFace: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    left: -33,
+    top: -23,
   },
   chipRow: {
     flexDirection: 'row',

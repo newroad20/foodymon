@@ -40,6 +40,7 @@ export const petStateArt: Record<
     mood: {
       very_good: require('@/assets/images/pet/level3/very_good.png'),
       good: require('@/assets/images/pet/level3/good.png'),
+      okay: require('@/assets/images/pet/level3/okay.png'),
       tired: require('@/assets/images/pet/level3/tired.png'),
       very_hard: require('@/assets/images/pet/level3/very_hard.png'),
       unsure: require('@/assets/images/pet/level3/unsure.png'),
@@ -52,6 +53,7 @@ export const petStateArt: Record<
     mood: {
       very_good: require('@/assets/images/pet/level4/very_good.png'),
       good: require('@/assets/images/pet/level4/good.png'),
+      okay: require('@/assets/images/pet/level4/okay.png'),
       tired: require('@/assets/images/pet/level4/tired.png'),
       very_hard: require('@/assets/images/pet/level4/very_hard.png'),
       unsure: require('@/assets/images/pet/level4/unsure.png'),
@@ -64,6 +66,7 @@ export const petStateArt: Record<
     mood: {
       very_good: require('@/assets/images/pet/level5/very_good.png'),
       good: require('@/assets/images/pet/level5/good.png'),
+      okay: require('@/assets/images/pet/level5/okay.png'),
       tired: require('@/assets/images/pet/level5/tired.png'),
       very_hard: require('@/assets/images/pet/level5/very_hard.png'),
       unsure: require('@/assets/images/pet/level5/unsure.png'),
@@ -76,6 +79,7 @@ export const petStateArt: Record<
     mood: {
       very_good: require('@/assets/images/pet/level6/very_good.png'),
       good: require('@/assets/images/pet/level6/good.png'),
+      okay: require('@/assets/images/pet/level6/okay.png'),
       tired: require('@/assets/images/pet/level6/tired.png'),
       very_hard: require('@/assets/images/pet/level6/very_hard.png'),
       unsure: require('@/assets/images/pet/level6/unsure.png'),

@@ -35,7 +35,7 @@ def make(base, cfg, kind):
     B = lambda x0, y0, x1, y1: (cx + x0 * s, cy + y0 * s, cx + x1 * s, cy + y1 * s)
     W = lambda w: max(3, round(w * s))
     holes = []
-    if kind != 'okay':
+    if True:
         x0, y0, x1, y1 = cfg['mouth']
         holes.append((x0 - 9, y0 - 9, x1 + 9, y1 + 9))
         if 'nose' in cfg:  # erase with the mouth so its pink can't bleed down, then put it back
@@ -46,7 +46,7 @@ def make(base, cfg, kind):
             (x - er, y - er, x + er, y + er) for (x, y) in cfg['eyes']]
     if holes:
         erase(img, holes)
-        if 'nose' in cfg and kind != 'okay':
+        if 'nose' in cfg:
             nx, ny, nr = cfg['nose']
             m = Image.new('L', img.size, 0); ImageDraw.Draw(m).ellipse((nx - nr, ny - nr, nx + nr, ny + nr), fill=255)
             img.paste(base, (0, 0), m.filter(ImageFilter.GaussianBlur(2)))
@@ -89,12 +89,14 @@ def make(base, cfg, kind):
         (rx, ry) = cfg['eyes'][1]
         d.line([(rx - er * 0.8, ry - er * 1.25), (rx + er * 0.9, ry - er * 1.45)], fill=INK, width=W(7))
         d.line([P(-29, 7), P(-15, -1), P(0, 7), P(15, -1), P(29, 7)], fill=INK, width=W(6), joint='curve')
+    elif kind == 'okay':
+        d.arc(B(-24, -10, 24, 14), 30, 150, fill=INK, width=W(7))
     elif kind == 'no_answer':
         d.line([P(-29, 1), P(29, 1)], fill=INK, width=W(7))
         for dx in range(-21, 27, 12): d.line([P(dx, -7), P(dx, 9)], fill=INK, width=W(4))
     return img.resize((512, 512), Image.LANCZOS)
 
-KINDS = ['eat_open', 'eat_chew', 'eat_yum', 'sleep', 'very_good', 'good', 'tired', 'very_hard', 'unsure', 'no_answer']
+KINDS = ['eat_open', 'eat_chew', 'eat_yum', 'sleep', 'very_good', 'good', 'tired', 'very_hard', 'okay', 'unsure', 'no_answer']
 images, outroot = sys.argv[1], sys.argv[2]
 for lv in map(int, sys.argv[3:]):
     base = Image.open(os.path.join(images, f'level{lv}.png')).convert('RGBA')

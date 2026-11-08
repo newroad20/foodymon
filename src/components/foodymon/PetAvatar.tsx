@@ -162,12 +162,12 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
   const currentLevelInfo =
     levelsData.find((l) => l.level === state.level) || levelsData[2];
   // Art for the current reaction when the team adds it; otherwise the stage image.
-  // With a costume on, keep showing the costume art; reactions then use motion only.
+  // With a costume on, keep showing the costume art; eating and moods then use motion only.
   const wearing = !!(state.equippedCostume && costumeArt[state.level]?.[state.equippedCostume]);
   const art = wearing ? undefined : petStateArt[state.level];
   const reactionArt =
     reaction?.kind === 'sleep'
-      ? art?.sleep
+      ? petStateArt[state.level]?.sleep // takes the outfit off for bed, so the closed eyes always show
       : reaction?.kind === 'eat'
         ? art?.eat?.[eatFrame]
         : reaction?.kind === 'mood'

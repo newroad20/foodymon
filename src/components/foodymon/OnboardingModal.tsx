@@ -143,7 +143,8 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               </Text>
               <TextInput
                 style={styles.input}
-                placeholder="마스터의 닉네임 입력 (예: 새길)"
+                placeholder="마스터의 닉네임 입력 (예: 김푸디)"
+                placeholderTextColor="#94A3B8"
                 value={name}
                 onChangeText={setName}
                 autoFocus
@@ -163,6 +164,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               <TextInput
                 style={styles.input}
                 placeholder="태어난 연도 (예: 2012)"
+                placeholderTextColor="#94A3B8"
                 value={birthText}
                 onChangeText={setBirthText}
                 keyboardType="number-pad"
@@ -183,6 +185,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               <TextInput
                 style={styles.input}
                 placeholder="보호자 이름"
+                placeholderTextColor="#94A3B8"
                 value={guardianName}
                 onChangeText={setGuardianName}
                 maxLength={50}
@@ -190,6 +193,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               <TextInput
                 style={styles.input}
                 placeholder="보호자 연락처 (전화번호 또는 이메일)"
+                placeholderTextColor="#94A3B8"
                 value={guardianContact}
                 onChangeText={setGuardianContact}
                 autoCapitalize="none"

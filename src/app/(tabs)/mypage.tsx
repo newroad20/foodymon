@@ -158,6 +158,7 @@ export default function MyPageScreen() {
             value={nickname}
             onChangeText={setNickname}
             placeholder="푸디몬이 부를 이름"
+            placeholderTextColor="#94A3B8"
             maxLength={12}
             returnKeyType="done"
           />
@@ -168,6 +169,7 @@ export default function MyPageScreen() {
             value={birthText}
             onChangeText={setBirthText}
             placeholder="예: 2012 (나이에 맞는 잠 시간 안내용)"
+            placeholderTextColor="#94A3B8"
             keyboardType="number-pad"
             maxLength={4}
           />

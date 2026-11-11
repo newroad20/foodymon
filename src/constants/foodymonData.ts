@@ -334,10 +334,10 @@ export function petImage(level: number, costumeId: string | null) {
 }
 
 export const backgroundsData: BackgroundItem[] = [
-  { id: 'carpet', icon: '🧶', name: '포근한 카펫', price: 30, type: 'carpet', emoji: '🧶' },
-  { id: 'bookshelf', icon: '📚', name: '미니 책장', price: 50, type: 'bookshelf', emoji: '📚' },
-  { id: 'plant', icon: '🪴', name: '미니 화분', price: 40, type: 'plant', emoji: '🪴' },
-  { id: 'plushie', icon: '🧸', name: '곰인형', price: 60, type: 'plushie', emoji: '🧸' },
+  { id: 'carpet', icon: '🧶', name: '포근한 카펫', price: 30, type: 'carpet', emoji: '🧶', image: require('@/assets/images/room/carpet.jpg') },
+  { id: 'bookshelf', icon: '📚', name: '미니 책장', price: 50, type: 'bookshelf', emoji: '📚', image: require('@/assets/images/room/bookshelf.jpg') },
+  { id: 'plant', icon: '🪴', name: '미니 화분', price: 40, type: 'plant', emoji: '🪴', image: require('@/assets/images/room/plant.jpg') },
+  { id: 'plushie', icon: '🧸', name: '곰인형', price: 60, type: 'plushie', emoji: '🧸', image: require('@/assets/images/room/plushie.jpg') },
 ];
 
 export const quizzesData: QuizQuestion[] = [

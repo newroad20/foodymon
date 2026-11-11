@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
+import { Image } from 'expo-image';
 import { useFoodyMon } from '@/context/FoodyMonContext';
+import { backgroundsData } from '@/constants/foodymonData';
 
 export function RoomBackground() {
   const { state } = useFoodyMon();
@@ -17,6 +19,17 @@ export function RoomBackground() {
   } else if (isNight) {
     skyColor = '#1A237E'; // Night
     sunOrMoon = '🌙';
+  }
+
+  // Older saves may hold several; the last one equipped wins.
+  const lastId = state.equippedBackgrounds[state.equippedBackgrounds.length - 1];
+  const roomArt = backgroundsData.find((b) => b.id === lastId)?.image;
+  if (roomArt) {
+    return (
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        <Image source={roomArt} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" />
+      </View>
+    );
   }
 
   const hasCarpet = state.equippedBackgrounds.includes('carpet');

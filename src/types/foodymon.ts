@@ -14,6 +14,7 @@ export interface BackgroundItem {
   price: number;
   type: 'carpet' | 'bookshelf' | 'plant' | 'plushie';
   emoji: string;
+  image: any;
 }
 
 export interface QuizQuestion {

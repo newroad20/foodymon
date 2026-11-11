@@ -25,7 +25,7 @@ export default function DressroomScreen() {
   const costumeId = trying?.type === 'costume' ? trying.item.id : state.equippedCostume;
   const costume = costumesData.find((c) => c.id === costumeId);
   const roomIds =
-    trying?.type === 'background' ? [...state.equippedBackgrounds, trying.item.id] : state.equippedBackgrounds;
+    trying?.type === 'background' ? [trying.item.id] : state.equippedBackgrounds;
   const roomItems = backgroundsData.filter((b) => roomIds.includes(b.id));
 
   const canAfford = !trying || state.currency >= trying.item.price;

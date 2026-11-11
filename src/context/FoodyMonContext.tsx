@@ -584,10 +584,8 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
 
   const toggleBackground = (id: string) => {
     const current = stateRef.current;
-    const isEquipped = current.equippedBackgrounds.includes(id);
-    const nextBgs = isEquipped
-      ? current.equippedBackgrounds.filter((b) => b !== id)
-      : [...current.equippedBackgrounds, id];
+    // Each background is a whole-room picture, so only one is equipped at a time.
+    const nextBgs = current.equippedBackgrounds.includes(id) ? [] : [id];
     saveEquipped({ ...current, equippedBackgrounds: nextBgs });
   };
 

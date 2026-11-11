@@ -1,11 +1,14 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { Image } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { backgroundsData } from '@/constants/foodymonData';
 
 export function RoomBackground() {
   const { state } = useFoodyMon();
+  // Wall decor sits below the header and goal card, which start under the notch.
+  const top = useSafeAreaInsets().top;
   const hour = new Date().getHours();
   const isNight = hour >= 20 || hour < 6;
   const isSunset = hour >= 17 && hour < 20;
@@ -44,7 +47,7 @@ export function RoomBackground() {
         <Text style={[styles.mote, styles.moteOne]}>✦</Text>
         <Text style={[styles.mote, styles.moteTwo]}>✦</Text>
 
-        <View style={styles.windowFrame}>
+        <View style={[styles.windowFrame, { top: top + 140 }]}>
           <View style={[styles.windowGlass, { backgroundColor: skyColor }]}>
             <Text style={styles.sunMoon}>{sunOrMoon}</Text>
             {!isNight && <View style={styles.cloudOne} />}
@@ -56,10 +59,10 @@ export function RoomBackground() {
           </View>
         </View>
 
-        <View style={styles.wallFrame}>
+        <View style={[styles.wallFrame, { top: top + 150 }]}>
           <Text style={styles.wallFrameLeaf}>☘</Text>
         </View>
-        <View style={styles.tinyShelf}>
+        <View style={[styles.tinyShelf, { top: top + 238 }]}>
           <View style={styles.shelfBookA} />
           <View style={styles.shelfBookB} />
           <View style={styles.shelfVase} />
@@ -149,7 +152,6 @@ const styles = StyleSheet.create({
   },
   windowFrame: {
     position: 'absolute',
-    top: 92,
     right: 24,
     width: 100,
     height: 126,
@@ -231,7 +233,6 @@ const styles = StyleSheet.create({
   },
   wallFrame: {
     position: 'absolute',
-    top: 112,
     left: 32,
     width: 62,
     height: 72,
@@ -250,7 +251,6 @@ const styles = StyleSheet.create({
   tinyShelf: {
     position: 'absolute',
     left: 25,
-    top: 200,
     width: 82,
     height: 8,
     borderRadius: 4,

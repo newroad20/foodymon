@@ -206,7 +206,7 @@ export default function FoodyMonHomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FDF5F5',
+    backgroundColor: '#F2F8F4',
   },
   safeArea: {
     flex: 1,

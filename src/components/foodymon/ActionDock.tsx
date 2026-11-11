@@ -31,10 +31,7 @@ export function ActionDock({
 
       <View style={styles.dockCard}>
         <View style={styles.dockHeading}>
-          <View>
-            <Text style={styles.dockEyebrow}>TODAY</Text>
-            <Text style={styles.dockTitle}>오늘의 이야기를 들려줘</Text>
-          </View>
+          <Text style={styles.dockTitle}>오늘의 이야기를 들려줘</Text>
           <Text style={styles.dockHint}>기록할수록 가까워져요</Text>
         </View>
         <View style={styles.dock}>
@@ -108,13 +105,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingHorizontal: 3,
     marginBottom: 10,
-  },
-  dockEyebrow: {
-    color: '#6E9886',
-    fontSize: 9,
-    lineHeight: 12,
-    letterSpacing: 1.4,
-    fontWeight: '900',
   },
   dockTitle: {
     color: '#263A31',

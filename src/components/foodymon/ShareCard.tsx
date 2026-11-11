@@ -62,7 +62,7 @@ export const ShareCard = forwardRef<View, { state: UserState }>(function ShareCa
 const styles = StyleSheet.create({
   card: {
     width: SHARE_CARD_WIDTH,
-    backgroundColor: '#FDF5F5',
+    backgroundColor: '#F2F8F4',
     borderRadius: 28,
     padding: 22,
     borderWidth: 3,

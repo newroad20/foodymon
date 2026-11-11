@@ -86,7 +86,7 @@ function AppContent() {
                 headerShown: true,
                 title: '컬렉션 도감',
                 headerBackTitle: '마이',
-                headerStyle: { backgroundColor: '#FDF5F5' },
+                headerStyle: { backgroundColor: '#F2F8F4' },
                 headerShadowVisible: false,
               }}
             />
@@ -95,7 +95,7 @@ function AppContent() {
               options={{
                 headerShown: true,
                 headerBackTitle: '요약',
-                headerStyle: { backgroundColor: '#FDF5F5' },
+                headerStyle: { backgroundColor: '#F2F8F4' },
                 headerShadowVisible: false,
               }}
             />
@@ -105,7 +105,7 @@ function AppContent() {
                 headerShown: true,
                 title: '100일 여정',
                 headerBackTitle: '홈',
-                headerStyle: { backgroundColor: '#FDF5F5' },
+                headerStyle: { backgroundColor: '#F2F8F4' },
                 headerShadowVisible: false,
               }}
             />
@@ -115,7 +115,7 @@ function AppContent() {
                 headerShown: true,
                 title: '도움 받기',
                 headerBackTitle: '뒤로',
-                headerStyle: { backgroundColor: '#FDF5F5' },
+                headerStyle: { backgroundColor: '#F2F8F4' },
                 headerShadowVisible: false,
               }}
             />
@@ -125,7 +125,7 @@ function AppContent() {
                 headerShown: true,
                 title: '식사 앨범',
                 headerBackTitle: '마이',
-                headerStyle: { backgroundColor: '#FDF5F5' },
+                headerStyle: { backgroundColor: '#F2F8F4' },
                 headerShadowVisible: false,
               }}
             />
@@ -145,7 +145,7 @@ function AppContent() {
                 headerShown: true,
                 title: '자랑하기',
                 headerBackTitle: '요약',
-                headerStyle: { backgroundColor: '#FDF5F5' },
+                headerStyle: { backgroundColor: '#F2F8F4' },
                 headerShadowVisible: false,
               }}
             />
@@ -173,6 +173,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FDF5F5',
+    backgroundColor: '#F2F8F4',
   },
 });

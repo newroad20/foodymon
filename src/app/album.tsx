@@ -140,8 +140,8 @@ export default function AlbumScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FDF5F5' },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FDF5F5' },
+  container: { flex: 1, backgroundColor: '#F2F8F4' },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F2F8F4' },
   list: { padding: 16, gap: 12 },
   headerCard: { marginBottom: 4 },
   headerTitle: { fontSize: 20, color: '#263A31', fontWeight: '900' },

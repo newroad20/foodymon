@@ -46,7 +46,7 @@ export function JourneyCard() {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>지금까지의 기록 · {j.recorded_days}일 함께했어요</Text>
+      <Text style={styles.title}>{j.recorded_days}일 함께한 기록</Text>
       <View style={styles.row}>
         <Stat value={`${j.total}점`} label="이번 100일 성장점" />
         <Stat value={`Lv.${j.level}`} label={level?.name ?? ''} />
@@ -61,7 +61,7 @@ export function JourneyCard() {
         style={styles.input}
         value={text}
         onChangeText={setText}
-        placeholder="기록하면서 달라진 점이 있다면 편하게 적어 줘 (선택)"
+        placeholder="기록하면서 달라진 점을 편하게 적어 줘"
         placeholderTextColor="#94A3B8"
         maxLength={1000}
         multiline

@@ -43,7 +43,7 @@ export function TopStatsHeader({ onOpenHistory }: TopStatsHeaderProps) {
           onPress={() => router.push('/help')}
           accessibilityRole="button"
           accessibilityLabel="도움 받기">
-          <Ionicons name="help-buoy-outline" size={18} color="#334155" />
+          <Ionicons name="help-circle-outline" size={18} color="#334155" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.historyButton}

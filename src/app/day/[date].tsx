@@ -170,7 +170,7 @@ function Point({ label, value, max }: { label: string; value: number; max: numbe
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FDF5F5',
+    backgroundColor: '#F2F8F4',
   },
   content: {
     padding: 16,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FDF5F5',
+    backgroundColor: '#F2F8F4',
   },
   empty: {
     fontSize: 14,

@@ -124,7 +124,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
           <View style={styles.header}>
-            <Text style={styles.title}>식사 · 감각 나누기</Text>
+            <Text style={styles.title}>식사 기록</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기">
               <Text style={styles.closeBtnText}>✕</Text>
             </TouchableOpacity>
@@ -167,7 +167,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
             {/* Up here so it's seen without scrolling; a meal that wasn't eaten clears the photo. */}
             {(status === null || eaten) && (
               <>
-                <Text style={styles.label}>사진 (선택)</Text>
+                <Text style={styles.label}>사진</Text>
                 {photoUri ? (
                   <View style={styles.photoPreview}>
                     <Image source={{ uri: photoUri }} style={styles.photo} contentFit="cover" />
@@ -195,7 +195,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
 
             {eaten && (
               <>
-                <Text style={styles.label}>무엇을 먹었어? (선택)</Text>
+                <Text style={styles.label}>무엇을 먹었어?</Text>
                 <HintInput
                   style={styles.input}
                   placeholder="예: 김밥, 우유"
@@ -205,7 +205,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
                   maxLength={100}
                 />
 
-                <Text style={styles.label}>감각 나누기 (선택)</Text>
+                <Text style={styles.label}>감각 나누기</Text>
                 <View style={styles.quizBox}>
                   <Text style={styles.quizQuestion}>{quiz.q}</Text>
                 </View>
@@ -224,9 +224,9 @@ export function MealModal({ visible, onClose }: MealModalProps) {
 
             {status !== null && (
               <>
-                <View style={styles.followUpBox}>
-                  <Text style={styles.followUpEyebrow}>푸디몬의 다음 질문</Text>
-                  <Text style={styles.followUpQuestion}>{followUp?.question}</Text>
+                <Text style={styles.label}>푸디몬의 다음 질문</Text>
+                <View style={styles.quizBox}>
+                  <Text style={styles.quizQuestion}>{followUp?.question}</Text>
                 </View>
                 <HintInput
                   style={[styles.input, styles.multiline]}
@@ -350,27 +350,6 @@ const styles = StyleSheet.create({
   quizQuestion: {
     fontSize: 14,
     color: '#17765D',
-    fontWeight: '800',
-    lineHeight: 20,
-  },
-  followUpBox: {
-    marginTop: 16,
-    marginBottom: 8,
-    padding: 12,
-    borderRadius: 14,
-    backgroundColor: '#FFF7ED',
-    borderWidth: 1,
-    borderColor: '#FED7AA',
-  },
-  followUpEyebrow: {
-    marginBottom: 4,
-    fontSize: 11,
-    color: '#C2410C',
-    fontWeight: '900',
-  },
-  followUpQuestion: {
-    fontSize: 14,
-    color: '#7C2D12',
     fontWeight: '800',
     lineHeight: 20,
   },

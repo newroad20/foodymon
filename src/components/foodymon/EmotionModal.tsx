@@ -74,7 +74,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
           <View style={styles.header}>
-            <Text style={styles.title}>감정 · 마음 날씨</Text>
+            <Text style={styles.title}>마음 기록</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기">
               <Text style={styles.closeBtnText}>✕</Text>
             </TouchableOpacity>

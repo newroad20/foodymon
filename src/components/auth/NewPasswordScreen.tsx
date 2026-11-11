@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: '#FDF5F5',
+    backgroundColor: '#F2F8F4',
   },
   card: {
     backgroundColor: '#FFFFFF',

@@ -80,7 +80,7 @@ export default function SummaryScreen() {
                 {logged ? state.currentDailyScore : '–'}
                 {logged && <Text style={styles.heroUnit}>점</Text>}
               </Text>
-              <Text style={styles.greeting}>{greeting(logged)}</Text>
+              <Text style={styles.greeting} lineBreakStrategyIOS="hangul-word">{greeting(logged)}</Text>
             </View>
             <Image source={levelInfo.image} style={styles.pet} contentFit="contain" />
           </View>
@@ -174,7 +174,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FDF5F5',
+    backgroundColor: '#F2F8F4',
   },
   content: {
     padding: 16,

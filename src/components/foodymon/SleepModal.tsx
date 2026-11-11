@@ -57,7 +57,7 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
           <View style={styles.header}>
-            <Text style={styles.title}>수면 · 숲의 밤</Text>
+            <Text style={styles.title}>수면 기록</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기">
               <Text style={styles.closeBtnText}>✕</Text>
             </TouchableOpacity>

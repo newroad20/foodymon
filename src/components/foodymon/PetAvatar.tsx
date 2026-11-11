@@ -457,12 +457,15 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: '600',
   },
+  // A circle squashed flat reads as a soft oval; the margins give back the space the squash frees.
   shadow: {
-    width: 126,
-    height: 17,
-    backgroundColor: 'rgba(44, 75, 61, 0.14)',
+    width: 120,
+    height: 120,
     borderRadius: 60,
-    marginTop: -8,
+    backgroundColor: 'rgba(44, 75, 61, 0.12)',
+    transform: [{ scaleY: 0.15 }],
+    marginTop: -59,
+    marginBottom: -51,
   },
   scoreContainer: {
     width: '90%',

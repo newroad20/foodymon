@@ -65,8 +65,8 @@ Product direction (keep consistent):
 - It is an emotional-support app: never blame, grade or compare the user in copy
   (no "과식/결식/잘 못했어요/슬퍼할 거예요"). Low days get company, not warnings.
   Meal score counts logged meals only; portion size never lowers it (PR #24).
-- Look: Duolingo / Pou / Roblox game feel — mint `#1B7F66` accent (white text 4.9:1), pink
-  `#FDF5F5` background, cards with a 2px border + 4px bottom edge, Ionicons instead of emoji in
+- Look: Duolingo / Pou / Roblox game feel — mint `#1B7F66` accent (white text 4.9:1), pale mint
+  `#F2F8F4` background on every screen (pink dropped 2026-11), cards with a 2px border + 4px bottom edge, Ionicons instead of emoji in
   UI chrome, system font one weight heavier (Nunito was dropped: no Hangul).
 
 Open items:

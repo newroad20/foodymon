@@ -78,7 +78,6 @@ export function RoomBackground() {
         <View style={[styles.floorPlank, { top: '28%' }]} />
         <View style={[styles.floorPlank, { top: '58%' }]} />
         <View style={[styles.floorPlank, { top: '84%' }]} />
-        <View style={styles.roomRug} />
 
         {/* Equipped Carpet */}
         {hasCarpet && (
@@ -307,17 +306,6 @@ const styles = StyleSheet.create({
     right: 0,
     height: 1,
     backgroundColor: 'rgba(142, 113, 86, 0.13)',
-  },
-  roomRug: {
-    position: 'absolute',
-    width: 290,
-    height: 92,
-    borderRadius: 48,
-    alignSelf: 'center',
-    top: 12,
-    backgroundColor: 'rgba(255, 246, 226, 0.72)',
-    borderWidth: 2,
-    borderColor: 'rgba(224, 193, 147, 0.5)',
   },
   carpetContainer: {
     position: 'absolute',

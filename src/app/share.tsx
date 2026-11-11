@@ -108,7 +108,7 @@ export default function ShareScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FDF5F5',
+    backgroundColor: '#F2F8F4',
   },
   content: {
     alignItems: 'center',

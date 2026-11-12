@@ -1,56 +1,62 @@
-# Welcome to your Expo app 👋
+<div align="center">
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+![header](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12&height=180&section=header&text=Foodimon&fontSize=65&fontColor=ffffff)
 
-## Get started
+**캐릭터를 돌보며 식사·수면·감정을 기록하는 습관 형성 앱**
 
-1. Install dependencies
+![React Native](https://img.shields.io/badge/React_Native-61DAFB?style=flat-square&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black)
 
-   ```bash
-   npm install
-   ```
+[데모 체험하기](https://example.com) · [기획서](./docs/plan.md)
 
-2. Start the app
+</div>
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 📖 소개
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+사용자가 식사·수면·감정을 기록하면 캐릭터가 함께 성장합니다.
+기록이라는 지루한 행위를 돌봄이라는 동기로 바꾸는 것이 목표입니다.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## ✨ 주요 기능
 
-## Get a fresh project
+| 기능 | 설명 | 상태 |
+|---|---|---|
+| 식사 기록 | 사진·시간 기반 기록 | ✅ 완료 |
+| 수면 기록 | 취침/기상 시간 입력 | ✅ 완료 |
+| 감정 기록 | 5단계 감정 선택 | ✅ 완료 |
+| 캐릭터 성장 | 기록량에 따른 단계별 진화 | 🚧 개발 중 |
+| 꾸미기 | 포인트로 아이템 구매 | 🚧 개발 중 |
+| 메타버스 웹 | 캐릭터 공간 공유 | 📋 기획 단계 |
 
-When you're ready, run:
+## 📱 화면
 
-```bash
-npm run reset-project
-```
+<div align="center">
+<table>
+  <tr>
+    <td><img src="./docs/home.png" width="220"></td>
+    <td><img src="./docs/meal.png" width="220"></td>
+    <td><img src="./docs/grow.png" width="220"></td>
+  </tr>
+</table>
+</div>
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+<details>
+<summary><b>🛠 실행 방법</b></summary>
 
-### Other setup steps
+<br>
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+터미널에서 아래 명령을 차례로 실행합니다.
 
-## Learn more
+</details>
 
-To learn more about developing your project with Expo, look at the following resources:
+## 🗂 프로젝트 구조
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+\`\`\`
+src/
+├── screens/     # 화면 컴포넌트
+├── components/  # 공통 UI
+├── hooks/       # 커스텀 훅
+└── utils/       # 보상·레벨 계산 로직
+\`\`\`

@@ -130,7 +130,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
             </TouchableOpacity>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
             <Text style={styles.label}>언제 먹었어?</Text>
             <View style={styles.chipRow} accessibilityRole="radiogroup">
               {MEAL_SLOTS.map((name, i) => {

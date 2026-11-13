@@ -145,7 +145,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
               </TouchableOpacity>
             </View>
           ) : (
-            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
               <Text style={styles.subtitle}>
                 {chosen.emoji} {chosen.label}
               </Text>

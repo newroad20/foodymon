@@ -68,7 +68,7 @@ export default function SummaryScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
         <Text style={styles.screenTitle}>하루 요약</Text>
 
         {/* S5-1 Today's report */}

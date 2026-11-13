@@ -105,7 +105,8 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled">
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets>
           <View style={styles.storyBadge}>
             <Ionicons name="leaf" size={14} color="#3B8169" />
             <Text style={styles.storyBadgeText}>푸디몬과 첫 만남 · {Math.min(step + 1, HATCH + 1)}/{HATCH + 1}</Text>

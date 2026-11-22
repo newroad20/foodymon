@@ -9,7 +9,7 @@ import {
   Easing,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
+import { CATEGORY_COLORS as C, shadow } from '@/constants/theme';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData, costumeArt, petImage, petStateArt } from '@/constants/foodymonData';
 import type { PetReaction } from '@/context/FoodyMonContext';
@@ -191,7 +191,7 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
         <Text style={styles.dialogueText}>{currentDialogue}</Text>
         {onOpenChat && (
           <View style={styles.chatHint}>
-            <Ionicons name={interactionLabel.includes('일기') ? 'book-outline' : 'chatbubble-ellipses-outline'} size={12} color="#4B806C" />
+            <Ionicons name={interactionLabel.includes('일기') ? 'book-outline' : 'chatbubble-ellipses-outline'} size={12} color="#64748B" />
             <Text style={styles.chatHintText}>{interactionLabel}</Text>
           </View>
         )}
@@ -263,7 +263,7 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
               {reaction.photoUri ? (
                 <Image source={{ uri: reaction.photoUri }} style={styles.foodPhoto} />
               ) : (
-                <Ionicons name={reaction.icon} size={56} color="#FF9600" />
+                <Ionicons name={reaction.icon} size={56} color="#C97719" />
               )}
             </Animated.View>
           )}
@@ -303,7 +303,7 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
           </View>
           {progress.next !== null ? (
             <View style={styles.nextStage}>
-              <Image source={petImage(state.level + 1, null)} style={styles.stagePet} resizeMode="contain" tintColor="#B9C7C0" />
+              <Image source={petImage(state.level + 1, null)} style={styles.stagePet} resizeMode="contain" tintColor="#CBD5E1" />
               <Text style={styles.nextMark}>?</Text>
             </View>
           ) : (
@@ -341,20 +341,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.94)',
     paddingHorizontal: 18,
     paddingVertical: 11,
-    borderRadius: 22,
+    borderRadius: 20,
+    borderCurve: 'continuous',
     marginBottom: 10,
     maxWidth: '90%',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#D8E8E0',
-    shadowColor: '#476657',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
+    borderColor: '#E2E8F0',
+    boxShadow: shadow.card,
   },
   dialogueText: {
-    fontSize: 14,
-    color: '#30463B',
+    fontSize: 15,
+    color: '#1E293B',
     textAlign: 'center',
     lineHeight: 20,
     fontWeight: '700',
@@ -366,8 +364,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   chatHintText: {
-    color: '#5B806F',
-    fontSize: 10,
+    color: '#64748B',
+    fontSize: 12,
     fontWeight: '800',
   },
   speechArrow: {
@@ -395,7 +393,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 18,
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: '900',
     color: '#7566C9',
   },
@@ -409,6 +407,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 3,
     borderColor: '#FFFFFF',
   },
@@ -416,8 +415,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     right: 10,
-    fontSize: 16,
-    color: '#17765D',
+    fontSize: 17,
+    color: '#1B7F66',
     fontWeight: '900',
   },
   moodFace: {
@@ -437,7 +436,8 @@ const styles = StyleSheet.create({
   shadow: {
     width: 120,
     height: 120,
-    borderRadius: 60,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     backgroundColor: 'rgba(44, 75, 61, 0.12)',
     transform: [{ scaleY: 0.15 }],
     marginTop: -59,
@@ -450,14 +450,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     paddingHorizontal: 13,
     paddingVertical: 10,
-    borderRadius: 19,
+    borderRadius: 20,
+    borderCurve: 'continuous',
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#D8E8E0',
-    shadowColor: '#476657',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    borderColor: '#E2E8F0',
+    boxShadow: shadow.card,
   },
   growthRow: {
     flexDirection: 'row',
@@ -488,29 +486,32 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   scoreValue: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#64748B',
     fontWeight: '800',
     textAlign: 'right',
   },
   progressBarTrack: {
     height: 14,
-    backgroundColor: '#E6EFEA',
-    borderRadius: 8,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 999,
+    borderCurve: 'continuous',
     borderBottomWidth: 3,
-    borderBottomColor: '#D3E2DA',
+    borderBottomColor: '#E2E8F0',
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#22A07D',
+    backgroundColor: '#1B7F66',
     borderRadius: 8,
+    borderCurve: 'continuous',
   },
   progressShine: {
     marginTop: 3,
     marginHorizontal: 6,
     height: 4,
-    borderRadius: 2,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     backgroundColor: 'rgba(255, 255, 255, 0.45)',
   },
   todayRow: {
@@ -522,7 +523,7 @@ const styles = StyleSheet.create({
   todayPoints: {
     flex: 1,
     fontSize: 12,
-    color: '#17765D',
+    color: '#1B7F66',
     fontWeight: '900',
   },
   chip: {
@@ -531,7 +532,8 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 9,
     paddingVertical: 4,
-    borderRadius: 10,
+    borderRadius: 12,
+    borderCurve: 'continuous',
     backgroundColor: '#F1F5F9',
   },
   chipText: {

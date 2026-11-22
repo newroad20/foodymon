@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
+import { CATEGORY_COLORS as C } from '@/constants/theme';
 import { BACKFILL_COST, emotionOptions } from '@/constants/foodymonData';
 
 const SLEEP_CHOICES = [4, 5, 6, 7, 8, 9, 10];
@@ -141,8 +141,9 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderCurve: 'continuous',
     padding: 24,
     maxHeight: '85%',
   },
@@ -154,21 +155,21 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: '#2D3748',
+    color: '#1E293B',
     fontWeight: '900',
   },
   closeBtn: {
     padding: 6,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748B',
     marginBottom: 16,
     lineHeight: 20,
     fontWeight: '600',
   },
   label: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#334155',
     marginBottom: 8,
     fontWeight: '900',
@@ -182,7 +183,8 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
     backgroundColor: '#F8FAFC',
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   chipTextActive: {
-    color: '#17765D',
+    color: '#1B7F66',
   },
   cost: {
     marginTop: 8,
@@ -210,6 +212,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     backgroundColor: '#1B7F66',
     borderRadius: 16,
+    borderCurve: 'continuous',
     paddingVertical: 14,
     alignItems: 'center',
     borderBottomWidth: 4,

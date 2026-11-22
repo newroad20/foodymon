@@ -123,13 +123,13 @@ export function DailyDiaryModal({ onClose }: DailyDiaryModalProps) {
         <View style={styles.sheet}>
           <View style={styles.handle} />
           <View style={styles.header}>
-            <View style={styles.headerIcon}><Ionicons name="book" size={22} color="#277B62" /></View>
+            <View style={styles.headerIcon}><Ionicons name="book" size={22} color="#1B7F66" /></View>
             <View style={styles.headerCopy}>
               <Text style={styles.title}>오늘의 일기장</Text>
               <Text style={styles.subtitle}>{dateLabel(todayKey)} · 내 하루를 평가 없이 정리해요</Text>
             </View>
             <TouchableOpacity style={styles.closeBtn} onPress={handleClose} accessibilityLabel="일기장 닫기" hitSlop={8}>
-              <Ionicons name="close" size={22} color="#61756B" />
+              <Ionicons name="close" size={22} color="#64748B" />
             </TouchableOpacity>
           </View>
 
@@ -155,13 +155,13 @@ export function DailyDiaryModal({ onClose }: DailyDiaryModalProps) {
                 value={draft}
                 onChangeText={setDraft}
                 placeholder="오늘 먹고, 자고, 느끼면서 어떤 생각이 들었어? 잘한 점보다 기억하고 싶은 마음을 편하게 적어 줘."
-                placeholderTextColor="#98A69F"
+                placeholderTextColor="#64748B"
                 multiline
                 maxLength={2000}
                 textAlignVertical="top"
               />
               <View style={styles.saveRow}>
-                <Ionicons name={saveState === 'error' ? 'cloud-offline-outline' : 'cloud-done-outline'} size={14} color={saveState === 'error' ? '#B45309' : '#6F8278'} />
+                <Ionicons name={saveState === 'error' ? 'cloud-offline-outline' : 'cloud-done-outline'} size={14} color={saveState === 'error' ? '#B45309' : '#64748B'} />
                 <Text style={[styles.saveText, saveState === 'error' && styles.saveTextError]}>{statusCopy}</Text>
                 <Text style={styles.countText}>{draft.length}/2000</Text>
               </View>
@@ -189,7 +189,7 @@ export function DailyDiaryModal({ onClose }: DailyDiaryModalProps) {
 function SummaryRow({ icon, label, value }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; value: string }) {
   return (
     <View style={styles.summaryRow}>
-      <Ionicons name={icon} size={17} color="#4F806B" />
+      <Ionicons name={icon} size={17} color="#64748B" />
       <Text style={styles.summaryLabel}>{label}</Text>
       <Text style={styles.summaryValue} numberOfLines={2}>{value}</Text>
     </View>
@@ -198,33 +198,33 @@ function SummaryRow({ icon, label, value }: { icon: React.ComponentProps<typeof 
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(24,40,33,0.5)', justifyContent: 'flex-end' },
-  sheet: { height: '92%', backgroundColor: '#F5FAF7', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingTop: 10, paddingHorizontal: 16 },
-  handle: { width: 42, height: 5, borderRadius: 3, backgroundColor: '#D2E0D9', alignSelf: 'center', marginBottom: 12 },
+  sheet: { height: '92%', backgroundColor: '#F2F8F4', borderTopLeftRadius: 28, borderTopRightRadius: 28, borderCurve: 'continuous', paddingTop: 10, paddingHorizontal: 16 },
+  handle: { width: 42, height: 5, borderRadius: 999, borderCurve: 'continuous', backgroundColor: '#CBD5E1', alignSelf: 'center', marginBottom: 12 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
-  headerIcon: { width: 44, height: 44, borderRadius: 15, backgroundColor: '#DFF2E9', alignItems: 'center', justifyContent: 'center' },
+  headerIcon: { width: 44, height: 44, borderRadius: 16, borderCurve: 'continuous', backgroundColor: '#E3F6EF', alignItems: 'center', justifyContent: 'center' },
   headerCopy: { flex: 1 },
-  title: { color: '#263A31', fontSize: 19, fontWeight: '900' },
-  subtitle: { color: '#74877E', fontSize: 11, fontWeight: '700', marginTop: 2 },
-  closeBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DCE8E2', alignItems: 'center', justifyContent: 'center' },
+  title: { color: '#1E293B', fontSize: 20, fontWeight: '900' },
+  subtitle: { color: '#64748B', fontSize: 12, fontWeight: '700', marginTop: 2 },
+  closeBtn: { width: 38, height: 38, borderRadius: 999, borderCurve: 'continuous', backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E2E8F0', alignItems: 'center', justifyContent: 'center' },
   scroll: { flex: 1 },
   content: { paddingBottom: 32, gap: 12 },
-  summaryCard: { backgroundColor: '#FFFFFF', borderRadius: 18, borderWidth: 2, borderBottomWidth: 4, borderColor: '#DCE8E2', padding: 14, gap: 10 },
+  summaryCard: { backgroundColor: '#FFFFFF', borderRadius: 20, borderCurve: 'continuous', borderWidth: 2, borderBottomWidth: 4, borderColor: '#E2E8F0', padding: 14, gap: 10 },
   summaryRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
-  summaryLabel: { width: 32, color: '#4F806B', fontSize: 12, fontWeight: '900' },
-  summaryValue: { flex: 1, color: '#43584E', fontSize: 12, fontWeight: '700', lineHeight: 17 },
-  sectionTitle: { color: '#354A40', fontSize: 14, fontWeight: '900' },
+  summaryLabel: { width: 32, color: '#64748B', fontSize: 12, fontWeight: '900' },
+  summaryValue: { flex: 1, color: '#475569', fontSize: 12, fontWeight: '700', lineHeight: 17 },
+  sectionTitle: { color: '#334155', fontSize: 15, fontWeight: '900' },
   prompts: { gap: 7, paddingBottom: 2 },
-  prompt: { borderRadius: 16, paddingHorizontal: 12, paddingVertical: 9, backgroundColor: '#E5F3EC', borderWidth: 1, borderColor: '#CEE5DA' },
-  promptText: { color: '#36735D', fontSize: 12, fontWeight: '800' },
-  editorCard: { backgroundColor: '#FFFFFF', borderRadius: 19, borderWidth: 2, borderBottomWidth: 4, borderColor: '#DCE8E2', overflow: 'hidden' },
-  input: { minHeight: 210, color: '#2C4036', fontSize: 15, fontWeight: '600', lineHeight: 23, padding: 16 },
-  saveRow: { flexDirection: 'row', alignItems: 'center', gap: 5, borderTopWidth: 1, borderTopColor: '#EDF3F0', paddingHorizontal: 14, paddingVertical: 9 },
-  saveText: { color: '#6F8278', fontSize: 11, fontWeight: '700' },
+  prompt: { borderRadius: 16, borderCurve: 'continuous', paddingHorizontal: 12, paddingVertical: 9, backgroundColor: '#E3F6EF', borderWidth: 1, borderColor: '#CBD5E1' },
+  promptText: { color: '#1B7F66', fontSize: 12, fontWeight: '800' },
+  editorCard: { backgroundColor: '#FFFFFF', borderRadius: 20, borderCurve: 'continuous', borderWidth: 2, borderBottomWidth: 4, borderColor: '#E2E8F0', overflow: 'hidden' },
+  input: { minHeight: 210, color: '#1E293B', fontSize: 15, fontWeight: '600', lineHeight: 23, padding: 16 },
+  saveRow: { flexDirection: 'row', alignItems: 'center', gap: 5, borderTopWidth: 1, borderTopColor: '#E2E8F0', paddingHorizontal: 14, paddingVertical: 9 },
+  saveText: { color: '#64748B', fontSize: 12, fontWeight: '700' },
   saveTextError: { color: '#B45309' },
-  countText: { marginLeft: 'auto', color: '#93A29A', fontSize: 10, fontWeight: '700' },
+  countText: { marginLeft: 'auto', color: '#64748B', fontSize: 12, fontWeight: '700', fontVariant: ['tabular-nums'] },
   recentSection: { gap: 8 },
-  recentCard: { backgroundColor: '#FFFFFF', borderRadius: 15, padding: 13, borderWidth: 2, borderBottomWidth: 4, borderColor: '#E0EAE5' },
-  recentDate: { color: '#4F806B', fontSize: 11, fontWeight: '900', marginBottom: 5 },
-  recentText: { color: '#53675D', fontSize: 13, fontWeight: '600', lineHeight: 19 },
-  privacy: { color: '#8A9A92', fontSize: 10, fontWeight: '600', textAlign: 'center', marginTop: 2 },
+  recentCard: { backgroundColor: '#FFFFFF', borderRadius: 16, borderCurve: 'continuous', padding: 13, borderWidth: 2, borderBottomWidth: 4, borderColor: '#E2E8F0' },
+  recentDate: { color: '#64748B', fontSize: 12, fontWeight: '900', marginBottom: 5 },
+  recentText: { color: '#475569', fontSize: 13, fontWeight: '600', lineHeight: 19 },
+  privacy: { color: '#64748B', fontSize: 12, fontWeight: '600', textAlign: 'center', marginTop: 2 },
 });

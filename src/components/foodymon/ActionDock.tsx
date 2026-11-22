@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
+import { CATEGORY_COLORS as C, shadow } from '@/constants/theme';
 
 interface ActionDockProps {
   onOpenMeal: () => void;
@@ -40,7 +40,7 @@ export function ActionDock({
             { label: '식사', icon: 'restaurant', color: C.meal.bg, ink: C.meal.ink, edge: C.meal.edge, onPress: onOpenMeal },
             { label: '수면', icon: 'moon', color: C.sleep.bg, ink: C.sleep.ink, edge: C.sleep.edge, onPress: onOpenSleep },
             { label: '마음', icon: 'happy', color: C.mind.bg, ink: C.mind.ink, edge: C.mind.edge, onPress: onOpenEmotion },
-            { label: '꾸미기', icon: 'shirt', color: '#DFF2EE', ink: '#287D68', edge: '#BFDED5', onPress: onOpenBag },
+            { label: '꾸미기', icon: 'shirt', color: '#E3F6EF', ink: '#1B7F66', edge: '#B5E6D4', onPress: onOpenBag },
           ].map((a) => (
             <Pressable key={a.label} style={styles.actionBtn} onPress={a.onPress} accessibilityRole="button" accessibilityLabel={a.label}>
               {({ pressed }) => (
@@ -77,6 +77,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
@@ -88,17 +89,14 @@ const styles = StyleSheet.create({
   dockCard: {
     width: '100%',
     backgroundColor: 'rgba(255,255,255,0.94)',
-    borderRadius: 26,
+    borderRadius: 28,
+    borderCurve: 'continuous',
     paddingHorizontal: 14,
     paddingTop: 13,
     paddingBottom: 12,
     borderWidth: 1,
     borderColor: 'rgba(206, 222, 214, 0.9)',
-    shadowColor: '#3F5E50',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.13,
-    shadowRadius: 16,
-    elevation: 6,
+    boxShadow: shadow.floating,
   },
   dockHeading: {
     flexDirection: 'row',
@@ -108,13 +106,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dockTitle: {
-    color: '#263A31',
+    color: '#1E293B',
     fontSize: 15,
     fontWeight: '900',
   },
   dockHint: {
-    color: '#8A9991',
-    fontSize: 10,
+    color: '#64748B',
+    fontSize: 12,
     fontWeight: '700',
   },
   dock: {
@@ -133,7 +131,8 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 54,
     height: 54,
-    borderRadius: 18,
+    borderRadius: 20,
+    borderCurve: 'continuous',
     borderWidth: 1.5,
     borderBottomWidth: 3,
     justifyContent: 'center',
@@ -146,7 +145,7 @@ const styles = StyleSheet.create({
   },
   actionLabel: {
     fontSize: 12,
-    color: '#43564D',
+    color: '#475569',
     fontWeight: '900',
   },
 });

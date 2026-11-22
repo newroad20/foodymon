@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
   card: {
     padding: 20,
     borderRadius: 20,
+    borderCurve: 'continuous',
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
     borderBottomWidth: 4,
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   body: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#475569',
     fontWeight: '700',
     marginBottom: 6,
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 6,
     fontSize: 13,
-    color: '#17765D',
+    color: '#1B7F66',
     fontWeight: '800',
   },
   note: {
@@ -100,6 +101,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingVertical: 14,
     borderRadius: 16,
+    borderCurve: 'continuous',
     backgroundColor: '#1B7F66',
     alignItems: 'center',
   },
@@ -108,7 +110,7 @@ const styles = StyleSheet.create({
   },
   primaryText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '900',
   },
   secondary: {
@@ -117,7 +119,7 @@ const styles = StyleSheet.create({
   },
   secondaryText: {
     color: '#64748B',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
   },
 });

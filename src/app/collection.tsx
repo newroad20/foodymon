@@ -80,7 +80,7 @@ export default function CollectionScreen() {
 
         {section === 'evolution' &&
           (loading ? (
-            <ActivityIndicator style={styles.loader} color="#17765D" />
+            <ActivityIndicator style={styles.loader} color="#1B7F66" />
           ) : (
             <>
               <Text style={styles.progress}>
@@ -148,7 +148,7 @@ export default function CollectionScreen() {
 
         {section === 'badges' &&
           (loading ? (
-            <ActivityIndicator style={styles.loader} color="#17765D" />
+            <ActivityIndicator style={styles.loader} color="#1B7F66" />
           ) : (
             <>
               <View style={styles.shieldCard}>
@@ -174,7 +174,7 @@ export default function CollectionScreen() {
                   const got = earned.has(b.id);
                   return (
                     <View key={b.id} style={[styles.badgeCard, !got && styles.locked]}>
-                      <Ionicons name={got ? b.icon : 'lock-closed'} size={30} color={got ? '#1B7F66' : '#94A3B8'} style={!got && styles.lockedIcon} />
+                      <Ionicons name={got ? b.icon : 'lock-closed'} size={30} color={got ? '#1B7F66' : '#64748B'} style={!got && styles.lockedIcon} />
                       <Text style={styles.badgeName}>{b.name}</Text>
                       <Text style={styles.badgeDesc}>{b.description}</Text>
                     </View>
@@ -231,7 +231,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 8,
     backgroundColor: '#F1F5F9',
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     padding: 4,
   },
   segmentBtn: {
@@ -239,7 +240,8 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: 'center',
     paddingVertical: 8,
-    borderRadius: 10,
+    borderRadius: 12,
+    borderCurve: 'continuous',
     alignItems: 'center',
   },
   segmentBtnActive: {
@@ -272,6 +274,7 @@ const styles = StyleSheet.create({
     color: '#1E293B',
     marginBottom: 12,
     fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   progressGap: {
     marginTop: 20,
@@ -286,6 +289,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
+    borderCurve: 'continuous',
     padding: 14,
     alignItems: 'center',
     gap: 2,
@@ -296,17 +300,17 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   levelNo: {
-    fontSize: 11,
-    color: '#17765D',
+    fontSize: 12,
+    color: '#1B7F66',
     fontWeight: '800',
   },
   levelName: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#1E293B',
     fontWeight: '900',
   },
   levelMeta: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#64748B',
     fontWeight: '600',
   },
@@ -321,7 +325,8 @@ const styles = StyleSheet.create({
     width: '31%',
     flexGrow: 1,
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
+    borderRadius: 20,
+    borderCurve: 'continuous',
     paddingVertical: 14,
     alignItems: 'center',
     gap: 4,
@@ -329,7 +334,8 @@ const styles = StyleSheet.create({
   itemArt: {
     width: 48,
     height: 48,
-    borderRadius: 10,
+    borderRadius: 12,
+    borderCurve: 'continuous',
   },
   itemName: {
     fontSize: 13,
@@ -337,7 +343,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   itemMeta: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#64748B',
     fontWeight: '600',
   },
@@ -353,6 +359,7 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
+    borderCurve: 'continuous',
     padding: 16,
     marginBottom: 12,
   },
@@ -375,6 +382,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
+    borderCurve: 'continuous',
     paddingVertical: 14,
     marginBottom: 20,
   },
@@ -384,12 +392,12 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   summaryValue: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#334155',
     fontWeight: '900',
   },
   summaryLabel: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#64748B',
     fontWeight: '600',
   },
@@ -397,7 +405,8 @@ const styles = StyleSheet.create({
     width: '31%',
     flexGrow: 1,
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
+    borderRadius: 20,
+    borderCurve: 'continuous',
     padding: 12,
     alignItems: 'center',
     gap: 4,
@@ -409,7 +418,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   badgeDesc: {
-    fontSize: 10,
+    fontSize: 12,
     lineHeight: 14,
     color: '#64748B',
     textAlign: 'center',

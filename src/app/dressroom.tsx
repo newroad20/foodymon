@@ -122,7 +122,7 @@ export default function DressroomScreen() {
         onPress={handleGiftBox}
         accessibilityRole="button"
         accessibilityLabel={`숲의 선물 상자, 젤리 ${GIFT_BOX_COST}개`}>
-        <Ionicons name="gift" size={26} color="#FF9600" />
+        <Ionicons name="gift" size={26} color="#C97719" />
         <View style={styles.giftText}>
           <Text style={styles.giftTitle}>숲의 선물 상자</Text>
           <Text style={styles.giftSub}>{allOwned ? '선물을 모두 모았어요!' : '아직 없는 아이템 하나가 무작위로 나와요'}</Text>
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 2,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
   },
   jelly: {
     position: 'absolute',
@@ -222,15 +222,17 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 2,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
     backgroundColor: '#FFFFFF', // readable over the room art
   },
   jellyText: {
     fontSize: 13,
     fontWeight: '900',
     color: '#334155',
+    fontVariant: ['tabular-nums'],
   },
   pet: {
     width: 200,
@@ -242,11 +244,12 @@ const styles = StyleSheet.create({
     left: 16,
     fontSize: 12,
     fontWeight: '800',
-    color: '#17765D',
+    color: '#1B7F66',
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 10,
+    borderRadius: 12,
+    borderCurve: 'continuous',
     overflow: 'hidden',
   },
   giftBox: {
@@ -256,11 +259,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 10,
     padding: 14,
-    borderRadius: 18,
+    borderRadius: 20,
+    borderCurve: 'continuous',
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#FFD9A8',
+    borderColor: '#F3D39C',
   },
   giftBoxPressed: {
     borderBottomWidth: 2,
@@ -294,9 +298,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 12,
+    borderCurve: 'continuous',
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
     backgroundColor: '#FFFFFF',
   },
   tabActive: {
@@ -304,7 +309,7 @@ const styles = StyleSheet.create({
     borderColor: '#125A48',
   },
   tabText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '800',
     color: '#64748B',
   },
@@ -326,9 +331,10 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingVertical: 14,
     borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
     backgroundColor: '#FFFFFF',
   },
   tileOn: {
@@ -336,7 +342,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E3F6EF',
   },
   tileTrying: {
-    borderColor: '#1CB0F6',
+    borderColor: '#286FA3',
   },
   check: {
     position: 'absolute',
@@ -344,7 +350,8 @@ const styles = StyleSheet.create({
     right: 6,
     width: 18,
     height: 18,
-    borderRadius: 9,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#1B7F66',
@@ -353,6 +360,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 12,
+    borderCurve: 'continuous',
   },
   locked: {
     opacity: 0.45,
@@ -363,9 +371,9 @@ const styles = StyleSheet.create({
     color: '#334155',
   },
   tileMeta: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
-    color: '#17765D',
+    color: '#1B7F66',
   },
   price: {
     flexDirection: 'row',
@@ -388,15 +396,16 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 2,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
   },
   cancelBtn: {
     paddingHorizontal: 18,
     justifyContent: 'center',
     borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
   },
   cancelText: {
     fontSize: 15,
@@ -408,6 +417,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
     borderRadius: 16,
+    borderCurve: 'continuous',
     backgroundColor: '#1B7F66',
     borderBottomWidth: 4,
     borderBottomColor: '#125A48',
@@ -420,7 +430,7 @@ const styles = StyleSheet.create({
     opacity: 0.45,
   },
   buyText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '900',
     color: '#FFFFFF',
   },

@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { toDateKey } from '@/lib/dayRollover';
 import { clearSmallGoal, fetchSmallGoal, saveSmallGoal, type GoalKind, type SmallGoalInfo } from '@/lib/gameApi';
+import { shadow } from '@/constants/theme';
 
 const shift = (hhmm: string, delta: number) => {
   const [h, m] = hhmm.split(':').map(Number);
@@ -180,7 +181,7 @@ export function GoalCard() {
               <>
                 {autoPrompt && (
                   <View style={styles.promptBox}>
-                    <Ionicons name="sparkles" size={19} color="#17765D" />
+                    <Ionicons name="sparkles" size={19} color="#1B7F66" />
                     <Text style={styles.promptBoxText}>{promptCopy}</Text>
                   </View>
                 )}
@@ -225,14 +226,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 18,
+    borderRadius: 20,
+    borderCurve: 'continuous',
     backgroundColor: 'rgba(255,255,255,0.9)',
     borderWidth: 1,
-    borderColor: '#D8E8E0',
-    shadowColor: '#476657',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
+    borderColor: '#E2E8F0',
+    boxShadow: shadow.card,
   },
   cardLeft: {
     flex: 1,
@@ -242,13 +241,13 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     flexShrink: 1,
-    fontSize: 14,
-    color: '#30463B',
+    fontSize: 15,
+    color: '#1E293B',
     fontWeight: '900',
   },
   cardMeta: {
     fontSize: 13,
-    color: '#17765D',
+    color: '#1B7F66',
     fontWeight: '800',
   },
   overlay: {
@@ -258,8 +257,9 @@ const styles = StyleSheet.create({
   },
   sheet: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderCurve: 'continuous',
     padding: 24,
     paddingBottom: 36,
     gap: 12,
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: '#2D3748',
+    color: '#1E293B',
     fontWeight: '900',
   },
   closeBtn: {
@@ -289,14 +289,15 @@ const styles = StyleSheet.create({
     gap: 9,
     padding: 14,
     borderRadius: 16,
+    borderCurve: 'continuous',
     backgroundColor: '#E3F6EF',
     borderWidth: 1,
     borderColor: '#B5E6D4',
   },
   promptBoxText: {
     flex: 1,
-    fontSize: 14,
-    color: '#2E594A',
+    fontSize: 15,
+    color: '#1B7F66',
     fontWeight: '800',
     lineHeight: 20,
   },
@@ -304,10 +305,11 @@ const styles = StyleSheet.create({
     gap: 6,
     padding: 14,
     borderRadius: 16,
+    borderCurve: 'continuous',
     backgroundColor: '#E3F6EF',
   },
   boxTitle: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#1E293B',
     fontWeight: '900',
   },
@@ -324,8 +326,8 @@ const styles = StyleSheet.create({
   },
   now: {
     marginTop: 4,
-    fontSize: 14,
-    color: '#17765D',
+    fontSize: 15,
+    color: '#1B7F66',
     fontWeight: '900',
   },
   row: {
@@ -335,7 +337,8 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
     backgroundColor: '#F8FAFC',
@@ -345,12 +348,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#E3F6EF',
   },
   chipText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#475569',
     fontWeight: '800',
   },
   chipTextActive: {
-    color: '#17765D',
+    color: '#1B7F66',
   },
   option: {
     flexDirection: 'row',
@@ -358,34 +361,36 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 14,
     borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
   },
   optionText: {
     flex: 1,
     gap: 4,
   },
   badge: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#FFFFFF',
     backgroundColor: '#1B7F66',
     fontWeight: '900',
   },
   startText: {
-    fontSize: 14,
-    color: '#17765D',
+    fontSize: 15,
+    color: '#1B7F66',
     fontWeight: '900',
   },
   secondary: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: 12,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     backgroundColor: '#F1F5F9',
   },
   secondaryText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#475569',
     fontWeight: '800',
   },
@@ -393,11 +398,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
     alignItems: 'center',
     paddingVertical: 12,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     backgroundColor: '#1B7F66',
   },
   primaryText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#FFFFFF',
     fontWeight: '900',
   },

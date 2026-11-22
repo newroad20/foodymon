@@ -1,7 +1,7 @@
 import { CostumeItem, BackgroundItem, QuizQuestion, LevelInfo } from '@/types/foodymon';
 import type { ImageSourcePropType } from 'react-native';
 import type { Emotion, MealStatus, Situation } from '@/lib/growth';
-import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
+import { CATEGORY_COLORS as C } from '@/constants/theme';
 
 export const levelsData: LevelInfo[] = [
   { level: 1, maxScore: 19, name: '푹 쉬는 푸디몬', image: require('@/assets/images/level1.png') },
@@ -260,7 +260,7 @@ export const tutorialPages = [
   },
   {
     icon: 'shirt',
-    color: '#1CB0F6',
+    color: '#286FA3',
     title: '우리만의 방',
     line: '모은 이슬방울로 "꾸미기"에서\n옷과 소품을 골라 봐.\n자, 이제 숲 생활을 시작하자!',
   },

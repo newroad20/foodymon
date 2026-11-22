@@ -62,7 +62,7 @@ export function JourneyCard() {
         value={text}
         onChangeText={setText}
         placeholder="기록하면서 달라진 점을 편하게 적어 줘"
-        placeholderTextColor="#94A3B8"
+        placeholderTextColor="#64748B"
         maxLength={1000}
         multiline
       />
@@ -87,15 +87,16 @@ function Stat({ value, label }: { value: string; label: string }) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
+    borderRadius: 28,
+    borderCurve: 'continuous',
     padding: 20,
     gap: 10,
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
   },
   title: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#1E293B',
     fontWeight: '900',
   },
@@ -108,8 +109,8 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   statValue: {
-    fontSize: 18,
-    color: '#17765D',
+    fontSize: 17,
+    color: '#1B7F66',
     fontWeight: '900',
   },
   statLabel: {
@@ -133,7 +134,8 @@ const styles = StyleSheet.create({
     minHeight: 72,
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
@@ -145,14 +147,15 @@ const styles = StyleSheet.create({
   btn: {
     alignItems: 'center',
     paddingVertical: 12,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     backgroundColor: '#1B7F66',
   },
   btnOff: {
     opacity: 0.5,
   },
   btnText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#FFFFFF',
     fontWeight: '900',
   },

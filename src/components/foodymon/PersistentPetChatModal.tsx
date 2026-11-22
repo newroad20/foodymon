@@ -178,7 +178,7 @@ export function PersistentPetChatModal({ onClose }: PetChatModalProps) {
           <View style={styles.header}>
             {panel === 'settings' ? (
               <TouchableOpacity style={styles.headerBtn} onPress={() => setPanel('chat')} accessibilityLabel="대화로 돌아가기">
-                <Ionicons name="arrow-back" size={21} color="#61756B" />
+                <Ionicons name="arrow-back" size={21} color="#64748B" />
               </TouchableOpacity>
             ) : (
               <View style={styles.petBadge}>
@@ -198,30 +198,30 @@ export function PersistentPetChatModal({ onClose }: PetChatModalProps) {
             </View>
             {panel === 'chat' && storageMode !== 'loading' && storageMode !== 'undecided' && (
               <TouchableOpacity style={styles.headerBtn} onPress={() => setPanel('settings')} accessibilityLabel="대화 저장 설정">
-                <Ionicons name="shield-checkmark-outline" size={20} color="#4F806B" />
+                <Ionicons name="shield-checkmark-outline" size={20} color="#64748B" />
               </TouchableOpacity>
             )}
             <TouchableOpacity style={styles.headerBtn} onPress={onClose} accessibilityLabel="대화 닫기">
-              <Ionicons name="close" size={22} color="#61756B" />
+              <Ionicons name="close" size={22} color="#64748B" />
             </TouchableOpacity>
           </View>
 
           {notice && (
             <TouchableOpacity style={styles.notice} onPress={() => setNotice(null)}>
               <Text style={styles.noticeText}>{notice}</Text>
-              <Ionicons name="close" size={14} color="#657B70" />
+              <Ionicons name="close" size={14} color="#64748B" />
             </TouchableOpacity>
           )}
 
           {storageMode === 'loading' ? (
             <View style={styles.centerState}>
-              <ActivityIndicator size="large" color="#277B62" />
+              <ActivityIndicator size="large" color="#1B7F66" />
               <Text style={styles.centerText}>지난 대화를 불러오고 있어요…</Text>
             </View>
           ) : storageMode === 'undecided' ? (
             <View style={styles.consentPanel}>
               <View style={styles.consentIcon}>
-                <Ionicons name="chatbubbles" size={32} color="#277B62" />
+                <Ionicons name="chatbubbles" size={32} color="#1B7F66" />
               </View>
               <Text style={styles.consentTitle}>다음에도 이야기를 이어갈까요?</Text>
               <Text style={styles.consentText}>
@@ -257,18 +257,18 @@ export function PersistentPetChatModal({ onClose }: PetChatModalProps) {
                 </TouchableOpacity>
               </View>
               <View style={styles.infoCard}>
-                <Ionicons name="lock-closed-outline" size={19} color="#4F806B" />
+                <Ionicons name="lock-closed-outline" size={19} color="#64748B" />
                 <Text style={styles.infoText}>저장된 대화는 본인 계정에서만 볼 수 있고 외부 AI에는 전송하지 않아요.</Text>
               </View>
               <TouchableOpacity style={styles.deleteBtn} onPress={confirmDelete}>
-                <Ionicons name="trash-outline" size={19} color="#B64646" />
+                <Ionicons name="trash-outline" size={19} color="#DC2626" />
                 <Text style={styles.deleteBtnText}>저장된 대화 전체 삭제</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <>
               <View style={styles.contextCard}>
-                <Ionicons name="sparkles" size={15} color="#4F8D75" />
+                <Ionicons name="sparkles" size={15} color="#1B7F66" />
                 <Text style={styles.contextText}>
                   오늘 나눈 것 · 수면 {state.records.sleep ? 1 : 0} · 식사 {state.records.meals.length} · 마음 {state.records.minds.length}
                 </Text>
@@ -297,7 +297,7 @@ export function PersistentPetChatModal({ onClose }: PetChatModalProps) {
                   value={draft}
                   onChangeText={setDraft}
                   placeholder="푸디몬에게 이야기하기"
-                  placeholderTextColor="#96A49D"
+                  placeholderTextColor="#64748B"
                   multiline
                   maxLength={300}
                   onSubmitEditing={() => send(draft)}
@@ -320,7 +320,7 @@ export function PersistentPetChatModal({ onClose }: PetChatModalProps) {
 function ConsentPoint({ icon, text }: { icon: React.ComponentProps<typeof Ionicons>['name']; text: string }) {
   return (
     <View style={styles.consentPoint}>
-      <Ionicons name={icon} size={18} color="#4F806B" />
+      <Ionicons name={icon} size={18} color="#64748B" />
       <Text style={styles.consentPointText}>{text}</Text>
     </View>
   );
@@ -328,63 +328,63 @@ function ConsentPoint({ icon, text }: { icon: React.ComponentProps<typeof Ionico
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(24,40,33,0.5)', justifyContent: 'flex-end' },
-  sheet: { height: '88%', backgroundColor: '#F5FAF7', borderTopLeftRadius: 30, borderTopRightRadius: 30, paddingTop: 10, paddingHorizontal: 16, paddingBottom: 12 },
-  handle: { width: 42, height: 5, borderRadius: 3, backgroundColor: '#D2E0D9', alignSelf: 'center', marginBottom: 11 },
+  sheet: { height: '88%', backgroundColor: '#F2F8F4', borderTopLeftRadius: 28, borderTopRightRadius: 28, borderCurve: 'continuous', paddingTop: 10, paddingHorizontal: 16, paddingBottom: 12 },
+  handle: { width: 42, height: 5, borderRadius: 999, borderCurve: 'continuous', backgroundColor: '#CBD5E1', alignSelf: 'center', marginBottom: 11 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 11 },
-  petBadge: { width: 50, height: 50, borderRadius: 18, backgroundColor: '#DFF2E9', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' },
+  petBadge: { width: 50, height: 50, borderRadius: 20, borderCurve: 'continuous', backgroundColor: '#E3F6EF', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' },
   petImage: { width: 54, height: 54 },
-  onlineDot: { position: 'absolute', right: 4, bottom: 4, width: 9, height: 9, borderRadius: 5, backgroundColor: '#3E9D78', borderWidth: 2, borderColor: '#FFFFFF' },
+  onlineDot: { position: 'absolute', right: 4, bottom: 4, width: 9, height: 9, borderRadius: 999, borderCurve: 'continuous', backgroundColor: '#1B7F66', borderWidth: 2, borderColor: '#FFFFFF' },
   headerCopy: { flex: 1 },
-  title: { color: '#263A31', fontSize: 18, fontWeight: '900' },
-  status: { color: '#74877E', fontSize: 11, fontWeight: '700', marginTop: 2 },
-  headerBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DCE8E2', alignItems: 'center', justifyContent: 'center' },
-  notice: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FFF4D9', borderRadius: 13, paddingHorizontal: 11, paddingVertical: 8, marginBottom: 8 },
-  noticeText: { flex: 1, color: '#79612E', fontSize: 11, fontWeight: '700' },
+  title: { color: '#1E293B', fontSize: 17, fontWeight: '900' },
+  status: { color: '#64748B', fontSize: 12, fontWeight: '700', marginTop: 2 },
+  headerBtn: { width: 38, height: 38, borderRadius: 999, borderCurve: 'continuous', backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E2E8F0', alignItems: 'center', justifyContent: 'center' },
+  notice: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FFF0D7', borderRadius: 12, borderCurve: 'continuous', paddingHorizontal: 11, paddingVertical: 8, marginBottom: 8 },
+  noticeText: { flex: 1, color: '#B45309', fontSize: 12, fontWeight: '700' },
   centerState: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  centerText: { color: '#74877E', fontSize: 13, fontWeight: '700' },
+  centerText: { color: '#64748B', fontSize: 13, fontWeight: '700' },
   consentPanel: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16 },
-  consentIcon: { width: 76, height: 76, borderRadius: 26, backgroundColor: '#DFF2E9', alignItems: 'center', justifyContent: 'center', marginBottom: 18 },
-  consentTitle: { color: '#263A31', fontSize: 21, fontWeight: '900', textAlign: 'center', marginBottom: 10 },
-  consentText: { color: '#60746A', fontSize: 14, fontWeight: '600', lineHeight: 21, textAlign: 'center', marginBottom: 18 },
-  consentPoints: { width: '100%', backgroundColor: '#FFFFFF', borderRadius: 18, padding: 14, gap: 12, borderWidth: 1, borderColor: '#DCE8E2', marginBottom: 18 },
+  consentIcon: { width: 76, height: 76, borderRadius: 28, borderCurve: 'continuous', backgroundColor: '#E3F6EF', alignItems: 'center', justifyContent: 'center', marginBottom: 18 },
+  consentTitle: { color: '#1E293B', fontSize: 22, fontWeight: '900', textAlign: 'center', marginBottom: 10 },
+  consentText: { color: '#64748B', fontSize: 15, fontWeight: '600', lineHeight: 21, textAlign: 'center', marginBottom: 18 },
+  consentPoints: { width: '100%', backgroundColor: '#FFFFFF', borderRadius: 20, borderCurve: 'continuous', padding: 14, gap: 12, borderWidth: 1, borderColor: '#E2E8F0', marginBottom: 18 },
   consentPoint: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  consentPointText: { color: '#475E53', fontSize: 13, fontWeight: '800' },
-  primaryBtn: { width: '100%', borderRadius: 17, backgroundColor: '#277B62', paddingVertical: 15, alignItems: 'center', borderBottomWidth: 4, borderBottomColor: '#185842' },
+  consentPointText: { color: '#475569', fontSize: 13, fontWeight: '800' },
+  primaryBtn: { width: '100%', borderRadius: 16, borderCurve: 'continuous', backgroundColor: '#1B7F66', paddingVertical: 15, alignItems: 'center', borderBottomWidth: 4, borderBottomColor: '#125A48' },
   primaryBtnText: { color: '#FFFFFF', fontSize: 15, fontWeight: '900' },
   secondaryBtn: { width: '100%', paddingVertical: 14, alignItems: 'center' },
-  secondaryBtnText: { color: '#64776D', fontSize: 13, fontWeight: '800' },
+  secondaryBtnText: { color: '#64748B', fontSize: 13, fontWeight: '800' },
   settingsPanel: { flex: 1, paddingTop: 8, gap: 12 },
-  settingCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#FFFFFF', borderRadius: 19, padding: 16, borderWidth: 1, borderColor: '#DCE8E2' },
+  settingCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#FFFFFF', borderRadius: 20, borderCurve: 'continuous', padding: 16, borderWidth: 1, borderColor: '#E2E8F0' },
   settingCopy: { flex: 1 },
-  settingTitle: { color: '#2C4036', fontSize: 15, fontWeight: '900', marginBottom: 4 },
-  settingDescription: { color: '#71847A', fontSize: 12, fontWeight: '600', lineHeight: 18 },
-  toggle: { width: 48, height: 28, borderRadius: 14, backgroundColor: '#CAD7D1', padding: 3 },
-  toggleOn: { backgroundColor: '#277B62' },
-  toggleKnob: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#FFFFFF' },
+  settingTitle: { color: '#1E293B', fontSize: 15, fontWeight: '900', marginBottom: 4 },
+  settingDescription: { color: '#64748B', fontSize: 12, fontWeight: '600', lineHeight: 18 },
+  toggle: { width: 48, height: 28, borderRadius: 999, borderCurve: 'continuous', backgroundColor: '#CBD5E1', padding: 3 },
+  toggleOn: { backgroundColor: '#1B7F66' },
+  toggleKnob: { width: 22, height: 22, borderRadius: 999, borderCurve: 'continuous', backgroundColor: '#FFFFFF' },
   toggleKnobOn: { alignSelf: 'flex-end' },
-  infoCard: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', backgroundColor: '#E6F4ED', borderRadius: 17, padding: 14 },
-  infoText: { flex: 1, color: '#587366', fontSize: 12, fontWeight: '700', lineHeight: 18 },
-  deleteBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 17, paddingVertical: 14, backgroundColor: '#FFF0F0', borderWidth: 1, borderColor: '#F1CCCC' },
-  deleteBtnText: { color: '#B64646', fontSize: 14, fontWeight: '900' },
-  contextCard: { flexDirection: 'row', alignItems: 'center', gap: 7, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 9, backgroundColor: '#E5F3EC', borderWidth: 1, borderColor: '#CEE5DA', marginBottom: 8 },
-  contextText: { flex: 1, color: '#537164', fontSize: 11, fontWeight: '800' },
+  infoCard: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', backgroundColor: '#E3F6EF', borderRadius: 16, borderCurve: 'continuous', padding: 14 },
+  infoText: { flex: 1, color: '#64748B', fontSize: 12, fontWeight: '700', lineHeight: 18 },
+  deleteBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 16, borderCurve: 'continuous', paddingVertical: 14, backgroundColor: '#FEE2E2', borderWidth: 1, borderColor: '#FCA5A5' },
+  deleteBtnText: { color: '#DC2626', fontSize: 15, fontWeight: '900' },
+  contextCard: { flexDirection: 'row', alignItems: 'center', gap: 7, borderRadius: 16, borderCurve: 'continuous', paddingHorizontal: 12, paddingVertical: 9, backgroundColor: '#E3F6EF', borderWidth: 1, borderColor: '#CBD5E1', marginBottom: 8 },
+  contextText: { flex: 1, color: '#64748B', fontSize: 12, fontWeight: '800' },
   messages: { flex: 1 },
   messagesContent: { paddingTop: 4, paddingBottom: 18 },
-  dayDivider: { alignSelf: 'center', color: '#93A29A', fontSize: 10, fontWeight: '800', paddingVertical: 8 },
+  dayDivider: { alignSelf: 'center', color: '#64748B', fontSize: 12, fontWeight: '800', paddingVertical: 8 },
   messageRow: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: 11, paddingRight: 44 },
   messageRowUser: { justifyContent: 'flex-end', paddingRight: 0, paddingLeft: 44 },
-  messageAvatar: { width: 30, height: 30, borderRadius: 10, marginRight: 7 },
-  bubble: { paddingHorizontal: 14, paddingVertical: 11, borderRadius: 18, maxWidth: '90%' },
-  petBubble: { backgroundColor: '#FFFFFF', borderBottomLeftRadius: 6, borderWidth: 1, borderColor: '#DFE9E4' },
-  userBubble: { backgroundColor: '#277B62', borderBottomRightRadius: 6 },
-  bubbleText: { color: '#344A40', fontSize: 14, fontWeight: '700', lineHeight: 20 },
+  messageAvatar: { width: 30, height: 30, borderRadius: 12, borderCurve: 'continuous', marginRight: 7 },
+  bubble: { paddingHorizontal: 14, paddingVertical: 11, borderRadius: 20, borderCurve: 'continuous', maxWidth: '90%' },
+  petBubble: { backgroundColor: '#FFFFFF', borderBottomLeftRadius: 8, borderCurve: 'continuous', borderWidth: 1, borderColor: '#E2E8F0' },
+  userBubble: { backgroundColor: '#1B7F66', borderBottomRightRadius: 8, borderCurve: 'continuous' },
+  bubbleText: { color: '#334155', fontSize: 15, fontWeight: '700', lineHeight: 20 },
   userBubbleText: { color: '#FFFFFF' },
   suggestions: { gap: 7, paddingVertical: 8 },
-  suggestion: { borderRadius: 16, paddingHorizontal: 13, paddingVertical: 9, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#BFDCCF' },
-  suggestionText: { color: '#36735D', fontSize: 12, fontWeight: '800' },
-  inputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, backgroundColor: '#FFFFFF', borderRadius: 20, borderWidth: 1, borderColor: '#D9E7E0', paddingLeft: 14, paddingRight: 6, paddingVertical: 6 },
-  input: { flex: 1, minHeight: 36, maxHeight: 88, color: '#2C4036', fontSize: 14, fontWeight: '600', paddingVertical: 8 },
-  sendBtn: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#277B62', alignItems: 'center', justifyContent: 'center' },
-  sendBtnDisabled: { backgroundColor: '#B7C9C0' },
-  privacyNote: { color: '#8A9A92', fontSize: 10, fontWeight: '600', textAlign: 'center', marginTop: 7 },
+  suggestion: { borderRadius: 16, borderCurve: 'continuous', paddingHorizontal: 13, paddingVertical: 9, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#CBD5E1' },
+  suggestionText: { color: '#1B7F66', fontSize: 12, fontWeight: '800' },
+  inputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, backgroundColor: '#FFFFFF', borderRadius: 20, borderCurve: 'continuous', borderWidth: 1, borderColor: '#E2E8F0', paddingLeft: 14, paddingRight: 6, paddingVertical: 6 },
+  input: { flex: 1, minHeight: 36, maxHeight: 88, color: '#1E293B', fontSize: 15, fontWeight: '600', paddingVertical: 8 },
+  sendBtn: { width: 38, height: 38, borderRadius: 999, borderCurve: 'continuous', backgroundColor: '#1B7F66', alignItems: 'center', justifyContent: 'center' },
+  sendBtnDisabled: { backgroundColor: '#CBD5E1' },
+  privacyNote: { color: '#64748B', fontSize: 12, fontWeight: '600', textAlign: 'center', marginTop: 7 },
 });

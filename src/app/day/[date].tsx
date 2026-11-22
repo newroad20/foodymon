@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
+import { CATEGORY_COLORS as C } from '@/constants/theme';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { mealStatuses, mindEmotions, mindSituations } from '@/constants/foodymonData';
@@ -185,21 +185,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#F2F8F4',
   },
   empty: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748B',
     fontWeight: '700',
   },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
+    borderCurve: 'continuous',
     padding: 16,
     gap: 8,
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#1E293B',
     fontWeight: '900',
   },
@@ -213,8 +214,9 @@ const styles = StyleSheet.create({
   },
   pointValue: {
     fontSize: 20,
-    color: '#17765D',
+    color: '#1B7F66',
     fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   pointLabel: {
     fontSize: 12,
@@ -222,7 +224,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   line: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#334155',
     fontWeight: '700',
     lineHeight: 20,
@@ -259,6 +261,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 12,
+    borderCurve: 'continuous',
     marginTop: 4,
   },
   mind: {

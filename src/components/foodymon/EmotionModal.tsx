@@ -160,7 +160,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
               <HintInput
                 style={styles.input}
                 placeholder={followUp?.placeholder}
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor="#64748B"
                 value={note}
                 onChangeText={setNote}
                 maxLength={500}
@@ -191,8 +191,9 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderCurve: 'continuous',
     padding: 24,
     maxHeight: '85%',
   },
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: '#2D3748',
+    color: '#1E293B',
     fontWeight: '900',
   },
   closeBtn: {
@@ -212,12 +213,12 @@ const styles = StyleSheet.create({
   },
   helpLink: {
     fontSize: 13,
-    color: '#17765D',
+    color: '#1B7F66',
     fontWeight: '800',
     marginBottom: 14,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748B',
     marginBottom: 16,
     lineHeight: 20,
@@ -226,20 +227,21 @@ const styles = StyleSheet.create({
   followUpBox: {
     marginBottom: 12,
     padding: 12,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     backgroundColor: '#E3F6EF',
     borderWidth: 1,
     borderColor: '#B5E6D4',
   },
   followUpEyebrow: {
     marginBottom: 4,
-    fontSize: 11,
-    color: '#17765D',
+    fontSize: 12,
+    color: '#1B7F66',
     fontWeight: '900',
   },
   followUpQuestion: {
-    fontSize: 14,
-    color: '#2E594A',
+    fontSize: 15,
+    color: '#1B7F66',
     fontWeight: '800',
     lineHeight: 20,
   },
@@ -250,11 +252,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 22,
     paddingHorizontal: 8,
-    borderRadius: 24,
-    backgroundColor: '#F8F5F0',
+    borderRadius: 28,
+    borderCurve: 'continuous',
+    backgroundColor: '#F8FAFC',
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#EDE6DC',
+    borderColor: '#E2E8F0',
   },
   arrow: {
     padding: 10,
@@ -277,12 +280,14 @@ const styles = StyleSheet.create({
   bigFace: {
     width: 150,
     height: 150,
-    borderRadius: 75,
+    borderRadius: 999,
+    borderCurve: 'continuous',
   },
   dot: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
@@ -306,7 +311,8 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 12,
     paddingVertical: 9,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
     backgroundColor: '#F8FAFC',
@@ -316,7 +322,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E3F6EF',
   },
   chipText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#475569',
     fontWeight: '800',
   },
@@ -326,7 +332,8 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     paddingHorizontal: 14,
     paddingVertical: 12,
     minHeight: 80,
@@ -343,6 +350,7 @@ const styles = StyleSheet.create({
     borderColor: '#125A48',
     borderBottomWidth: 4,
     borderRadius: 16,
+    borderCurve: 'continuous',
     paddingVertical: 15,
     alignItems: 'center',
   },
@@ -351,7 +359,7 @@ const styles = StyleSheet.create({
   },
   primaryBtnText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '900',
   },
   backBtn: {
@@ -359,7 +367,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   backText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748B',
     fontWeight: '700',
   },

@@ -73,7 +73,7 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
             <Text style={styles.resultValue}>{formatDuration(minutes)}</Text>
           </View>
           <View style={[styles.rhythmCard, bedtimeOk && durationOk && styles.rhythmCardGood]}>
-            <Ionicons name={bedtimeOk && durationOk ? 'checkmark-circle' : 'time-outline'} size={20} color={bedtimeOk && durationOk ? '#17765D' : '#8B5CF6'} />
+            <Ionicons name={bedtimeOk && durationOk ? 'checkmark-circle' : 'time-outline'} size={20} color={bedtimeOk && durationOk ? '#1B7F66' : '#7566C9'} />
             <View style={styles.rhythmCopy}>
               <Text style={styles.rhythmTitle}>{guide.ageLabel} 생활 리듬 가이드</Text>
               <Text style={styles.note}>취침 {formatTime(guide.bedtimeStart)}~{formatTime(guide.bedtimeEnd)} · 수면 {guide.durationLabel}</Text>
@@ -109,7 +109,7 @@ function TimeStepper({
 }) {
   return (
     <View style={styles.stepper}>
-      <Ionicons name={icon} size={20} color="#7C3AED" />
+      <Ionicons name={icon} size={20} color="#7566C9" />
       <Text style={styles.stepperLabel}>{label}</Text>
       <TouchableOpacity
         style={styles.stepBtn}
@@ -136,8 +136,9 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderCurve: 'continuous',
     padding: 24,
     gap: 12,
   },
@@ -148,14 +149,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: '#2D3748',
+    color: '#1E293B',
     fontWeight: '900',
   },
   closeBtn: {
     padding: 6,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748B',
     lineHeight: 20,
     fontWeight: '600',
@@ -168,18 +169,20 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
     borderRadius: 16,
+    borderCurve: 'continuous',
     padding: 12,
   },
   stepperLabel: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 15,
     color: '#334155',
     fontWeight: '800',
   },
   stepBtn: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
@@ -189,7 +192,7 @@ const styles = StyleSheet.create({
   time: {
     minWidth: 86,
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 17,
     color: '#1E293B',
     fontWeight: '900',
     fontVariant: ['tabular-nums'],
@@ -198,19 +201,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#F3E8FF',
-    borderRadius: 14,
+    backgroundColor: '#ECE9FF',
+    borderRadius: 16,
+    borderCurve: 'continuous',
     padding: 14,
   },
   resultLabel: {
-    fontSize: 14,
-    color: '#6D28D9',
+    fontSize: 15,
+    color: '#7566C9',
     fontWeight: '800',
   },
   resultValue: {
-    fontSize: 18,
-    color: '#6D28D9',
+    fontSize: 17,
+    color: '#7566C9',
     fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   note: {
     fontSize: 12,
@@ -223,14 +228,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 10,
     padding: 13,
-    borderRadius: 14,
-    backgroundColor: '#F5F3FF',
+    borderRadius: 16,
+    borderCurve: 'continuous',
+    backgroundColor: '#ECE9FF',
     borderWidth: 1,
-    borderColor: '#DDD6FE',
+    borderColor: '#D6D0F5',
   },
   rhythmCardGood: {
-    backgroundColor: '#ECFDF5',
-    borderColor: '#BBF7D0',
+    backgroundColor: '#E3F6EF',
+    borderColor: '#B5E6D4',
   },
   rhythmCopy: {
     flex: 1,
@@ -243,20 +249,21 @@ const styles = StyleSheet.create({
   },
   rhythmHint: {
     fontSize: 12,
-    color: '#6D28D9',
+    color: '#7566C9',
     fontWeight: '700',
     lineHeight: 18,
   },
   primaryBtn: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#7566C9',
     padding: 16,
     borderRadius: 16,
+    borderCurve: 'continuous',
     alignItems: 'center',
     marginTop: 4,
   },
   primaryBtnText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '800',
   },
 });

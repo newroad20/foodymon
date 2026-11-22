@@ -22,6 +22,7 @@ import { HATCH_TAPS, HatchEgg } from './HatchEgg';
 import { isContact, mayBeUnder14, parseBirthYear } from '@/lib/age';
 import { bumpFeel } from '@/lib/haptics';
 import { WorldBackdrop } from './WorldBackdrop';
+import { shadow } from '@/constants/theme';
 
 // Step order: prologue story → name → birth year → (guardian consent if under 14) → sleep → meals → usual portion → tutorial pages → egg hatch.
 // FoodyMon speaks from inside the egg until it hatches at the end.
@@ -108,7 +109,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
           keyboardShouldPersistTaps="handled"
           automaticallyAdjustKeyboardInsets>
           <View style={styles.storyBadge}>
-            <Ionicons name="leaf" size={14} color="#3B8169" />
+            <Ionicons name="leaf" size={14} color="#1B7F66" />
             <Text style={styles.storyBadgeText}>푸디몬과 첫 만남 · {Math.min(step + 1, HATCH + 1)}/{HATCH + 1}</Text>
           </View>
           <View style={styles.petStage}>
@@ -145,7 +146,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               <HintInput
                 style={styles.input}
                 placeholder="마스터의 닉네임 입력 (예: 김푸디)"
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor="#64748B"
                 value={name}
                 onChangeText={setName}
                 autoFocus
@@ -165,7 +166,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               <HintInput
                 style={styles.input}
                 placeholder="태어난 연도 (예: 2012)"
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor="#64748B"
                 value={birthText}
                 onChangeText={setBirthText}
                 keyboardType="number-pad"
@@ -186,7 +187,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               <HintInput
                 style={styles.input}
                 placeholder="보호자 이름"
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor="#64748B"
                 value={guardianName}
                 onChangeText={setGuardianName}
                 maxLength={50}
@@ -194,7 +195,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
               <HintInput
                 style={styles.input}
                 placeholder="보호자 연락처 (전화번호 또는 이메일)"
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor="#64748B"
                 value={guardianContact}
                 onChangeText={setGuardianContact}
                 autoCapitalize="none"
@@ -396,8 +397,9 @@ const styles = StyleSheet.create({
   dot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
-    backgroundColor: '#E5E5E5',
+    borderRadius: 999,
+    borderCurve: 'continuous',
+    backgroundColor: '#E2E8F0',
   },
   dotActive: {
     width: 20,
@@ -406,14 +408,15 @@ const styles = StyleSheet.create({
   tutorialIcon: {
     width: 72,
     height: 72,
-    borderRadius: 36,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 14,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F2FAF6',
+    backgroundColor: '#F2F8F4',
   },
   scrollView: {
     flex: 1,
@@ -430,17 +433,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    borderRadius: 99,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     paddingHorizontal: 13,
     paddingVertical: 7,
     backgroundColor: 'rgba(255,255,255,0.84)',
     borderWidth: 1,
-    borderColor: '#D6E9E0',
+    borderColor: '#E2E8F0',
     marginBottom: 6,
   },
   storyBadgeText: {
-    color: '#547366',
-    fontSize: 11,
+    color: '#64748B',
+    fontSize: 12,
     fontWeight: '800',
   },
   petStage: {
@@ -454,10 +458,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 175,
     height: 175,
-    borderRadius: 88,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     backgroundColor: 'rgba(217, 242, 231, 0.92)',
     borderWidth: 1,
-    borderColor: '#C4E6D8',
+    borderColor: '#B5E6D4',
   },
   petContainer: {
     alignItems: 'center',
@@ -468,15 +473,12 @@ const styles = StyleSheet.create({
     maxWidth: 460,
     backgroundColor: 'rgba(255,255,255,0.95)',
     borderRadius: 28,
+    borderCurve: 'continuous',
     padding: 22,
     position: 'relative',
     borderWidth: 1,
-    borderColor: '#D8E8E0',
-    shadowColor: '#426454',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.12,
-    shadowRadius: 22,
-    elevation: 6,
+    borderColor: '#E2E8F0',
+    boxShadow: shadow.floating,
   },
   backBtn: {
     position: 'absolute',
@@ -485,7 +487,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   backBtnText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748B',
     fontWeight: '800',
   },
@@ -494,14 +496,14 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   storyTitle: {
-    fontSize: 21,
-    color: '#206C57',
+    fontSize: 22,
+    color: '#1B7F66',
     marginBottom: 12,
     fontWeight: '900',
   },
   dialogueText: {
     fontSize: 15,
-    color: '#40564C',
+    color: '#475569',
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 24,
@@ -510,14 +512,15 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     borderWidth: 1.5,
-    borderColor: '#D4E5DD',
-    borderRadius: 17,
+    borderColor: '#E2E8F0',
+    borderRadius: 16,
+    borderCurve: 'continuous',
     padding: 14,
-    fontSize: 16,
+    fontSize: 17,
     textAlign: 'center',
     marginBottom: 20,
-    color: '#243B31',
-    backgroundColor: '#F8FCFA',
+    color: '#1E293B',
+    backgroundColor: '#F8FAFC',
     fontWeight: '600',
   },
   optionsRow: {
@@ -531,6 +534,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
     backgroundColor: '#F8FAFC',
@@ -540,12 +544,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#E3F6EF',
   },
   optionChipText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#475569',
     fontWeight: '800',
   },
   optionChipTextActive: {
-    color: '#17765D',
+    color: '#1B7F66',
   },
   optionsCol: {
     width: '100%',
@@ -554,7 +558,8 @@ const styles = StyleSheet.create({
   },
   optionRow: {
     padding: 12,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
     backgroundColor: '#F8FAFC',
@@ -565,25 +570,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#E3F6EF',
   },
   optionRowText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#475569',
     fontWeight: '800',
   },
   optionRowTextActive: {
-    color: '#17765D',
+    color: '#1B7F66',
   },
   primaryBtn: {
     width: '100%',
-    backgroundColor: '#207C63',
+    backgroundColor: '#1B7F66',
     padding: 16,
-    borderRadius: 17,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     alignItems: 'center',
     borderBottomWidth: 4,
-    borderBottomColor: '#145743',
+    borderBottomColor: '#125A48',
   },
   primaryBtnText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '800',
   },
 });

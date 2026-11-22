@@ -18,6 +18,7 @@ import {
   type HistoryCategory,
 } from '@/lib/history';
 import type { LogItem } from '@/types/foodymon';
+import { CATEGORY_COLORS } from '@/constants/theme';
 
 interface HistoryModalProps {
   visible: boolean;
@@ -34,10 +35,10 @@ const CATEGORIES: { id: HistoryCategory; label: string; icon: IconName }[] = [
 ];
 
 const META: Record<LogItem['type'], { bg: string; text: string; label: string; icon: IconName }> = {
-  meal: { bg: '#E7F5EE', text: '#24745F', label: '식사', icon: 'restaurant' },
-  skip: { bg: '#F2F4F3', text: '#66756E', label: '못 먹음', icon: 'remove-circle-outline' },
-  sleep: { bg: '#EEEBFB', text: '#6F5DB2', label: '수면', icon: 'moon' },
-  emotion: { bg: '#FBEAF0', text: '#B65478', label: '마음', icon: 'heart' },
+  meal: { bg: CATEGORY_COLORS.meal.bg, text: CATEGORY_COLORS.meal.ink, label: '식사', icon: 'restaurant' },
+  skip: { bg: '#F1F5F9', text: '#64748B', label: '못 먹음', icon: 'remove-circle-outline' },
+  sleep: { bg: CATEGORY_COLORS.sleep.bg, text: CATEGORY_COLORS.sleep.ink, label: '수면', icon: 'moon' },
+  emotion: { bg: CATEGORY_COLORS.mind.bg, text: CATEGORY_COLORS.mind.ink, label: '마음', icon: 'heart' },
 };
 
 const EMPTY_COPY: Record<HistoryCategory, string> = {
@@ -76,7 +77,7 @@ export function CategoryHistoryModal({ visible, onClose }: HistoryModalProps) {
               <Text style={styles.title}>푸디몬 기록 숲</Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="기록장 닫기">
-              <Ionicons name="close" size={22} color="#64756D" />
+              <Ionicons name="close" size={22} color="#64748B" />
             </TouchableOpacity>
           </View>
 
@@ -100,7 +101,7 @@ export function CategoryHistoryModal({ visible, onClose }: HistoryModalProps) {
                   onPress={() => setCategory(item.id)}
                   accessibilityRole="tab"
                   accessibilityState={{ selected: active }}>
-                  <Ionicons name={item.icon} size={16} color={active ? '#FFFFFF' : '#61756B'} />
+                  <Ionicons name={item.icon} size={16} color={active ? '#FFFFFF' : '#64748B'} />
                   <Text style={[styles.tabText, active && styles.tabTextActive]}>{item.label}</Text>
                   <View style={[styles.countBadge, active && styles.countBadgeActive]}>
                     <Text style={[styles.countText, active && styles.countTextActive]}>{counts[item.id]}</Text>
@@ -117,7 +118,7 @@ export function CategoryHistoryModal({ visible, onClose }: HistoryModalProps) {
             {groups.length === 0 ? (
               <View style={styles.emptyContainer}>
                 <View style={styles.emptyIcon}>
-                  <Ionicons name="leaf-outline" size={30} color="#72A38E" />
+                  <Ionicons name="leaf-outline" size={30} color="#1B7F66" />
                 </View>
                 <Text style={styles.emptyTitle}>
                   {CATEGORIES.find((item) => item.id === category)?.label} 기록이 비어 있어요
@@ -178,9 +179,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#F8FCFA',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    backgroundColor: '#F8FAFC',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderCurve: 'continuous',
     paddingHorizontal: 18,
     paddingTop: 10,
     maxHeight: '92%',
@@ -189,8 +191,9 @@ const styles = StyleSheet.create({
   handle: {
     width: 42,
     height: 5,
-    borderRadius: 4,
-    backgroundColor: '#D5E2DC',
+    borderRadius: 999,
+    borderCurve: 'continuous',
+    backgroundColor: '#E2E8F0',
     alignSelf: 'center',
     marginBottom: 14,
   },
@@ -201,25 +204,26 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   eyebrow: {
-    color: '#6F9A87',
-    fontSize: 10,
+    color: '#64748B',
+    fontSize: 12,
     fontWeight: '900',
     letterSpacing: 1.5,
     marginBottom: 2,
   },
   title: {
-    fontSize: 23,
-    color: '#263A31',
+    fontSize: 22,
+    color: '#1E293B',
     fontWeight: '900',
     letterSpacing: -0.5,
   },
   closeBtn: {
     width: 38,
     height: 38,
-    borderRadius: 19,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#DCE8E2',
+    borderColor: '#E2E8F0',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -227,18 +231,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 13,
-    borderRadius: 19,
-    backgroundColor: '#E6F4ED',
+    borderRadius: 20,
+    borderCurve: 'continuous',
+    backgroundColor: '#E3F6EF',
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#CFE7DC',
+    borderColor: '#E2E8F0',
     marginBottom: 12,
   },
   summaryIcon: {
     width: 42,
     height: 42,
-    borderRadius: 14,
-    backgroundColor: '#3D8B70',
+    borderRadius: 16,
+    borderCurve: 'continuous',
+    backgroundColor: '#1B7F66',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 11,
@@ -247,14 +253,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   summaryTitle: {
-    color: '#285545',
+    color: '#1B7F66',
     fontSize: 15,
     fontWeight: '900',
     marginBottom: 2,
   },
   summaryText: {
-    color: '#668074',
-    fontSize: 11,
+    color: '#64748B',
+    fontSize: 12,
     fontWeight: '700',
   },
   tabs: {
@@ -266,22 +272,23 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
     height: 39,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#DDE8E2',
+    borderColor: '#E2E8F0',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
   },
   tabActive: {
-    backgroundColor: '#277B62',
-    borderColor: '#277B62',
+    backgroundColor: '#1B7F66',
+    borderColor: '#1B7F66',
   },
   tabText: {
-    color: '#61756B',
-    fontSize: 11,
+    color: '#64748B',
+    fontSize: 12,
     fontWeight: '900',
   },
   tabTextActive: {
@@ -291,8 +298,9 @@ const styles = StyleSheet.create({
     minWidth: 18,
     height: 18,
     paddingHorizontal: 4,
-    borderRadius: 9,
-    backgroundColor: '#EEF3F0',
+    borderRadius: 999,
+    borderCurve: 'continuous',
+    backgroundColor: '#F1F5F9',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -300,9 +308,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.2)',
   },
   countText: {
-    color: '#71827A',
-    fontSize: 9,
+    color: '#64748B',
+    fontSize: 12,
     fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   countTextActive: {
     color: '#FFFFFF',
@@ -325,40 +334,43 @@ const styles = StyleSheet.create({
   dayDot: {
     width: 7,
     height: 7,
-    borderRadius: 4,
-    backgroundColor: '#72A38E',
+    borderRadius: 999,
+    borderCurve: 'continuous',
+    backgroundColor: '#1B7F66',
     marginRight: 7,
   },
   dayLabel: {
-    color: '#4C6257',
+    color: '#475569',
     fontSize: 13,
     fontWeight: '900',
   },
   dayLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#E0EAE5',
+    backgroundColor: '#E2E8F0',
     marginHorizontal: 9,
   },
   dayCount: {
-    color: '#96A49D',
-    fontSize: 10,
+    color: '#64748B',
+    fontSize: 12,
     fontWeight: '800',
   },
   logCard: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
+    borderRadius: 20,
+    borderCurve: 'continuous',
     padding: 12,
     marginBottom: 9,
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#E0E9E4',
+    borderColor: '#E2E8F0',
   },
   logIcon: {
     width: 38,
     height: 38,
-    borderRadius: 13,
+    borderRadius: 12,
+    borderCurve: 'continuous',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -377,26 +389,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
+    borderCurve: 'continuous',
   },
   tagText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '900',
   },
   logTime: {
-    fontSize: 10,
-    color: '#96A49D',
+    fontSize: 12,
+    color: '#64748B',
     fontWeight: '700',
+    fontVariant: ['tabular-nums'],
   },
   logContent: {
     fontSize: 13,
-    color: '#2F4339',
+    color: '#1E293B',
     lineHeight: 19,
     fontWeight: '700',
   },
   logPhoto: {
     width: '100%',
     aspectRatio: 1.4,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     marginTop: 10,
   },
   emptyContainer: {
@@ -407,22 +422,23 @@ const styles = StyleSheet.create({
   emptyIcon: {
     width: 62,
     height: 62,
-    borderRadius: 31,
-    backgroundColor: '#E8F4EE',
+    borderRadius: 999,
+    borderCurve: 'continuous',
+    backgroundColor: '#E3F6EF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 13,
   },
   emptyTitle: {
-    fontSize: 16,
-    color: '#334B40',
+    fontSize: 17,
+    color: '#334155',
     fontWeight: '900',
     marginBottom: 7,
     textAlign: 'center',
   },
   emptyText: {
     fontSize: 13,
-    color: '#7B8E84',
+    color: '#64748B',
     textAlign: 'center',
     lineHeight: 19,
     fontWeight: '600',

@@ -83,10 +83,11 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
+    borderCurve: 'continuous',
     padding: 16,
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
   },
   cardUrgent: {
     borderColor: '#FCA5A5',
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   name: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#1E293B',
     fontWeight: '900',
   },
@@ -111,7 +112,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#1B7F66',
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
@@ -129,7 +131,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 15,
-    color: '#17765D',
+    color: '#1B7F66',
     fontWeight: '800',
   },
 });

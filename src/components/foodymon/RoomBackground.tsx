@@ -5,6 +5,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { backgroundsData } from '@/constants/foodymonData';
+import { shadow } from '@/constants/theme';
 
 export function RoomBackground() {
   const { state } = useFoodyMon();
@@ -112,10 +113,7 @@ const styles = StyleSheet.create({
     borderColor: '#E8DDD1',
     backgroundColor: '#F8F2EB',
     overflow: 'hidden',
-    shadowColor: '#6A5947',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
+    boxShadow: shadow.card,
   },
   windowGlass: {
     flex: 1,

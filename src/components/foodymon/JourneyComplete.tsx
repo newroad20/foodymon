@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 18,
     borderRadius: 20,
+    borderCurve: 'continuous',
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
     borderBottomWidth: 4,
@@ -46,18 +47,18 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: '#17765D',
+    color: '#1B7F66',
     fontWeight: '900',
     textAlign: 'center',
   },
   body: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#475569',
     fontWeight: '700',
     textAlign: 'center',
   },
   counts: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#334155',
     fontWeight: '800',
     textAlign: 'center',
@@ -67,12 +68,13 @@ const styles = StyleSheet.create({
     marginTop: 6,
     paddingVertical: 14,
     borderRadius: 16,
+    borderCurve: 'continuous',
     backgroundColor: '#1B7F66',
     alignItems: 'center',
   },
   primaryText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '900',
   },
   secondary: {
@@ -81,7 +83,7 @@ const styles = StyleSheet.create({
   },
   secondaryText: {
     color: '#475569',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '800',
   },
 });

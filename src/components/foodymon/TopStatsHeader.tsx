@@ -4,6 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData } from '@/constants/foodymonData';
 import { router } from 'expo-router';
+import { shadow } from '@/constants/theme';
 
 interface TopStatsHeaderProps {
   onOpenHistory: () => void;
@@ -26,13 +27,13 @@ export function TopStatsHeader({ onOpenHistory }: TopStatsHeaderProps) {
         {/* Streak · jelly · shields in one pill */}
         <View style={styles.badge} accessibilityLabel={`연속 ${state.streak}일, 젤리 ${state.currency}개, 방패 ${state.shields}개`}>
           <Ionicons name="flame" size={14} color="#E8734A" />
-          <Text style={styles.badgeText}>{state.streak}</Text>
+          <Text style={[styles.badgeText, styles.num]}>{state.streak}</Text>
           <View style={styles.sep} />
           <Ionicons name="water" size={14} color="#1B7F66" />
-          <Text style={styles.badgeText}>{state.currency}</Text>
+          <Text style={[styles.badgeText, styles.num]}>{state.currency}</Text>
           <View style={styles.sep} />
           <Ionicons name="shield-checkmark" size={14} color="#64748B" />
-          <Text style={styles.badgeText}>{state.shields}</Text>
+          <Text style={[styles.badgeText, styles.num]}>{state.shields}</Text>
         </View>
       </View>
 
@@ -87,19 +88,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 11,
     paddingVertical: 7,
     borderRadius: 20,
+    borderCurve: 'continuous',
     gap: 4,
     borderWidth: 1,
-    borderColor: '#D9E7E0',
-    shadowColor: '#456456',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+    borderColor: '#E2E8F0',
+    boxShadow: shadow.card,
   },
   levelBadge: {
     flexShrink: 1,
     minWidth: 0,
     backgroundColor: 'rgba(226, 245, 236, 0.95)',
-    borderColor: '#C6E5D7',
+    borderColor: '#B5E6D4',
   },
   sep: {
     width: 1,
@@ -109,22 +108,21 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 12,
-    color: '#2D3748',
+    color: '#1E293B',
     fontWeight: '800',
   },
+  num: { fontVariant: ['tabular-nums'] },
   historyButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     width: 38,
     height: 38,
-    borderRadius: 19,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 6,
     borderWidth: 1,
-    borderColor: '#D9E7E0',
-    shadowColor: '#456456',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+    borderColor: '#E2E8F0',
+    boxShadow: shadow.card,
   },
 });

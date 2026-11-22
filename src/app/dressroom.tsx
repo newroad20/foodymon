@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   giftSub: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   tabs: {

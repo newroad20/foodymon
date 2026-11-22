@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
 
 interface ActionDockProps {
   onOpenMeal: () => void;
@@ -36,9 +37,9 @@ export function ActionDock({
         </View>
         <View style={styles.dock}>
           {[
-            { label: '식사', icon: 'restaurant', color: '#FFF0D7', ink: '#C97719', edge: '#F3D39C', onPress: onOpenMeal },
-            { label: '수면', icon: 'moon', color: '#ECE9FF', ink: '#7566C9', edge: '#D6D0F5', onPress: onOpenSleep },
-            { label: '마음', icon: 'happy', color: '#FFE7EF', ink: '#C95E83', edge: '#F1C8D6', onPress: onOpenEmotion },
+            { label: '식사', icon: 'restaurant', color: C.meal.bg, ink: C.meal.ink, edge: C.meal.edge, onPress: onOpenMeal },
+            { label: '수면', icon: 'moon', color: C.sleep.bg, ink: C.sleep.ink, edge: C.sleep.edge, onPress: onOpenSleep },
+            { label: '마음', icon: 'happy', color: C.mind.bg, ink: C.mind.ink, edge: C.mind.edge, onPress: onOpenEmotion },
             { label: '꾸미기', icon: 'shirt', color: '#DFF2EE', ink: '#287D68', edge: '#BFDED5', onPress: onOpenBag },
           ].map((a) => (
             <Pressable key={a.label} style={styles.actionBtn} onPress={a.onPress} accessibilityRole="button" accessibilityLabel={a.label}>
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
   },
   testButtonText: {
     fontSize: 12,
-    color: '#718096',
+    color: '#64748B',
     fontWeight: '700',
   },
   dockCard: {

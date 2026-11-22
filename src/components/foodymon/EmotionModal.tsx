@@ -75,8 +75,8 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
         <View style={styles.modalContent}>
           <View style={styles.header}>
             <Text style={styles.title}>마음 기록</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기">
-              <Ionicons name="close" size={22} color="#A0AEC0" />
+            <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기" hitSlop={8}>
+              <Ionicons name="close" size={22} color="#64748B" />
             </TouchableOpacity>
           </View>
 
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#718096',
+    color: '#64748B',
     marginBottom: 16,
     lineHeight: 20,
     fontWeight: '600',
@@ -227,19 +227,19 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     padding: 12,
     borderRadius: 14,
-    backgroundColor: '#FCE7F3',
+    backgroundColor: '#E3F6EF',
     borderWidth: 1,
-    borderColor: '#FBCFE8',
+    borderColor: '#B5E6D4',
   },
   followUpEyebrow: {
     marginBottom: 4,
     fontSize: 11,
-    color: '#BE185D',
+    color: '#17765D',
     fontWeight: '900',
   },
   followUpQuestion: {
     fontSize: 14,
-    color: '#831843',
+    color: '#2E594A',
     fontWeight: '800',
     lineHeight: 20,
   },
@@ -312,8 +312,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   chipActive: {
-    borderColor: '#BE185D',
-    backgroundColor: '#FCE7F3',
+    borderColor: '#1B7F66',
+    backgroundColor: '#E3F6EF',
   },
   chipText: {
     fontSize: 14,
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   chipTextActive: {
-    color: '#BE185D',
+    color: '#1B7F66',
   },
   input: {
     borderWidth: 1.5,
@@ -338,7 +338,10 @@ const styles = StyleSheet.create({
   },
   primaryBtn: {
     marginTop: 16,
-    backgroundColor: '#C2185B',
+    backgroundColor: '#1B7F66',
+    borderWidth: 2,
+    borderColor: '#125A48',
+    borderBottomWidth: 4,
     borderRadius: 16,
     paddingVertical: 15,
     alignItems: 'center',

@@ -164,7 +164,6 @@ export default function CollectionScreen() {
               <View style={styles.summaryRow}>
                 <Summary label="기록한 날" value={`${stats.recordedDays}일`} />
                 <Summary label="최장 연속" value={`${stats.bestRun}일`} />
-                <Summary label="최고 점수" value={stats.bestScore === null ? '–' : `${stats.bestScore}점`} />
               </View>
 
               <Text style={styles.progress}>
@@ -237,6 +236,8 @@ const styles = StyleSheet.create({
   },
   segmentBtn: {
     flex: 1,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingVertical: 8,
     borderRadius: 10,
     alignItems: 'center',
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     fontSize: 13,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '800',
   },
   segmentTextActive: {
@@ -306,13 +307,13 @@ const styles = StyleSheet.create({
   },
   levelMeta: {
     fontSize: 11,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   hint: {
     marginTop: 16,
     fontSize: 12,
-    color: '#94A3B8',
+    color: '#64748B',
     textAlign: 'center',
     fontWeight: '600',
   },
@@ -337,7 +338,7 @@ const styles = StyleSheet.create({
   },
   itemMeta: {
     fontSize: 11,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   locked: {
@@ -389,7 +390,7 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: 11,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   badgeCard: {
@@ -410,7 +411,7 @@ const styles = StyleSheet.create({
   badgeDesc: {
     fontSize: 10,
     lineHeight: 14,
-    color: '#94A3B8',
+    color: '#64748B',
     textAlign: 'center',
     fontWeight: '600',
   },

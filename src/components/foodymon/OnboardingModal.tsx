@@ -208,7 +208,7 @@ export function OnboardingModal({ visible }: OnboardingModalProps) {
                 <Ionicons
                   name={guardianAgree ? 'checkbox' : 'square-outline'}
                   size={22}
-                  color={guardianAgree ? '#1B7F66' : '#94A3B8'}
+                  color={guardianAgree ? '#1B7F66' : '#64748B'}
                 />
                 <Text style={styles.guardianAgreeText}>
                   저는 보호자이며, 아이의 개인정보와 수면·식사·마음 기록(민감정보) 처리에 동의합니다.
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
   },
   backBtnText: {
     fontSize: 14,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '800',
   },
   stepContent: {

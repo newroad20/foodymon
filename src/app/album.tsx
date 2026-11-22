@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   notice: { fontSize: 13, color: '#B45309', fontWeight: '700', marginBottom: 8 },
   empty: { alignItems: 'center', gap: 12, paddingTop: 80 },
   emptyText: { fontSize: 14, color: '#64748B', fontWeight: '600', textAlign: 'center', lineHeight: 21 },
-  dayCard: { backgroundColor: '#FFFFFF', borderRadius: 20, padding: 14, gap: 12, borderWidth: 1, borderColor: '#E9E2E2' },
+  dayCard: { backgroundColor: '#FFFFFF', borderRadius: 20, padding: 14, gap: 12, borderWidth: 2, borderBottomWidth: 4, borderColor: '#DCE8E2', borderBottomColor: '#C5D6CD' },
   dayHeader: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   dayTitle: { fontSize: 16, color: '#2E443A', fontWeight: '900' },
   photoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: GAP },

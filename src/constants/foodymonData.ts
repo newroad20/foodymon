@@ -1,6 +1,7 @@
 import { CostumeItem, BackgroundItem, QuizQuestion, LevelInfo } from '@/types/foodymon';
 import type { ImageSourcePropType } from 'react-native';
 import type { Emotion, MealStatus, Situation } from '@/lib/growth';
+import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
 
 export const levelsData: LevelInfo[] = [
   { level: 1, maxScore: 19, name: '푹 쉬는 푸디몬', image: require('@/assets/images/level1.png') },
@@ -235,19 +236,19 @@ export const tutorialPages = [
   },
   {
     icon: 'restaurant',
-    color: '#FF9600',
+    color: C.meal.ink,
     title: '식사 = 감각 나누기',
     line: '먹고 나서 "식사"를 눌러 줘.\n어떤 색이었는지, 어떤 식감이었는지\n작은 질문에 답하면 그 감각이 내 먹이가 돼.',
   },
   {
     icon: 'moon',
-    color: '#8E7CF0',
+    color: C.sleep.ink,
     title: '수면 = 숲의 밤',
     line: '일어나면 "수면"에 몇 시간 잤는지 알려 줘.\n네가 푹 쉬면 숲에도 고요한 밤이 와.',
   },
   {
     icon: 'happy',
-    color: '#FF6FA8',
+    color: C.mind.ink,
     title: '감정 = 마음 날씨',
     line: '"감정"에서 오늘 마음 날씨를 골라 줘.\n흐린 날도 소중한 기록이야.\n어떤 날씨든 나는 곁에 있을게.',
   },

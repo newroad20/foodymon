@@ -7,7 +7,7 @@ const BAR_COLOR = '#17765D';
 const MISSING_COLOR = '#E2E8F0';
 const GRID_COLOR = '#F1F5F9';
 const INK_PRIMARY = '#1E293B';
-const INK_MUTED = '#94A3B8';
+const INK_MUTED = '#64748B';
 
 const PLOT_HEIGHT = 140;
 const MAX_BAR_WIDTH = 24;

@@ -445,7 +445,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
   /** Fills in yesterday for jelly; the server restores the streak and any shield used (S25). */
   const backfillYesterday = async (day: { sleepHours: number | null; mealCount: number; emotion: number | null }) => {
     const current = stateRef.current;
-    if (!current.backfill) return { success: false, message: '복구할 기록이 없어요.' };
+    if (!current.backfill) return { success: false, message: '남길 수 있는 어제 기록이 없어요.' };
 
     const sleepDiff = day.sleepHours === null ? null : Math.abs(current.targetSleep - day.sleepHours);
     const yesterday = {
@@ -464,8 +464,8 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     const res = await gameApi.backfillYesterday(toDateKey(new Date()), { ...yesterday, score });
     if (!res.ok) {
       const messages: Record<gameApi.BackfillError, string> = {
-        insufficient_jelly: `젤리가 부족해요! 복구에는 젤리 ${BACKFILL_COST}개가 필요해요.`,
-        nothing_to_backfill: '복구할 수 있는 기간이 지났어요. 오늘 기록부터 다시 시작해요!',
+        insufficient_jelly: `젤리가 부족해요! 어제 기록을 남기려면 젤리 ${BACKFILL_COST}개가 필요해요.`,
+        nothing_to_backfill: '어제 기록을 남길 수 있는 시간이 지났어요. 오늘 기록부터 다시 시작해요!',
         network: '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.',
       };
       if (res.error === 'nothing_to_backfill') await syncFromServer();
@@ -473,7 +473,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     }
 
     await syncFromServer();
-    return { success: true, message: `어제 기록을 복구했어요! 연속 기록이 이어졌어요` };
+    return { success: true, message: `어제 기록을 남겼어요! 연속 기록이 이어졌어요` };
   };
 
   /** Updates name and lifestyle goals; today's score is recalculated against the new goals. */

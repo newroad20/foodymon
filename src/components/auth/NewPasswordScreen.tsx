@@ -36,7 +36,7 @@ export function NewPasswordScreen() {
         <HintInput
           style={styles.input}
           placeholder="새 비밀번호 (6자 이상)"
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor="#64748B"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -44,7 +44,7 @@ export function NewPasswordScreen() {
         <HintInput
           style={styles.input}
           placeholder="새 비밀번호 다시 입력"
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor="#64748B"
           value={confirm}
           onChangeText={setConfirm}
           secureTextEntry
@@ -66,12 +66,13 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
+    borderRadius: 28,
+    borderCurve: 'continuous',
     padding: 24,
     gap: 12,
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
   },
   title: {
     fontSize: 20,
@@ -83,7 +84,8 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     padding: 14,
     fontSize: 15,
     color: '#1E293B',
@@ -94,6 +96,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1B7F66',
     padding: 16,
     borderRadius: 16,
+    borderCurve: 'continuous',
     alignItems: 'center',
   },
   btnOff: {
@@ -101,7 +104,7 @@ const styles = StyleSheet.create({
   },
   btnText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '900',
   },
 });

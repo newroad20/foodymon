@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
     width: SHARE_CARD_WIDTH,
     backgroundColor: '#F2F8F4',
     borderRadius: 28,
+    borderCurve: 'continuous',
     padding: 22,
     borderWidth: 3,
     borderColor: '#B5E6D4',
@@ -73,12 +74,12 @@ const styles = StyleSheet.create({
   brand: {
     fontSize: 12,
     letterSpacing: 1.5,
-    color: '#17765D',
+    color: '#1B7F66',
     fontWeight: '900',
   },
   date: {
     fontSize: 12,
-    color: '#17765D',
+    color: '#1B7F66',
     fontWeight: '700',
   },
   title: {
@@ -90,7 +91,8 @@ const styles = StyleSheet.create({
   stage: {
     marginTop: 14,
     backgroundColor: '#FFFFFF',
-    borderRadius: 22,
+    borderRadius: 20,
+    borderCurve: 'continuous',
     alignItems: 'center',
     paddingTop: 18,
     paddingBottom: 14,
@@ -105,9 +107,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 999,
+    borderCurve: 'continuous',
     overflow: 'hidden',
     backgroundColor: '#E3F6EF',
-    color: '#17765D',
+    color: '#1B7F66',
     fontSize: 12,
     fontWeight: '900',
   },
@@ -115,7 +118,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 16,
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
+    borderRadius: 20,
+    borderCurve: 'continuous',
     paddingVertical: 12,
   },
   stat: {
@@ -124,12 +128,12 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   statValue: {
-    fontSize: 24,
+    fontSize: 22,
     color: '#1E293B',
     fontWeight: '900',
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#64748B',
     fontWeight: '600',
   },
@@ -140,8 +144,8 @@ const styles = StyleSheet.create({
   footer: {
     marginTop: 14,
     textAlign: 'center',
-    fontSize: 11,
-    color: '#17765D',
+    fontSize: 12,
+    color: '#1B7F66',
     fontWeight: '600',
   },
 });

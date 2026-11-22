@@ -260,7 +260,7 @@ export const tutorialPages = [
   },
   {
     icon: 'shirt',
-    color: '#1CB0F6',
+    color: '#286FA3',
     title: '우리만의 방',
     line: '모은 이슬방울로 "꾸미기"에서\n옷과 소품을 골라 봐.\n자, 이제 숲 생활을 시작하자!',
   },

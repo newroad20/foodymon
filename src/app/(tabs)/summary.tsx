@@ -122,7 +122,7 @@ export default function SummaryScreen() {
           </View>
 
           {loading && rows.length === 0 ? (
-            <ActivityIndicator style={styles.loader} color="#17765D" />
+            <ActivityIndicator style={styles.loader} color="#1B7F66" />
           ) : error ? (
             <Text style={styles.errorText}>기록을 불러오지 못했어요. 탭을 다시 열어 주세요.</Text>
           ) : (
@@ -184,11 +184,12 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
+    borderRadius: 28,
+    borderCurve: 'continuous',
     padding: 20,
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
   },
   reportHeader: {
     flexDirection: 'row',
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   greeting: {
-    fontSize: 14,
+    fontSize: 15,
     lineHeight: 20,
     color: '#334155',
     fontWeight: '600',
@@ -234,6 +235,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderRadius: 16,
+    borderCurve: 'continuous',
     backgroundColor: '#E3F6EF',
     gap: 2,
   },
@@ -248,13 +250,14 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   partValue: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#64748B',
     fontWeight: '600',
   },
   shareBtn: {
     marginTop: 16,
     borderRadius: 16,
+    borderCurve: 'continuous',
     paddingVertical: 13,
     alignItems: 'center',
     backgroundColor: '#E3F6EF',
@@ -263,7 +266,7 @@ const styles = StyleSheet.create({
   },
   shareText: {
     fontSize: 15,
-    color: '#17765D',
+    color: '#1B7F66',
     fontWeight: '900',
   },
   trendHeader: {
@@ -273,7 +276,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#1E293B',
     fontWeight: '900',
   },
@@ -281,6 +284,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#F1F5F9',
     borderRadius: 12,
+    borderCurve: 'continuous',
     padding: 3,
   },
   segmentBtn: {
@@ -288,7 +292,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 9,
+    borderRadius: 8,
+    borderCurve: 'continuous',
   },
   segmentBtnActive: {
     backgroundColor: '#FFFFFF',
@@ -311,12 +316,12 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   statValue: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#334155',
     fontWeight: '900',
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#64748B',
     fontWeight: '600',
   },

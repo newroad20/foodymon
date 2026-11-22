@@ -94,11 +94,11 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
             <Text style={styles.cardTitle}>푸디몬이 기다리고 있어요</Text>
 
             <View style={styles.inputWrap}>
-              <Ionicons name="mail-outline" size={19} color="#5E806F" />
+              <Ionicons name="mail-outline" size={19} color="#64748B" />
               <HintInput
                 style={styles.input}
                 placeholder="이메일"
-                placeholderTextColor="#9AA8A1"
+                placeholderTextColor="#64748B"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -107,11 +107,11 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
               />
             </View>
             <View style={styles.inputWrap}>
-              <Ionicons name="lock-closed-outline" size={19} color="#5E806F" />
+              <Ionicons name="lock-closed-outline" size={19} color="#64748B" />
               <HintInput
                 style={styles.input}
                 placeholder="비밀번호"
-                placeholderTextColor="#9AA8A1"
+                placeholderTextColor="#64748B"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -201,8 +201,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     padding: 10,
     borderRadius: 12,
+    borderCurve: 'continuous',
     backgroundColor: '#E3F6EF',
-    color: '#17765D',
+    color: '#1B7F66',
     fontSize: 13,
     fontWeight: '700',
     lineHeight: 19,
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#F2FAF6',
+    backgroundColor: '#F2F8F4',
   },
   scroll: {
     flexGrow: 1,
@@ -235,16 +236,17 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   heroBadge: {
-    borderRadius: 99,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     backgroundColor: 'rgba(255,255,255,0.82)',
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderWidth: 1,
-    borderColor: '#D8EDE4',
+    borderColor: '#B5E6D4',
     marginBottom: 6,
   },
   heroBadgeText: {
-    color: '#477361',
+    color: '#64748B',
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0.2,
@@ -260,17 +262,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 148,
     height: 148,
-    borderRadius: 74,
-    backgroundColor: '#D9F2E7',
+    borderRadius: 999,
+    borderCurve: 'continuous',
+    backgroundColor: '#E3F6EF',
     borderWidth: 1,
-    borderColor: '#C7E9DC',
+    borderColor: '#B5E6D4',
   },
   groundShadow: {
     position: 'absolute',
     bottom: 5,
     width: 86,
     height: 12,
-    borderRadius: 99,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     backgroundColor: 'rgba(51, 92, 73, 0.13)',
   },
   petImage: {
@@ -279,15 +283,15 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   appTitle: {
-    fontSize: 35,
-    color: '#176C57',
+    fontSize: 34,
+    color: '#1B7F66',
     marginTop: 2,
     letterSpacing: -1.2,
     fontWeight: '900',
   },
   appSubtitle: {
-    fontSize: 14,
-    color: '#61756B',
+    fontSize: 15,
+    color: '#64748B',
     marginTop: 5,
     fontWeight: '700',
     textAlign: 'center',
@@ -295,9 +299,10 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: 'rgba(255, 255, 255, 0.94)',
     borderRadius: 28,
+    borderCurve: 'continuous',
     padding: 22,
     borderWidth: 1,
-    borderColor: '#DCEBE4',
+    borderColor: '#E2E8F0',
     shadowColor: '#426454',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.12,
@@ -305,7 +310,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   cardEyebrow: {
-    color: '#6C877A',
+    color: '#64748B',
     fontSize: 12,
     fontWeight: '800',
     textAlign: 'center',
@@ -313,7 +318,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 20,
-    color: '#263A31',
+    color: '#1E293B',
     marginBottom: 18,
     textAlign: 'center',
     fontWeight: '900',
@@ -321,11 +326,12 @@ const styles = StyleSheet.create({
   inputWrap: {
     minHeight: 54,
     borderWidth: 1.5,
-    borderColor: '#D9E7E0',
-    borderRadius: 17,
+    borderColor: '#E2E8F0',
+    borderRadius: 16,
+    borderCurve: 'continuous',
     paddingHorizontal: 15,
     marginBottom: 11,
-    backgroundColor: '#F8FCFA',
+    backgroundColor: '#F8FAFC',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
@@ -334,24 +340,25 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     fontSize: 15,
-    color: '#243B31',
+    color: '#1E293B',
     fontWeight: '600',
   },
   primaryBtn: {
-    backgroundColor: '#207C63',
+    backgroundColor: '#1B7F66',
     padding: 16,
-    borderRadius: 17,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     alignItems: 'center',
     marginTop: 5,
     borderBottomWidth: 4,
-    borderBottomColor: '#145743',
+    borderBottomColor: '#125A48',
   },
   btnDisabled: {
     opacity: 0.7,
   },
   primaryBtnText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '800',
   },
   primaryBtnContent: {
@@ -368,7 +375,7 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#DDE9E3',
+    backgroundColor: '#E2E8F0',
   },
   dividerText: {
     fontSize: 13,
@@ -384,7 +391,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     height: 48,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
   },
   kakaoBtn: {
     backgroundColor: '#FEE500',
@@ -412,7 +420,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   secondaryBtnText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748B',
     fontWeight: '600',
   },

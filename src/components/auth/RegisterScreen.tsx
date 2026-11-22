@@ -22,7 +22,7 @@ interface RegisterScreenProps {
   onSwitchToLogin: () => void;
 }
 
-const PLACEHOLDER_COLOR = '#9CA3AF';
+const PLACEHOLDER_COLOR = '#64748B';
 
 export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
   const { signUp } = useAuth();
@@ -98,7 +98,7 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
           <Text style={styles.cardTitle}>먼저 계정을 만들어 주세요</Text>
 
           <View style={styles.labelRow}>
-            <Ionicons name="mail-outline" size={15} color="#5E806F" />
+            <Ionicons name="mail-outline" size={15} color="#64748B" />
             <Text style={styles.label}>이메일</Text>
           </View>
           <HintInput
@@ -113,7 +113,7 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
           />
 
           <View style={styles.labelRow}>
-            <Ionicons name="lock-closed-outline" size={15} color="#5E806F" />
+            <Ionicons name="lock-closed-outline" size={15} color="#64748B" />
             <Text style={styles.label}>비밀번호</Text>
           </View>
           <HintInput
@@ -126,7 +126,7 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
           />
 
           <View style={styles.labelRow}>
-            <Ionicons name="checkmark-circle-outline" size={15} color="#5E806F" />
+            <Ionicons name="checkmark-circle-outline" size={15} color="#64748B" />
             <Text style={styles.label}>비밀번호 확인</Text>
           </View>
           <HintInput
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   policyLink: {
     fontSize: 13,
-    color: '#17765D',
+    color: '#1B7F66',
     fontWeight: '800',
     paddingVertical: 6,
   },
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFF7F1',
+    backgroundColor: '#F2F8F4',
   },
   scroll: {
     flexGrow: 1,
@@ -242,15 +242,16 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   heroBadge: {
-    borderRadius: 99,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     backgroundColor: 'rgba(255,255,255,0.8)',
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderWidth: 1,
-    borderColor: '#F0DED1',
+    borderColor: '#E2E8F0',
   },
   heroBadgeText: {
-    color: '#806854',
+    color: '#64748B',
     fontSize: 12,
     fontWeight: '800',
   },
@@ -265,21 +266,22 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 152,
     height: 152,
-    borderRadius: 76,
-    backgroundColor: '#FDE6D7',
+    borderRadius: 999,
+    borderCurve: 'continuous',
+    backgroundColor: '#E3F6EF',
     borderWidth: 1,
-    borderColor: '#F6D6C3',
+    borderColor: '#B5E6D4',
   },
   appTitle: {
-    fontSize: 27,
-    color: '#176C57',
+    fontSize: 28,
+    color: '#1B7F66',
     marginTop: 2,
     fontWeight: '900',
     letterSpacing: -0.8,
   },
   appSubtitle: {
-    fontSize: 14,
-    color: '#6F756F',
+    fontSize: 15,
+    color: '#64748B',
     marginTop: 5,
     fontWeight: '700',
     textAlign: 'center',
@@ -287,9 +289,10 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: 'rgba(255,255,255,0.95)',
     borderRadius: 28,
+    borderCurve: 'continuous',
     padding: 22,
     borderWidth: 1,
-    borderColor: '#E9E3DC',
+    borderColor: '#E2E8F0',
     shadowColor: '#705A48',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.11,
@@ -298,14 +301,14 @@ const styles = StyleSheet.create({
   },
   cardEyebrow: {
     fontSize: 12,
-    color: '#7E897F',
+    color: '#64748B',
     textAlign: 'center',
     fontWeight: '800',
     marginBottom: 4,
   },
   cardTitle: {
     fontSize: 20,
-    color: '#263A31',
+    color: '#1E293B',
     marginBottom: 18,
     textAlign: 'center',
     fontWeight: '900',
@@ -318,36 +321,38 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 13,
-    color: '#52685D',
+    color: '#475569',
     fontWeight: '800',
   },
   input: {
     borderWidth: 1.5,
-    borderColor: '#DDE7E1',
-    borderRadius: 17,
+    borderColor: '#E2E8F0',
+    borderRadius: 16,
+    borderCurve: 'continuous',
     padding: 14,
     fontSize: 15,
-    color: '#243B31',
+    color: '#1E293B',
     marginBottom: 14,
-    backgroundColor: '#F8FCFA',
+    backgroundColor: '#F8FAFC',
     fontWeight: '600',
   },
   primaryBtn: {
-    backgroundColor: '#207C63',
+    backgroundColor: '#1B7F66',
     padding: 16,
-    borderRadius: 17,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     alignItems: 'center',
     marginTop: 6,
     marginBottom: 16,
     borderBottomWidth: 4,
-    borderBottomColor: '#145743',
+    borderBottomColor: '#125A48',
   },
   btnDisabled: {
     opacity: 0.7,
   },
   primaryBtnText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '800',
   },
   primaryBtnContent: {
@@ -360,7 +365,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   secondaryBtnText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748B',
     fontWeight: '600',
   },

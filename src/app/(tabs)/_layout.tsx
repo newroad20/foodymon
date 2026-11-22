@@ -15,17 +15,17 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#207C63',
-        tabBarInactiveTintColor: '#9AA8A1',
+        tabBarActiveTintColor: '#1B7F66',
+        tabBarInactiveTintColor: '#64748B',
         tabBarStyle: {
-          backgroundColor: '#FCFFFD',
-          borderTopColor: '#DCE9E3',
+          backgroundColor: '#F8FAFC',
+          borderTopColor: '#E2E8F0',
           borderTopWidth: 1,
           height: 68,
           paddingTop: 7,
           paddingBottom: 8,
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '800' },
+        tabBarLabelStyle: { fontSize: 12, fontWeight: '800' },
       }}>
       <Tabs.Screen name="index" options={{ title: '홈', tabBarIcon: tabIcon('home') }} />
       <Tabs.Screen name="summary" options={{ title: '요약', tabBarIcon: tabIcon('bar-chart') }} />

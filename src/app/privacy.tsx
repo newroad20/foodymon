@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   back: {
-    fontSize: 14,
-    color: '#17765D',
+    fontSize: 15,
+    color: '#1B7F66',
     fontWeight: '800',
   },
   title: {
@@ -69,12 +69,12 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   heading: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#1E293B',
     fontWeight: '900',
   },
   body: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#334155',
     fontWeight: '500',
     lineHeight: 21,

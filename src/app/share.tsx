@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   lead: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#334155',
     textAlign: 'center',
     fontWeight: '600',
@@ -127,7 +127,8 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 320,
     backgroundColor: '#1B7F66',
-    borderRadius: 18,
+    borderRadius: 20,
+    borderCurve: 'continuous',
     paddingVertical: 15,
     alignItems: 'center',
     borderBottomWidth: 4,
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
   },
   shareText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '900',
   },
   hint: {

@@ -74,7 +74,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 4,
     height: 4,
-    borderRadius: 2,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     backgroundColor: '#FFF7C2',
   },
   caption: {

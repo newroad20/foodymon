@@ -95,7 +95,7 @@ export default function AlbumScreen() {
         ListEmptyComponent={
           error ? null : (
             <View style={styles.empty}>
-              <Ionicons name="camera-outline" size={40} color="#9FD8C5" />
+              <Ionicons name="camera-outline" size={40} color="#B5E6D4" />
               <Text style={styles.emptyText}>아직 사진이 없어요.{`\n`}식사를 기록할 때 사진 버튼으로 남겨 보세요!</Text>
             </View>
           )
@@ -103,7 +103,7 @@ export default function AlbumScreen() {
         renderItem={({ item: day }) => (
           <View style={styles.dayCard}>
             <View style={styles.dayHeader}>
-              <Ionicons name="calendar-outline" size={17} color="#24745F" />
+              <Ionicons name="calendar-outline" size={17} color="#1B7F66" />
               <Text style={styles.dayTitle}>{day.title}</Text>
             </View>
             <View style={styles.photoRow}>
@@ -144,21 +144,21 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F2F8F4' },
   list: { padding: 16, gap: 12 },
   headerCard: { marginBottom: 4 },
-  headerTitle: { fontSize: 20, color: '#263A31', fontWeight: '900' },
+  headerTitle: { fontSize: 20, color: '#1E293B', fontWeight: '900' },
   count: { fontSize: 13, color: '#64748B', fontWeight: '700', marginTop: 3 },
   notice: { fontSize: 13, color: '#B45309', fontWeight: '700', marginBottom: 8 },
   empty: { alignItems: 'center', gap: 12, paddingTop: 80 },
-  emptyText: { fontSize: 14, color: '#64748B', fontWeight: '600', textAlign: 'center', lineHeight: 21 },
-  dayCard: { backgroundColor: '#FFFFFF', borderRadius: 20, padding: 14, gap: 12, borderWidth: 2, borderBottomWidth: 4, borderColor: '#DCE8E2', borderBottomColor: '#C5D6CD' },
+  emptyText: { fontSize: 15, color: '#64748B', fontWeight: '600', textAlign: 'center', lineHeight: 21 },
+  dayCard: { backgroundColor: '#FFFFFF', borderRadius: 20, borderCurve: 'continuous', padding: 14, gap: 12, borderWidth: 2, borderBottomWidth: 4, borderColor: '#E2E8F0', borderBottomColor: '#CBD5E1' },
   dayHeader: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-  dayTitle: { fontSize: 16, color: '#2E443A', fontWeight: '900' },
+  dayTitle: { fontSize: 17, color: '#1E293B', fontWeight: '900' },
   photoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: GAP },
-  photo: { borderRadius: 12, backgroundColor: '#E8F1ED' },
-  mealLabel: { marginTop: 6, fontSize: 12, color: '#24745F', fontWeight: '900' },
-  mealCopy: { marginTop: 1, fontSize: 10, color: '#7A8982', fontWeight: '600' },
+  photo: { borderRadius: 12, borderCurve: 'continuous', backgroundColor: '#F1F5F9' },
+  mealLabel: { marginTop: 6, fontSize: 12, color: '#1B7F66', fontWeight: '900' },
+  mealCopy: { marginTop: 1, fontSize: 12, color: '#64748B', fontWeight: '600' },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center', justifyContent: 'center', padding: 20 },
-  viewer: { width: '100%', maxWidth: 420, backgroundColor: '#FFFFFF', borderRadius: 20, padding: 12, gap: 8 },
-  large: { width: '100%', aspectRatio: 1, borderRadius: 14 },
-  time: { fontSize: 13, color: '#24745F', fontWeight: '900', paddingHorizontal: 4 },
+  viewer: { width: '100%', maxWidth: 420, backgroundColor: '#FFFFFF', borderRadius: 20, borderCurve: 'continuous', padding: 12, gap: 8 },
+  large: { width: '100%', aspectRatio: 1, borderRadius: 16, borderCurve: 'continuous' },
+  time: { fontSize: 13, color: '#1B7F66', fontWeight: '900', paddingHorizontal: 4 },
   note: { fontSize: 15, color: '#1E293B', fontWeight: '600', paddingHorizontal: 4, paddingBottom: 4 },
 });

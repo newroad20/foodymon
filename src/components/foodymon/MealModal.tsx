@@ -199,7 +199,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
                 <HintInput
                   style={styles.input}
                   placeholder="예: 김밥, 우유"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#64748B"
                   value={menu}
                   onChangeText={setMenu}
                   maxLength={100}
@@ -212,7 +212,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
                 <HintInput
                   style={[styles.input, styles.multiline]}
                   placeholder="떠오르는 대로 편하게"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#64748B"
                   value={feeling}
                   onChangeText={setFeeling}
                   maxLength={300}
@@ -231,7 +231,7 @@ export function MealModal({ visible, onClose }: MealModalProps) {
                 <HintInput
                   style={[styles.input, styles.multiline]}
                   placeholder={followUp?.placeholder}
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor="#64748B"
                   value={memo}
                   onChangeText={setMemo}
                   maxLength={300}
@@ -267,8 +267,9 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderCurve: 'continuous',
     padding: 24,
     maxHeight: '88%',
   },
@@ -280,7 +281,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: '#2D3748',
+    color: '#1E293B',
     fontWeight: '900',
   },
   closeBtn: {
@@ -304,7 +305,8 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 9,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
     backgroundColor: '#F8FAFC',
@@ -314,17 +316,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#E3F6EF',
   },
   chipText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#475569',
     fontWeight: '800',
   },
   chipTextActive: {
-    color: '#17765D',
+    color: '#1B7F66',
   },
   input: {
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
@@ -338,13 +341,14 @@ const styles = StyleSheet.create({
   },
   quizBox: {
     backgroundColor: '#E3F6EF',
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     padding: 12,
     marginBottom: 8,
   },
   quizQuestion: {
-    fontSize: 14,
-    color: '#17765D',
+    fontSize: 15,
+    color: '#1B7F66',
     fontWeight: '800',
     lineHeight: 20,
   },
@@ -359,15 +363,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     paddingVertical: 11,
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 1.5,
     borderStyle: 'dashed',
-    borderColor: '#9FD8C5',
-    backgroundColor: '#F4FBF8',
+    borderColor: '#B5E6D4',
+    backgroundColor: '#F2F8F4',
   },
   photoBtnText: {
-    fontSize: 14,
-    color: '#17765D',
+    fontSize: 15,
+    color: '#1B7F66',
     fontWeight: '800',
   },
   photoPreview: {
@@ -377,6 +382,7 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 16,
+    borderCurve: 'continuous',
   },
   photoRemove: {
     position: 'absolute',
@@ -384,7 +390,8 @@ const styles = StyleSheet.create({
     right: 6,
     width: 26,
     height: 26,
-    borderRadius: 13,
+    borderRadius: 999,
+    borderCurve: 'continuous',
     backgroundColor: 'rgba(0,0,0,0.55)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -394,6 +401,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     backgroundColor: '#1B7F66',
     borderRadius: 16,
+    borderCurve: 'continuous',
     paddingVertical: 15,
     alignItems: 'center',
     borderBottomWidth: 4,
@@ -404,7 +412,7 @@ const styles = StyleSheet.create({
   },
   primaryBtnText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '900',
   },
 });

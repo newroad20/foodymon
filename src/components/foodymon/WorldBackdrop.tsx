@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
   orb: {
     position: 'absolute',
     borderRadius: 999,
+    borderCurve: 'continuous',
     opacity: 0.78,
   },
   orbTop: {

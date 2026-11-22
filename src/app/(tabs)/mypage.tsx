@@ -158,7 +158,7 @@ export default function MyPageScreen() {
             value={nickname}
             onChangeText={setNickname}
             placeholder="푸디몬이 부를 이름"
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor="#64748B"
             maxLength={12}
             returnKeyType="done"
           />
@@ -169,7 +169,7 @@ export default function MyPageScreen() {
             value={birthText}
             onChangeText={setBirthText}
             placeholder="예: 2012 (나이에 맞는 잠 시간 안내용)"
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor="#64748B"
             keyboardType="number-pad"
             maxLength={4}
           />
@@ -344,11 +344,12 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
+    borderRadius: 28,
+    borderCurve: 'continuous',
     padding: 20,
     borderWidth: 2,
     borderBottomWidth: 4,
-    borderColor: '#E5E5E5',
+    borderColor: '#E2E8F0',
   },
   profileRow: {
     flexDirection: 'row',
@@ -364,7 +365,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   name: {
-    fontSize: 18,
+    fontSize: 17,
     color: '#1E293B',
     fontWeight: '900',
   },
@@ -379,9 +380,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
+    borderCurve: 'continuous',
     overflow: 'hidden',
     backgroundColor: '#E3F6EF',
-    color: '#17765D',
+    color: '#1B7F66',
     fontSize: 12,
     fontWeight: '800',
   },
@@ -403,12 +405,12 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#64748B',
     fontWeight: '600',
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#1E293B',
     marginBottom: 12,
     fontWeight: '900',
@@ -422,7 +424,8 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
-    borderRadius: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
@@ -440,6 +443,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 16,
+    borderCurve: 'continuous',
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
     backgroundColor: '#F8FAFC',
@@ -449,17 +453,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#E3F6EF',
   },
   chipText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#475569',
     fontWeight: '800',
   },
   chipTextActive: {
-    color: '#17765D',
+    color: '#1B7F66',
   },
   primaryBtn: {
     marginTop: 4,
     backgroundColor: '#1B7F66',
     borderRadius: 16,
+    borderCurve: 'continuous',
     paddingVertical: 14,
     alignItems: 'center',
     borderBottomWidth: 4,
@@ -483,7 +488,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   sectionTitleInline: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#1E293B',
     fontWeight: '900',
   },

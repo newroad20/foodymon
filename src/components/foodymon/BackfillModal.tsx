@@ -54,8 +54,8 @@ export function BackfillModal({ visible, onClose }: Props) {
           <View style={styles.header}>
             <Text style={styles.title}>
               <Ionicons name="calendar" size={18} color="#1B7F66" /> {formatDay(state.backfill.date)} 기록 남기기</Text>
-            <TouchableOpacity style={styles.closeBtn} onPress={onClose} accessibilityLabel="닫기">
-              <Ionicons name="close" size={22} color="#A0AEC0" />
+            <TouchableOpacity style={styles.closeBtn} onPress={onClose} accessibilityLabel="닫기" hitSlop={8}>
+              <Ionicons name="close" size={22} color="#64748B" />
             </TouchableOpacity>
           </View>
 

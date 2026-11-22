@@ -58,8 +58,8 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
         <View style={styles.modalContent}>
           <View style={styles.header}>
             <Text style={styles.title}>수면 기록</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기">
-              <Ionicons name="close" size={22} color="#A0AEC0" />
+            <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기" hitSlop={8}>
+              <Ionicons name="close" size={22} color="#64748B" />
             </TouchableOpacity>
           </View>
 

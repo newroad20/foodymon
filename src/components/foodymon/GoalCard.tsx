@@ -122,8 +122,8 @@ export function GoalCard() {
           <View style={styles.sheet}>
             <View style={styles.header}>
               <Text style={styles.title}>{autoPrompt ? '어제 기록을 보고 제안해요' : `작은 목표 · ${info.day}일차`}</Text>
-              <TouchableOpacity onPress={close} style={styles.closeBtn} accessibilityLabel="닫기">
-                <Ionicons name="close" size={22} color="#A0AEC0" />
+              <TouchableOpacity onPress={close} style={styles.closeBtn} accessibilityLabel="닫기" hitSlop={8}>
+                <Ionicons name="close" size={22} color="#64748B" />
               </TouchableOpacity>
             </View>
 

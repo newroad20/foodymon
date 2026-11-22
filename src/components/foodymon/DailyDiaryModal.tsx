@@ -128,7 +128,7 @@ export function DailyDiaryModal({ onClose }: DailyDiaryModalProps) {
               <Text style={styles.title}>오늘의 일기장</Text>
               <Text style={styles.subtitle}>{dateLabel(todayKey)} · 내 하루를 평가 없이 정리해요</Text>
             </View>
-            <TouchableOpacity style={styles.closeBtn} onPress={handleClose} accessibilityLabel="일기장 닫기">
+            <TouchableOpacity style={styles.closeBtn} onPress={handleClose} accessibilityLabel="일기장 닫기" hitSlop={8}>
               <Ionicons name="close" size={22} color="#61756B" />
             </TouchableOpacity>
           </View>

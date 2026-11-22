@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
+import { CATEGORY_COLORS as C } from '@/constants/theme';
 import { BACKFILL_COST, emotionOptions } from '@/constants/foodymonData';
 
 const SLEEP_CHOICES = [4, 5, 6, 7, 8, 9, 10];

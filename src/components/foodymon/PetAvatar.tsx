@@ -9,7 +9,7 @@ import {
   Easing,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
+import { CATEGORY_COLORS as C } from '@/constants/theme';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData, costumeArt, petImage, petStateArt } from '@/constants/foodymonData';
 import type { PetReaction } from '@/context/FoodyMonContext';

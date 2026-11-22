@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
+import { CATEGORY_COLORS as C } from '@/constants/theme';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { mealStatuses, mindEmotions, mindSituations } from '@/constants/foodymonData';

@@ -1,7 +1,7 @@
 import { CostumeItem, BackgroundItem, QuizQuestion, LevelInfo } from '@/types/foodymon';
 import type { ImageSourcePropType } from 'react-native';
 import type { Emotion, MealStatus, Situation } from '@/lib/growth';
-import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
+import { CATEGORY_COLORS as C } from '@/constants/theme';
 
 export const levelsData: LevelInfo[] = [
   { level: 1, maxScore: 19, name: '푹 쉬는 푸디몬', image: require('@/assets/images/level1.png') },

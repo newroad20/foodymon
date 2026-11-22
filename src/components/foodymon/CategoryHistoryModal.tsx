@@ -18,6 +18,7 @@ import {
   type HistoryCategory,
 } from '@/lib/history';
 import type { LogItem } from '@/types/foodymon';
+import { CATEGORY_COLORS } from '@/constants/theme';
 
 interface HistoryModalProps {
   visible: boolean;

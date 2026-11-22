@@ -2,7 +2,7 @@
 export const MIND_WEATHER: readonly { id: string; emoji: string; label: string; replies: readonly string[] }[] = [
   {
     id: 'lonely',
-    emoji: '🫂',
+    emoji: '🥺',
     label: '외로워',
     replies: [
       '외로운 마음이 들었구나. 지금은 내가 옆에 꼭 붙어 있을게.',
@@ -47,7 +47,7 @@ export const MIND_WEATHER: readonly { id: string; emoji: string; label: string; 
   },
   {
     id: 'bored',
-    emoji: '🫠',
+    emoji: '🥱',
     label: '심심해',
     replies: [
       '심심했구나! 나랑 잠깐 숲 이야기 나눌래?',

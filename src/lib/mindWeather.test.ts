@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { MIND_WEATHER, pickReply } from './mindWeather.ts';
 
-const BANNED = ['과식', '결식', '참아', '야식', '배달', '살'];
+const BANNED = ['과식', '결식', '참아', '야식', '배달', '살 빼', '살찌', '다이어트'];
 
 test('every feeling has a unique id and at least one reply', () => {
   assert.equal(new Set(MIND_WEATHER.map((m) => m.id)).size, MIND_WEATHER.length);

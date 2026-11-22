@@ -35,10 +35,10 @@ const CATEGORIES: { id: HistoryCategory; label: string; icon: IconName }[] = [
 ];
 
 const META: Record<LogItem['type'], { bg: string; text: string; label: string; icon: IconName }> = {
-  meal: { bg: '#E3F6EF', text: '#1B7F66', label: '식사', icon: 'restaurant' },
+  meal: { bg: CATEGORY_COLORS.meal.bg, text: CATEGORY_COLORS.meal.ink, label: '식사', icon: 'restaurant' },
   skip: { bg: '#F1F5F9', text: '#64748B', label: '못 먹음', icon: 'remove-circle-outline' },
-  sleep: { bg: '#ECE9FF', text: '#7566C9', label: '수면', icon: 'moon' },
-  emotion: { bg: '#E3F1FB', text: '#286FA3', label: '마음', icon: 'heart' },
+  sleep: { bg: CATEGORY_COLORS.sleep.bg, text: CATEGORY_COLORS.sleep.ink, label: '수면', icon: 'moon' },
+  emotion: { bg: CATEGORY_COLORS.mind.bg, text: CATEGORY_COLORS.mind.ink, label: '마음', icon: 'heart' },
 };
 
 const EMPTY_COPY: Record<HistoryCategory, string> = {

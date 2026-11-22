@@ -139,6 +139,8 @@ function AppContent() {
                 headerShadowVisible: false,
               }}
             />
+            {/* 마음 쉼터: a self-contained task with its own stack (src/app/shelter/_layout.tsx). */}
+            <Stack.Screen name="shelter" options={{ presentation: 'modal' }} />
             <Stack.Screen
               name="share"
               options={{

@@ -63,7 +63,7 @@ export function buildPetChatOpening(
 export function replyToPetChat(text: string, focus: ChatFocus): string {
   const message = text.trim();
   if (/같이|곁에|여기까지/.test(message)) {
-    return '응, 말하지 않아도 괜찮아. 내가 조용히 옆에 있을게. 🌿';
+    return '응, 말하지 않아도 괜찮아. 내가 조용히 옆에 있을게.';
   }
   if (/힘들|속상|불안|걱정|울|지쳤|여유가 없/.test(message)) {
     return '그랬구나. 혼자 삼키지 않고 말해줘서 고마워. 지금 당장 다 해결하지 않아도 괜찮아.';
@@ -75,7 +75,7 @@ export function replyToPetChat(text: string, focus: ChatFocus): string {
     return '그런 이유가 있었구나. 잘 먹고 못 먹고를 평가하지 않을게. 다음 기회에 챙길 수 있으면 그걸로 충분해.';
   }
   if (/좋|행복|신나|잘한|괜찮/.test(message)) {
-    return '그 이야기를 들으니 나도 마음이 몽글몽글해! 오늘의 좋은 순간을 같이 기억하고 싶어. ✨';
+    return '그 이야기를 들으니 나도 마음이 몽글몽글해! 오늘의 좋은 순간을 같이 기억하고 싶어.';
   }
   return '응, 잘 듣고 있어. 네가 들려주는 이야기는 작아 보여도 나한테는 소중해.';
 }

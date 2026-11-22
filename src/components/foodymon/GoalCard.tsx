@@ -123,7 +123,7 @@ export function GoalCard() {
             <View style={styles.header}>
               <Text style={styles.title}>{autoPrompt ? '어제 기록을 보고 제안해요' : `작은 목표 · ${info.day}일차`}</Text>
               <TouchableOpacity onPress={close} style={styles.closeBtn} accessibilityLabel="닫기">
-                <Text style={styles.closeText}>✕</Text>
+                <Ionicons name="close" size={22} color="#A0AEC0" />
               </TouchableOpacity>
             </View>
 
@@ -276,11 +276,6 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     padding: 6,
-  },
-  closeText: {
-    fontSize: 18,
-    color: '#A0AEC0',
-    fontWeight: '800',
   },
   subtitle: {
     fontSize: 13,

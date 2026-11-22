@@ -90,7 +90,7 @@ export default function MyPageScreen() {
     });
     setSaving(false);
     Alert.alert(
-      ok ? '저장했어요 ✨' : '저장하지 못했어요',
+      ok ? '저장했어요' : '저장하지 못했어요',
       ok
         ? '저장했어요.'
         : '네트워크를 확인하고 다시 시도해 주세요.'

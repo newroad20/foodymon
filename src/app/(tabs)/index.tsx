@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
@@ -19,7 +20,6 @@ import { MealModal } from '@/components/foodymon/MealModal';
 import { SleepModal } from '@/components/foodymon/SleepModal';
 import { EmotionModal } from '@/components/foodymon/EmotionModal';
 import { ShelterModal } from '@/components/foodymon/ShelterModal';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { CategoryHistoryModal } from '@/components/foodymon/CategoryHistoryModal';
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 import { BackfillModal } from '@/components/foodymon/BackfillModal';
@@ -33,13 +33,13 @@ import { RolloverResult, toDateKey } from '@/lib/dayRollover';
 
 function describeRollover(r: RolloverResult): { title: string; message: string } {
   const lines: string[] = [];
-  if (r.rewardedJelly > 0) lines.push(`어제 나눠 준 기록 덕분에 이슬 ✨ +${r.rewardedJelly}개가 맺혔어요!`);
-  if (r.milestoneBonus > 0) lines.push(`🎉 연속 기록 기념 보너스 +${r.milestoneBonus}개도 함께 담았어요!`);
-  if (r.shieldEarned) lines.push('🛡️ 7일 연속 보상으로 스트릭 방패 1개를 추가 획득했어요!');
-  if (r.shieldsUsed > 0) lines.push(`🛡️ 방패 ${r.shieldsUsed}개가 쉬어 간 날을 지켜 줬어요. 연속 기록이 그대로예요!`);
-  if (r.streakReset) lines.push('쉬어 간 날이 있었네. 괜찮아, 오늘 다시 같이 시작하자 🌱');
+  if (r.rewardedJelly > 0) lines.push(`어제 나눠 준 기록 덕분에 이슬 +${r.rewardedJelly}개가 맺혔어요!`);
+  if (r.milestoneBonus > 0) lines.push(`연속 기록 기념 보너스 +${r.milestoneBonus}개도 함께 담았어요!`);
+  if (r.shieldEarned) lines.push('7일 연속 보상으로 스트릭 방패 1개를 추가 획득했어요!');
+  if (r.shieldsUsed > 0) lines.push(`방패 ${r.shieldsUsed}개가 쉬어 간 날을 지켜 줬어요. 연속 기록이 그대로예요!`);
+  if (r.streakReset) lines.push('쉬어 간 날이 있었네. 괜찮아, 오늘 다시 같이 시작하자');
 
-  const title = r.rewardedJelly > 0 && !r.streakReset ? '새로운 하루 시작! 🌅' : '새로운 하루 🌅';
+  const title = r.rewardedJelly > 0 && !r.streakReset ? '새로운 하루 시작!' : '새로운 하루';
   return { title, message: lines.join('\n') || '오늘도 건강한 하루 보내자!' };
 }
 
@@ -84,19 +84,19 @@ export default function FoodyMonHomeScreen() {
           onPress: () => {
             const res = advanceToNextDay();
             if (res.rewardedJelly > 0) {
-              let bonusMsg = `출석 보상으로 젤리 ✨ +${res.rewardedJelly}개를 받았습니다!`;
+              let bonusMsg = `출석 보상으로 젤리 +${res.rewardedJelly}개를 받았습니다!`;
               if (res.shieldEarned) {
-                bonusMsg += '\n🛡️ 7일 연속 보상으로 스트릭 방패 1개를 추가 획득했습니다!';
+                bonusMsg += '\n7일 연속 보상으로 스트릭 방패 1개를 추가 획득했습니다!';
               }
-              Alert.alert('새로운 하루 시작! 🌅', bonusMsg);
+              Alert.alert('새로운 하루 시작!', bonusMsg);
             } else if (res.shieldUsed) {
               Alert.alert(
-                '방패 사용! 🛡️',
+                '방패 사용!',
                 '어제 기록이 없었지만, 스트릭 방패가 사용되어 연속 기록이 유지되었습니다!'
               );
             } else {
               Alert.alert(
-                '새로운 하루 🌱',
+                '새로운 하루',
                 '어제는 쉬어 갔구나. 괜찮아, 오늘 다시 같이 시작하자!'
               );
             }
@@ -116,7 +116,7 @@ export default function FoodyMonHomeScreen() {
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         {syncError && (
           <TouchableOpacity style={styles.syncBanner} activeOpacity={0.8} onPress={retrySync}>
-            <Text style={styles.syncBannerText}>☁️ 서버와 동기화하지 못했어요. 눌러서 다시 시도</Text>
+            <Text style={styles.syncBannerText}><Ionicons name="cloud-offline" size={14} color="#991B1B" /> 서버와 동기화하지 못했어요. 눌러서 다시 시도</Text>
           </TouchableOpacity>
         )}
 
@@ -140,7 +140,7 @@ export default function FoodyMonHomeScreen() {
                 <Text style={styles.backfillLaterText}>나중에</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.backfillGo} onPress={() => setShowBackfillModal(true)}>
-                <Text style={styles.backfillGoText}>복구하기 ✨{BACKFILL_COST}</Text>
+                <Text style={styles.backfillGoText}>복구하기 <Ionicons name="water" size={13} color="#FFFFFF" /> {BACKFILL_COST}</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -2,18 +2,15 @@ import type { DayPoints, DayRecords } from '../lib/growth';
 
 export interface CostumeItem {
   id: string;
-  icon: string;
   name: string;
   price: number;
 }
 
 export interface BackgroundItem {
   id: string;
-  icon: string;
   name: string;
   price: number;
   type: 'carpet' | 'bookshelf' | 'plant' | 'plushie';
-  emoji: string;
   image: any;
 }
 

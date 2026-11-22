@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 interface WorldBackdropProps {
   mood?: 'mint' | 'sunset' | 'night';
@@ -20,10 +20,6 @@ export function WorldBackdrop({ mood = 'mint' }: WorldBackdropProps) {
       <View style={[styles.orb, styles.orbTop, { backgroundColor: palette.glow }]} />
       <View style={[styles.orb, styles.orbRight, { backgroundColor: palette.accent }]} />
       <View style={[styles.orb, styles.orbBottom, { backgroundColor: palette.detail }]} />
-      <Text style={[styles.sparkle, styles.sparkleOne]}>✦</Text>
-      <Text style={[styles.sparkle, styles.sparkleTwo]}>✦</Text>
-      <Text style={[styles.leaf, styles.leafLeft]}>❧</Text>
-      <Text style={[styles.leaf, styles.leafRight]}>❧</Text>
     </View>
   );
 }
@@ -59,36 +55,5 @@ const styles = StyleSheet.create({
     bottom: -150,
     left: -80,
     opacity: 0.5,
-  },
-  sparkle: {
-    position: 'absolute',
-    color: '#E9B65E',
-    opacity: 0.75,
-  },
-  sparkleOne: {
-    top: 84,
-    right: 38,
-    fontSize: 18,
-  },
-  sparkleTwo: {
-    top: 142,
-    left: 30,
-    fontSize: 12,
-  },
-  leaf: {
-    position: 'absolute',
-    color: '#70AD94',
-    opacity: 0.42,
-    fontSize: 42,
-  },
-  leafLeft: {
-    left: 12,
-    bottom: 90,
-    transform: [{ rotate: '-28deg' }],
-  },
-  leafRight: {
-    right: 4,
-    top: 320,
-    transform: [{ rotate: '145deg' }],
   },
 });

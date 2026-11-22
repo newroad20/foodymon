@@ -16,11 +16,11 @@ export const sleepTargetOptions = [5, 6, 7, 8, 9];
 export const mealTargetOptions = [1, 2, 3, 4];
 
 export const emotionOptions = [
-  { score: 100, emoji: '🥰', label: '매우 좋음', desc: '기운이 넘치고 행복해요!' },
-  { score: 80, emoji: '🙂', label: '좋음', desc: '평온하고 기분 좋은 하루예요.' },
-  { score: 60, emoji: '😐', label: '보통', desc: '무난하고 평범한 일상이에요.' },
-  { score: 40, emoji: '🙁', label: '조금 지침', desc: '스트레스나 피로감이 있어요.' },
-  { score: 20, emoji: '😭', label: '매우 힘듦', desc: '지치고 위로가 필요해요...' },
+  { score: 100, label: '매우 좋음', desc: '기운이 넘치고 행복해요!' },
+  { score: 80, label: '좋음', desc: '평온하고 기분 좋은 하루예요.' },
+  { score: 60, label: '보통', desc: '무난하고 평범한 일상이에요.' },
+  { score: 40, label: '조금 지침', desc: '스트레스나 피로감이 있어요.' },
+  { score: 20, label: '매우 힘듦', desc: '지치고 위로가 필요해요...' },
 ];
 
 // Faces for check-in reactions, per stage (same body, only the face changes). Stages without
@@ -33,7 +33,7 @@ export const petStateArt: Record<
     eat?: [ImageSourcePropType, ImageSourcePropType, ImageSourcePropType];
     mood?: Partial<Record<Emotion, ImageSourcePropType>>;
     /** Face-only crops of the mood faces, for the mood picker. */
-    face?: Partial<Record<Emotion, ImageSourcePropType>>;
+    face: Record<Emotion, ImageSourcePropType>;
   }
 > = {
   1: {
@@ -171,14 +171,14 @@ export const petStateArt: Record<
 };
 
 // Mind record (재형 피드백): every feeling counts the same; none of these is better than another.
-export const mindEmotions: { id: Emotion; emoji: string; label: string }[] = [
-  { id: 'very_good', emoji: '🥰', label: '매우 좋음' },
-  { id: 'good', emoji: '🙂', label: '좋음' },
-  { id: 'okay', emoji: '😐', label: '보통' },
-  { id: 'tired', emoji: '🙁', label: '조금 지침' },
-  { id: 'very_hard', emoji: '😭', label: '매우 힘듦' },
-  { id: 'unsure', emoji: '🤔', label: '잘 모르겠음' },
-  { id: 'no_answer', emoji: '🤐', label: '답하고 싶지 않음' },
+export const mindEmotions: { id: Emotion; label: string }[] = [
+  { id: 'very_good', label: '매우 좋음' },
+  { id: 'good', label: '좋음' },
+  { id: 'okay', label: '보통' },
+  { id: 'tired', label: '조금 지침' },
+  { id: 'very_hard', label: '매우 힘듦' },
+  { id: 'unsure', label: '잘 모르겠음' },
+  { id: 'no_answer', label: '답하고 싶지 않음' },
 ];
 
 export const mindSituations: { id: Situation; label: string }[] = [
@@ -266,16 +266,16 @@ export const tutorialPages = [
 ] as const;
 
 export const costumesData: CostumeItem[] = [
-  { id: 'crown', icon: '👑', name: '왕관', price: 50 },
-  { id: 'ribbon', icon: '🎀', name: '리본', price: 30 },
-  { id: 'glasses', icon: '🕶️', name: '선글라스', price: 40 },
-  { id: 'flower', icon: '🌸', name: '꽃장식', price: 20 },
-  { id: 'wizard', icon: '🧙‍♂️', name: '마법사 모자', price: 60 },
-  { id: 'bunny', icon: '🐰', name: '토끼 귀', price: 50 },
+  { id: 'crown', name: '왕관', price: 50 },
+  { id: 'ribbon', name: '리본', price: 30 },
+  { id: 'glasses', name: '선글라스', price: 40 },
+  { id: 'flower', name: '꽃장식', price: 20 },
+  { id: 'wizard', name: '마법사 모자', price: 60 },
+  { id: 'bunny', name: '토끼 귀', price: 50 },
 ];
 
 // FoodyMon wearing each costume, per stage (team art, 2026-10). Shown instead of the stage image
-// while that costume is on; the old emoji overlay is only a fallback for missing art.
+// while that costume is on.
 export const costumeArt: Record<number, Record<string, ImageSourcePropType>> = {
   1: {
     crown: require('@/assets/images/costume/level1/crown.png'),
@@ -334,10 +334,10 @@ export function petImage(level: number, costumeId: string | null) {
 }
 
 export const backgroundsData: BackgroundItem[] = [
-  { id: 'carpet', icon: '🧶', name: '포근한 카펫', price: 30, type: 'carpet', emoji: '🧶', image: require('@/assets/images/room/carpet.jpg') },
-  { id: 'bookshelf', icon: '📚', name: '미니 책장', price: 50, type: 'bookshelf', emoji: '📚', image: require('@/assets/images/room/bookshelf.jpg') },
-  { id: 'plant', icon: '🪴', name: '미니 화분', price: 40, type: 'plant', emoji: '🪴', image: require('@/assets/images/room/plant.jpg') },
-  { id: 'plushie', icon: '🧸', name: '곰인형', price: 60, type: 'plushie', emoji: '🧸', image: require('@/assets/images/room/plushie.jpg') },
+  { id: 'carpet', name: '포근한 카펫', price: 30, type: 'carpet', image: require('@/assets/images/room/carpet.jpg') },
+  { id: 'bookshelf', name: '미니 책장', price: 50, type: 'bookshelf', image: require('@/assets/images/room/bookshelf.jpg') },
+  { id: 'plant', name: '미니 화분', price: 40, type: 'plant', image: require('@/assets/images/room/plant.jpg') },
+  { id: 'plushie', name: '곰인형', price: 60, type: 'plushie', image: require('@/assets/images/room/plushie.jpg') },
 ];
 
 export const quizzesData: QuizQuestion[] = [
@@ -364,34 +364,32 @@ export const dialoguesData = {
     '네가 웃으면 나도 배가 불러!',
     '가끔은 쉬어가는 것도 필요해.',
     '밥은 잘 챙겨 먹고 있는 거지?',
-    '오늘 하루도 고생 많았어 💖',
+    '오늘 하루도 고생 많았어',
   ],
   good: [
     '마스터! 완전 최고야! 쌩쌩해!',
     '네 덕분에 나도 이렇게 건강해졌어!',
-    '우리 이대로 계속 건강하게 지내자 ✨',
+    '우리 이대로 계속 건강하게 지내자',
     '마스터의 좋은 기운이 뿜뿜 느껴져!',
   ],
   // Time of day (morning 5–11, afternoon 11–17, evening 17–22, night 22–5).
-  morning: ['좋은 아침! 숲에 이슬이 반짝여.', '창밖 공기 한 번 마셔볼까?', '아침 햇살이 간지러워 ☀️'],
+  morning: ['좋은 아침! 숲에 이슬이 반짝여.', '창밖 공기 한 번 마셔볼까?', '아침 햇살이 간지러워'],
   afternoon: ['오후의 숲은 나른하다~', '잠깐 기지개 켜고 가자!', '점심엔 어떤 색깔을 만났어?'],
-  evening: ['노을이 숲을 물들이고 있어 🌇', '오늘 하루 수고했어.', '저녁 바람이 선선하다~'],
-  night: ['별이 많이 떴어 🌙', '이제 슬슬 쉴 준비 해볼까?', '오늘도 곁에 있어줘서 고마워.'],
+  evening: ['노을이 숲을 물들이고 있어', '오늘 하루 수고했어.', '저녁 바람이 선선하다~'],
+  night: ['별이 많이 떴어', '이제 슬슬 쉴 준비 해볼까?', '오늘도 곁에 있어줘서 고마워.'],
   // Gentle invitations for what isn't logged yet — never a reminder of what was missed.
-  askSleep: ['어젯밤 잠은 어땠어? 들려줘!', '꿈속 숲 이야기 궁금해 💤'],
-  askMeal: ['오늘 숲에서 어떤 맛을 만났어?', '먹은 음식의 색깔을 알려줄래? 🍃'],
-  askEmotion: ['지금 마음 날씨는 어때?', '마음 한 조각 나눠줄래? ☁️'],
+  askSleep: ['어젯밤 잠은 어땠어? 들려줘!', '꿈속 숲 이야기 궁금해'],
+  askMeal: ['오늘 숲에서 어떤 맛을 만났어?', '먹은 음식의 색깔을 알려줄래?'],
+  askEmotion: ['지금 마음 날씨는 어때?', '마음 한 조각 나눠줄래?'],
   // When the user said they feel low: company, not cheering.
   lowMood: ['오늘은 그냥 같이 있자.', '마음이 무거운 날엔 나한테 기대도 돼.', '괜찮아지지 않아도 괜찮아.'],
   // {n} = streak days.
-  streak: ['벌써 {n}일째 함께야! 🌱', '{n}일 동안 숲을 찾아와 줘서 고마워.'],
+  streak: ['벌써 {n}일째 함께야!', '{n}일 동안 숲을 찾아와 줘서 고마워.'],
   // Right after a check-in.
   reaction: {
-    sleep: ['잠 이야기 고마워! 이슬처럼 맑아졌어.', '푹 쉰 만큼 숲도 쉬었어 💤'],
-    meal: ['냠! 그 맛 나도 느껴졌어 😋', '알아차려줘서 고마워. 배가 든든해!'],
+    sleep: ['잠 이야기 고마워! 이슬처럼 맑아졌어.', '푹 쉰 만큼 숲도 쉬었어'],
+    meal: ['냠! 그 맛 나도 느껴졌어', '알아차려줘서 고마워. 배가 든든해!'],
     skip: ['그럴 때도 있지. 알려줘서 고마워.', '다음 끼니 때 또 만나자!'],
-    emotion: ['마음 알려줘서 고마워 💖', '어떤 마음이든 다 소중해.'],
+    emotion: ['마음 알려줘서 고마워', '어떤 마음이든 다 소중해.'],
   },
 };
-
-export const interactionEmojis = ['💖', '✨', '🎵', '⭐', '🎈', '🥰'];

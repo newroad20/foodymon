@@ -64,7 +64,7 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
       }
     } else if (needsConfirmation) {
       Alert.alert(
-        '🎉 가입 완료!',
+        '가입 완료!',
         `환영합니다!\n이 폰에서 인증 메일의 링크를 누르면 앱이 열리면서 바로 로그인돼요.\n(받은 편지함 또는 스팸함을 확인하세요)`,
         [{ text: '확인', onPress: onSwitchToLogin }]
       );

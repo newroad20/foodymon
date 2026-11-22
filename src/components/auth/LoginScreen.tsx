@@ -78,7 +78,6 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
             </View>
             <View style={styles.petStage}>
               <View style={styles.petGlow} />
-              <Text style={styles.stageSparkle}>✦</Text>
               <Image
                 source={require('@/assets/images/level3.png')}
                 style={styles.petImage}
@@ -265,14 +264,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#D9F2E7',
     borderWidth: 1,
     borderColor: '#C7E9DC',
-  },
-  stageSparkle: {
-    position: 'absolute',
-    right: 12,
-    top: 20,
-    color: '#E7AD4B',
-    fontSize: 18,
-    zIndex: 2,
   },
   groundShadow: {
     position: 'absolute',

@@ -131,7 +131,7 @@ export default function DayScreen() {
             return (
               <View key={i} style={styles.mind}>
                 <Text style={styles.line}>
-                  {e?.emoji} {e?.label}
+                  {e?.label}
                   {s ? ` · ${s.label}` : ''}
                 </Text>
                 {r.note ? <Text style={styles.quote}>"{r.note}"</Text> : null}

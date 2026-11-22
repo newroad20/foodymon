@@ -59,7 +59,7 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
           <View style={styles.header}>
             <Text style={styles.title}>수면 기록</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기">
-              <Text style={styles.closeBtnText}>✕</Text>
+              <Ionicons name="close" size={22} color="#A0AEC0" />
             </TouchableOpacity>
           </View>
 
@@ -153,11 +153,6 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     padding: 6,
-  },
-  closeBtnText: {
-    fontSize: 18,
-    color: '#A0AEC0',
-    fontWeight: '800',
   },
   subtitle: {
     fontSize: 14,

@@ -96,7 +96,7 @@ export default function AlbumScreen() {
           error ? null : (
             <View style={styles.empty}>
               <Ionicons name="camera-outline" size={40} color="#9FD8C5" />
-              <Text style={styles.emptyText}>아직 사진이 없어요.{`\n`}식사를 기록할 때 📷 버튼으로 남겨 보세요!</Text>
+              <Text style={styles.emptyText}>아직 사진이 없어요.{`\n`}식사를 기록할 때 사진 버튼으로 남겨 보세요!</Text>
             </View>
           )
         }

@@ -30,7 +30,7 @@ import { pickDialogue } from '@/lib/dialogue';
 import { journeyEnd } from '@/lib/journey';
 import { enableReminders, refreshReminders, setReminderEnd } from '@/lib/reminders';
 import { successFeel, tapFeel } from '@/lib/haptics';
-import { foodEmoji } from '@/lib/foodEmoji';
+import { foodIcon, type FoodIcon } from '@/lib/foodIcon';
 import { formatLogTime, withDayPoints } from '@/lib/serverState';
 import * as gameApi from '@/lib/gameApi';
 
@@ -138,7 +138,7 @@ interface FoodyMonContextType {
 function describeMind(r: MindRecord): string {
   const e = mindEmotions.find((m) => m.id === r.emotion);
   const situation = mindSituations.find((m) => m.id === r.situation);
-  return [`마음 · ${e?.emoji ?? ''} ${e?.label ?? ''}`, situation?.label, r.note && `"${r.note}"`]
+  return [`마음 · ${e?.label ?? ''}`, situation?.label, r.note && `"${r.note}"`]
     .filter(Boolean)
     .join(' · ');
 }
@@ -146,7 +146,7 @@ function describeMind(r: MindRecord): string {
 /** What FoodyMon just reacted to on home; `id` changes each time so the same kind replays. */
 export type PetReaction =
   | { id: number; kind: 'sleep' }
-  | { id: number; kind: 'eat'; photoUri: string | null; emoji: string }
+  | { id: number; kind: 'eat'; photoUri: string | null; icon: FoodIcon }
   | { id: number; kind: 'mood'; emotion: Emotion };
 
 const FoodyMonContext = createContext<FoodyMonContextType | undefined>(undefined);
@@ -192,7 +192,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     if (g.evolved) {
       const info = levelsData.find((l) => l.level === g.level);
       successFeel();
-      Alert.alert('🎉 푸디몬이 자랐어요!', `Lv.${g.level} ${info?.name ?? ''}이(가) 되었어요. 함께 쌓은 기록 덕분이야!`);
+      Alert.alert('푸디몬이 자랐어요!', `Lv.${g.level} ${info?.name ?? ''}이(가) 되었어요. 함께 쌓은 기록 덕분이야!`);
     }
   };
 
@@ -260,7 +260,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
 
   const triggerPetInteraction = () => {
     tapFeel();
-    const pool = ['앗, 간지러워!', '에헤헤 🎵', '마스터 손길 최고야 🥰', '기분 좋아!', '오늘도 힘낼게! ✨'];
+    const pool = ['앗, 간지러워!', '에헤헤', '마스터 손길 최고야', '기분 좋아!', '오늘도 힘낼게!'];
     const chosen = pool[Math.floor(Math.random() * pool.length)];
     const msg = state.masterName ? `${state.masterName} 마스터, ${chosen}` : chosen;
     setCurrentDialogue(msg);
@@ -331,7 +331,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     mealSize: number,
     guardian?: { name: string; contact: string }
   ) => {
-    const firstLog = { type: 'emotion' as const, content: `${name} 마스터와 푸디몬이 첫 만남을 가졌어요! 🎉` };
+    const firstLog = { type: 'emotion' as const, content: `${name} 마스터와 푸디몬이 첫 만남을 가졌어요!` };
     applyState(
       withScore({
         ...stateRef.current,
@@ -425,7 +425,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
       }
     );
     if (saved && ['ate', 'much', 'little', 'hard'].includes(record.status)) {
-      setPetReaction({ id: Date.now(), kind: 'eat', photoUri: photoUri ?? null, emoji: foodEmoji(record.menu) });
+      setPetReaction({ id: Date.now(), kind: 'eat', photoUri: photoUri ?? null, icon: foodIcon(record.menu) });
     }
     return { saved, photoFailed };
   };
@@ -473,7 +473,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     }
 
     await syncFromServer();
-    return { success: true, message: `어제 기록을 복구했어요! 연속 기록이 이어졌어요 🔥` };
+    return { success: true, message: `어제 기록을 복구했어요! 연속 기록이 이어졌어요` };
   };
 
   /** Updates name and lifestyle goals; today's score is recalculated against the new goals. */
@@ -517,14 +517,14 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
 
     if (!item) return { success: false, message: '아이템을 찾을 수 없습니다.' };
     if (stateRef.current.currency < item.price) {
-      return { success: false, message: '젤리가 부족해요! 체크인으로 젤리를 모아보세요 ✨' };
+      return { success: false, message: '젤리가 부족해요! 체크인으로 젤리를 모아보세요' };
     }
 
     const res = await gameApi.buyItem(type, id);
     if (!res.ok) {
       const messages: Record<gameApi.BuyError, string> = {
         already_owned: '이미 가지고 있는 아이템이에요.',
-        insufficient_jelly: '젤리가 부족해요! 체크인으로 젤리를 모아보세요 ✨',
+        insufficient_jelly: '젤리가 부족해요! 체크인으로 젤리를 모아보세요',
         not_found: '아이템을 찾을 수 없습니다.',
         network: '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.',
       };
@@ -539,18 +539,18 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
       ownedBackgrounds:
         type === 'background' ? [...current.ownedBackgrounds, id] : current.ownedBackgrounds,
     });
-    return { success: true, message: `${item.name}을(를) 구매했습니다! 🎒` };
+    return { success: true, message: `${item.name}을(를) 구매했습니다!` };
   };
 
   const openGiftBox = async () => {
     if (stateRef.current.currency < GIFT_BOX_COST) {
-      return { success: false as const, message: `선물 상자에는 젤리 ${GIFT_BOX_COST}개가 필요해요 ✨` };
+      return { success: false as const, message: `선물 상자에는 젤리 ${GIFT_BOX_COST}개가 필요해요` };
     }
     const res = await gameApi.openGiftBox();
     if (!res.ok) {
       const messages: Record<gameApi.GiftBoxError, string> = {
         all_owned: '숲의 선물을 모두 모았어요! 새 선물이 곧 찾아올 거예요.',
-        insufficient_jelly: `선물 상자에는 젤리 ${GIFT_BOX_COST}개가 필요해요 ✨`,
+        insufficient_jelly: `선물 상자에는 젤리 ${GIFT_BOX_COST}개가 필요해요`,
         network: '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.',
       };
       return { success: false as const, message: messages[res.error] };

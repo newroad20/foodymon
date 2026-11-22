@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { BACKFILL_COST, emotionOptions } from '@/constants/foodymonData';
 
 const SLEEP_CHOICES = [4, 5, 6, 7, 8, 9, 10];
@@ -41,7 +42,7 @@ export function BackfillModal({ visible, onClose }: Props) {
     setSaving(true);
     const res = await backfillYesterday({ sleepHours, mealCount, emotion });
     setSaving(false);
-    Alert.alert(res.success ? '복구 완료 🎉' : '복구하지 못했어요', res.message);
+    Alert.alert(res.success ? '복구 완료' : '복구하지 못했어요', res.message);
     if (res.success) onClose();
   };
 
@@ -50,9 +51,10 @@ export function BackfillModal({ visible, onClose }: Props) {
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
           <View style={styles.header}>
-            <Text style={styles.title}>📅 {formatDay(state.backfill.date)} 기록 복구</Text>
-            <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-              <Text style={styles.closeBtnText}>✕</Text>
+            <Text style={styles.title}>
+              <Ionicons name="calendar" size={18} color="#1B7F66" /> {formatDay(state.backfill.date)} 기록 복구</Text>
+            <TouchableOpacity style={styles.closeBtn} onPress={onClose} accessibilityLabel="닫기">
+              <Ionicons name="close" size={22} color="#A0AEC0" />
             </TouchableOpacity>
           </View>
 
@@ -61,7 +63,9 @@ export function BackfillModal({ visible, onClose }: Props) {
               어제 기억나는 것만 골라도 돼요. 복구하면 끊긴 연속 기록이 이어지고, 어제 쓴 방패도 돌려받아요.
             </Text>
 
-            <Text style={styles.label}>🌙 어제 잔 시간</Text>
+            <Text style={styles.label}>
+              <Ionicons name="moon" size={15} color="#7566C9" /> 어제 잔 시간
+            </Text>
             <View style={styles.chipRow}>
               {SLEEP_CHOICES.map((h) => (
                 <Chip
@@ -73,19 +77,23 @@ export function BackfillModal({ visible, onClose }: Props) {
               ))}
             </View>
 
-            <Text style={styles.label}>🍚 어제 먹은 끼니</Text>
+            <Text style={styles.label}>
+              <Ionicons name="restaurant" size={15} color="#C97719" /> 어제 먹은 끼니
+            </Text>
             <View style={styles.chipRow}>
               {mealChoices.map((m) => (
                 <Chip key={m} label={`${m}끼`} active={mealCount === m} onPress={() => setMealCount(m)} />
               ))}
             </View>
 
-            <Text style={styles.label}>😊 어제의 기분</Text>
+            <Text style={styles.label}>
+              <Ionicons name="happy" size={15} color="#C95E83" /> 어제의 기분
+            </Text>
             <View style={styles.chipRow}>
               {emotionOptions.map((e) => (
                 <Chip
                   key={e.score}
-                  label={`${e.emoji} ${e.label}`}
+                  label={e.label}
                   active={emotion === e.score}
                   onPress={() => setEmotion(emotion === e.score ? null : e.score)}
                 />
@@ -94,7 +102,8 @@ export function BackfillModal({ visible, onClose }: Props) {
           </ScrollView>
 
           <Text style={styles.cost}>
-            복구 비용 ✨ {BACKFILL_COST} · 보유 ✨ {state.currency}
+            복구 비용 <Ionicons name="water" size={13} color="#1B7F66" /> {BACKFILL_COST} · 보유{' '}
+            <Ionicons name="water" size={13} color="#1B7F66" /> {state.currency}
           </Text>
           <TouchableOpacity
             style={[styles.submitBtn, (!hasInput || !enoughJelly || saving) && styles.submitBtnDisabled]}
@@ -149,11 +158,6 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     padding: 6,
-  },
-  closeBtnText: {
-    fontSize: 18,
-    color: '#A0AEC0',
-    fontWeight: '800',
   },
   subtitle: {
     fontSize: 14,

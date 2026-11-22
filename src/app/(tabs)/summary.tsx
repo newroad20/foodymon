@@ -19,7 +19,7 @@ type Range = (typeof RANGES)[number];
 // Points measure how much was shared, never how "good" the day was.
 function greeting(logged: boolean) {
   return logged
-    ? '오늘 나눠 준 기록이 푸디몬의 성장점으로 쌓였어요. 고마워요 🌱'
+    ? '오늘 나눠 준 기록이 푸디몬의 성장점으로 쌓였어요. 고마워요'
     : '아직 오늘 기록이 없어요. 하나만 나눠 볼까요?';
 }
 

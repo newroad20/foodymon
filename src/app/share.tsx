@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { captureRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import { useFoodyMon } from '@/context/FoodyMonContext';
@@ -94,7 +95,7 @@ export default function ShareScreen() {
         activeOpacity={0.85}
         disabled={sharing}
         onPress={handleShare}>
-        {sharing ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.shareText}>📤 이미지로 공유하기</Text>}
+        {sharing ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.shareText}><Ionicons name="share-outline" size={17} color="#FFFFFF" /> 이미지로 공유하기</Text>}
       </TouchableOpacity>
       <Text style={styles.hint}>
         {Platform.OS === 'web'

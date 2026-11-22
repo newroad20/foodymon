@@ -20,7 +20,6 @@ import { MealModal } from '@/components/foodymon/MealModal';
 import { SleepModal } from '@/components/foodymon/SleepModal';
 import { EmotionModal } from '@/components/foodymon/EmotionModal';
 import { ShelterModal } from '@/components/foodymon/ShelterModal';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { CategoryHistoryModal } from '@/components/foodymon/CategoryHistoryModal';
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 import { BackfillModal } from '@/components/foodymon/BackfillModal';

@@ -123,7 +123,7 @@ export default function FoodyMonHomeScreen() {
         {/* Top Badges & History */}
         <TopStatsHeader onOpenHistory={() => setShowHistoryModal(true)} />
         {day !== null && !journeyOver && (
-          <TouchableOpacity onPress={() => router.push('/journey')} accessibilityRole="link" accessibilityHint="100일 여정 지도를 열어요">
+          <TouchableOpacity onPress={() => router.push('/journey')} hitSlop={{ top: 10, bottom: 10 }} accessibilityRole="link" accessibilityHint="100일 여정 지도를 열어요">
             <Text style={styles.dayPill}>{JOURNEY_DAYS}일 중 {day}일차 ›</Text>
           </TouchableOpacity>
         )}

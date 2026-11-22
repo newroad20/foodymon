@@ -1,8 +1,8 @@
 /** 마음 쉼터 (기능 C 한 줄 마음 날씨): one feeling in, one warm line back. Client-only, nothing saved. */
-export const MIND_WEATHER: readonly { id: string; emoji: string; label: string; replies: readonly string[] }[] = [
+export const MIND_WEATHER: readonly { id: string; icon: string; label: string; replies: readonly string[] }[] = [
   {
     id: 'lonely',
-    emoji: '🥺',
+    icon: 'cloudy-night',
     label: '외로워',
     replies: [
       '외로운 마음이 들었구나. 지금은 내가 옆에 꼭 붙어 있을게.',
@@ -11,7 +11,7 @@ export const MIND_WEATHER: readonly { id: string; emoji: string; label: string; 
   },
   {
     id: 'tired',
-    emoji: '😪',
+    icon: 'moon',
     label: '피곤해',
     replies: [
       '많이 지쳤구나. 오늘 여기까지 온 것만으로도 충분해.',
@@ -20,7 +20,7 @@ export const MIND_WEATHER: readonly { id: string; emoji: string; label: string; 
   },
   {
     id: 'stuffy',
-    emoji: '😮‍💨',
+    icon: 'cloudy',
     label: '답답해',
     replies: [
       '마음이 꽉 막힌 느낌이구나. 그런 날도 있어, 이상한 거 아니야.',
@@ -29,7 +29,7 @@ export const MIND_WEATHER: readonly { id: string; emoji: string; label: string; 
   },
   {
     id: 'anxious',
-    emoji: '😟',
+    icon: 'thunderstorm',
     label: '불안해',
     replies: [
       '불안한 마음이 찾아왔구나. 천천히, 지금 여기 나랑 같이 있자.',
@@ -38,7 +38,7 @@ export const MIND_WEATHER: readonly { id: string; emoji: string; label: string; 
   },
   {
     id: 'upset',
-    emoji: '😢',
+    icon: 'rainy',
     label: '속상해',
     replies: [
       '속상한 일이 있었구나. 말해 줘서 고마워, 내가 들어 줄게.',
@@ -47,7 +47,7 @@ export const MIND_WEATHER: readonly { id: string; emoji: string; label: string; 
   },
   {
     id: 'bored',
-    emoji: '🥱',
+    icon: 'partly-sunny',
     label: '심심해',
     replies: [
       '심심했구나! 나랑 잠깐 숲 이야기 나눌래?',
@@ -56,7 +56,7 @@ export const MIND_WEATHER: readonly { id: string; emoji: string; label: string; 
   },
   {
     id: 'hungry',
-    emoji: '🍙',
+    icon: 'nutrition',
     label: '배가 고픈 것 같아',
     replies: [
       '몸이 보내는 신호를 알아챘구나. 그 신호, 소중하게 들어 줘도 괜찮아.',
@@ -65,7 +65,7 @@ export const MIND_WEATHER: readonly { id: string; emoji: string; label: string; 
   },
   {
     id: 'unsure',
-    emoji: '🌫️',
+    icon: 'help-circle',
     label: '잘 모르겠어',
     replies: [
       '잘 모르겠는 마음도 괜찮아. 이름 없는 마음도 다 소중해.',

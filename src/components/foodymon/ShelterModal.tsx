@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { petImage } from '@/constants/foodymonData';
@@ -27,7 +28,7 @@ export function ShelterModal({ visible, onClose }: ShelterModalProps) {
           <View style={styles.header}>
             <Text style={styles.title}>마음 쉼터</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기">
-              <Text style={styles.closeBtnText}>✕</Text>
+              <Ionicons name="close" size={24} color="#64748B" />
             </TouchableOpacity>
           </View>
 
@@ -51,7 +52,7 @@ export function ShelterModal({ visible, onClose }: ShelterModalProps) {
                     onPress={() => setReply(pickReply(m.id))}
                     accessibilityRole="button"
                     accessibilityLabel={m.label}>
-                    <Text style={styles.chipEmoji}>{m.emoji}</Text>
+                    <Ionicons name={m.icon as React.ComponentProps<typeof Ionicons>['name']} size={22} color="#1B7F66" />
                     <Text style={styles.chipText}>{m.label}</Text>
                   </TouchableOpacity>
                 ))}
@@ -107,12 +108,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   closeBtn: {
-    padding: 6,
-  },
-  closeBtnText: {
-    fontSize: 18,
-    color: '#A0AEC0',
-    fontWeight: '800',
+    padding: 10,
   },
   helpLink: {
     fontSize: 13,
@@ -146,9 +142,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderBottomWidth: 4,
     borderColor: '#D5E8DE',
-  },
-  chipEmoji: {
-    fontSize: 22,
   },
   chipText: {
     flexShrink: 1,

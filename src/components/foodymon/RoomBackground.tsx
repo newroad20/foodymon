@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { backgroundsData } from '@/constants/foodymonData';
@@ -15,13 +16,13 @@ export function RoomBackground() {
 
   // Determine window sky style
   let skyColor = '#81D4FA'; // Day
-  let sunOrMoon = '☀️';
+  let sky: { icon: 'sunny' | 'partly-sunny' | 'moon'; color: string } = { icon: 'sunny', color: '#FFD54F' };
   if (isSunset) {
     skyColor = '#FFB74D'; // Sunset
-    sunOrMoon = '🌅';
+    sky = { icon: 'partly-sunny', color: '#FFF3E0' };
   } else if (isNight) {
     skyColor = '#1A237E'; // Night
-    sunOrMoon = '🌙';
+    sky = { icon: 'moon', color: '#FFF59D' };
   }
 
   // Older saves may hold several; the last one equipped wins.
@@ -35,21 +36,14 @@ export function RoomBackground() {
     );
   }
 
-  const hasCarpet = state.equippedBackgrounds.includes('carpet');
-  const hasBookshelf = state.equippedBackgrounds.includes('bookshelf');
-  const hasPlant = state.equippedBackgrounds.includes('plant');
-  const hasPlushie = state.equippedBackgrounds.includes('plushie');
-
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       <View style={[styles.wall, isNight && styles.wallNight, isSunset && styles.wallSunset]}>
         <View style={[styles.wallGlow, isNight && styles.wallGlowNight]} />
-        <Text style={[styles.mote, styles.moteOne]}>✦</Text>
-        <Text style={[styles.mote, styles.moteTwo]}>✦</Text>
 
         <View style={[styles.windowFrame, { top: top + 140 }]}>
           <View style={[styles.windowGlass, { backgroundColor: skyColor }]}>
-            <Text style={styles.sunMoon}>{sunOrMoon}</Text>
+            <Ionicons name={sky.icon} size={20} color={sky.color} style={styles.sunMoon} />
             {!isNight && <View style={styles.cloudOne} />}
             {!isNight && <View style={styles.cloudTwo} />}
             <View style={styles.hillFar} />
@@ -60,20 +54,13 @@ export function RoomBackground() {
         </View>
 
         <View style={[styles.wallFrame, { top: top + 150 }]}>
-          <Text style={styles.wallFrameLeaf}>☘</Text>
+          <Ionicons name="leaf" size={28} color="#78AD8F" />
         </View>
         <View style={[styles.tinyShelf, { top: top + 238 }]}>
           <View style={styles.shelfBookA} />
           <View style={styles.shelfBookB} />
           <View style={styles.shelfVase} />
         </View>
-
-        {/* Equipped Bookshelf (Left Wall) */}
-        {hasBookshelf && (
-          <View style={styles.bookshelfContainer}>
-            <Text style={styles.bookshelfEmoji}>📚</Text>
-          </View>
-        )}
       </View>
 
       <View style={styles.floor}>
@@ -81,29 +68,6 @@ export function RoomBackground() {
         <View style={[styles.floorPlank, { top: '28%' }]} />
         <View style={[styles.floorPlank, { top: '58%' }]} />
         <View style={[styles.floorPlank, { top: '84%' }]} />
-
-        {/* Equipped Carpet */}
-        {hasCarpet && (
-          <View style={styles.carpetContainer}>
-            <View style={styles.carpetOval}>
-              <Text style={styles.carpetPattern}>🧶 포근한 카펫</Text>
-            </View>
-          </View>
-        )}
-
-        {/* Equipped Plant */}
-        {hasPlant && (
-          <View style={styles.plantContainer}>
-            <Text style={styles.decorEmoji}>🪴</Text>
-          </View>
-        )}
-
-        {/* Equipped Plushie */}
-        {hasPlushie && (
-          <View style={styles.plushieContainer}>
-            <Text style={styles.decorEmoji}>🧸</Text>
-          </View>
-        )}
       </View>
     </View>
   );
@@ -135,21 +99,6 @@ const styles = StyleSheet.create({
   wallGlowNight: {
     backgroundColor: 'rgba(255,255,255,0.28)',
   },
-  mote: {
-    position: 'absolute',
-    color: '#E2B45A',
-    opacity: 0.45,
-  },
-  moteOne: {
-    top: 118,
-    left: 42,
-    fontSize: 13,
-  },
-  moteTwo: {
-    top: 205,
-    right: 130,
-    fontSize: 9,
-  },
   windowFrame: {
     position: 'absolute',
     right: 24,
@@ -175,11 +124,9 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   sunMoon: {
-    fontSize: 20,
     position: 'absolute',
     top: 10,
     right: 10,
-    fontWeight: '600',
   },
   cloudOne: {
     position: 'absolute',
@@ -244,10 +191,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     transform: [{ rotate: '-2deg' }],
   },
-  wallFrameLeaf: {
-    color: '#78AD8F',
-    fontSize: 29,
-  },
   tinyShelf: {
     position: 'absolute',
     left: 25,
@@ -280,15 +223,6 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 8,
     backgroundColor: '#E8C77E',
   },
-  bookshelfContainer: {
-    position: 'absolute',
-    left: 20,
-    top: 120,
-  },
-  bookshelfEmoji: {
-    fontSize: 38,
-    fontWeight: '600',
-  },
   floor: {
     flex: 3,
     backgroundColor: '#E9DDCE',
@@ -306,44 +240,5 @@ const styles = StyleSheet.create({
     right: 0,
     height: 1,
     backgroundColor: 'rgba(142, 113, 86, 0.13)',
-  },
-  carpetContainer: {
-    position: 'absolute',
-    bottom: 120,
-    alignSelf: 'center',
-    width: 260,
-    height: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  carpetOval: {
-    width: 240,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#FFE0B2',
-    borderWidth: 2,
-    borderColor: '#FFCC80',
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  carpetPattern: {
-    fontSize: 11,
-    color: '#D84315',
-    fontWeight: '700',
-  },
-  plantContainer: {
-    position: 'absolute',
-    left: 25,
-    bottom: 120,
-  },
-  plushieContainer: {
-    position: 'absolute',
-    right: 30,
-    bottom: 120,
-  },
-  decorEmoji: {
-    fontSize: 34,
-    fontWeight: '600',
   },
 });

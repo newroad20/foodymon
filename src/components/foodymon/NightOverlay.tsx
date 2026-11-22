@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 
 // Fixed star spots (fractions of the screen) so the sky looks the same every night.
@@ -45,7 +46,7 @@ export function NightOverlay() {
 
   return (
     <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.sky, { opacity: dark }]}>
-      <Text style={styles.moon}>🌙</Text>
+      <Ionicons name="moon" size={54} color="#FFE9A8" style={styles.moon} />
       <Animated.View style={[StyleSheet.absoluteFill, { opacity: twinkle }]}>
         {STARS.map(([x, y], i) => (
           <View
@@ -68,7 +69,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '9%',
     right: '10%',
-    fontSize: 54,
   },
   star: {
     position: 'absolute',

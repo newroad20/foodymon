@@ -132,7 +132,7 @@ export default function FoodyMonHomeScreen() {
         {/* S25: offer to fill in a missed yesterday */}
         {backfillOffer && !journeyOver && (
           <View style={styles.backfillCard}>
-            <Text style={styles.backfillText}>어제 기록을 완료하지 못했어요. 지금 복구할까요?</Text>
+            <Text style={styles.backfillText}>어제 이야기도 들려줄래?</Text>
             <View style={styles.backfillActions}>
               <TouchableOpacity
                 style={styles.backfillLater}
@@ -140,7 +140,7 @@ export default function FoodyMonHomeScreen() {
                 <Text style={styles.backfillLaterText}>나중에</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.backfillGo} onPress={() => setShowBackfillModal(true)}>
-                <Text style={styles.backfillGoText}>복구하기 <Ionicons name="water" size={13} color="#FFFFFF" /> {BACKFILL_COST}</Text>
+                <Text style={styles.backfillGoText}>어제 기록 남기기 <Ionicons name="water" size={13} color="#FFFFFF" /> {BACKFILL_COST}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -264,7 +264,8 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 18,
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderWidth: 1.5,
+    borderWidth: 2,
+    borderBottomWidth: 4,
     borderColor: '#B5E6D4',
     gap: 10,
   },
@@ -282,11 +283,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 12,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#1B7F66',
   },
   backfillLaterText: {
     fontSize: 13,
-    color: '#64748B',
+    color: '#1B7F66',
     fontWeight: '800',
   },
   backfillGo: {

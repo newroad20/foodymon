@@ -43,7 +43,7 @@ export function BackfillModal({ visible, onClose }: Props) {
     setSaving(true);
     const res = await backfillYesterday({ sleepHours, mealCount, emotion });
     setSaving(false);
-    Alert.alert(res.success ? '복구 완료' : '복구하지 못했어요', res.message);
+    Alert.alert(res.success ? '어제 기록을 남겼어요' : '기록을 남기지 못했어요', res.message);
     if (res.success) onClose();
   };
 
@@ -53,7 +53,7 @@ export function BackfillModal({ visible, onClose }: Props) {
         <View style={styles.modalContent}>
           <View style={styles.header}>
             <Text style={styles.title}>
-              <Ionicons name="calendar" size={18} color="#1B7F66" /> {formatDay(state.backfill.date)} 기록 복구</Text>
+              <Ionicons name="calendar" size={18} color="#1B7F66" /> {formatDay(state.backfill.date)} 기록 남기기</Text>
             <TouchableOpacity style={styles.closeBtn} onPress={onClose} accessibilityLabel="닫기">
               <Ionicons name="close" size={22} color="#A0AEC0" />
             </TouchableOpacity>
@@ -61,7 +61,7 @@ export function BackfillModal({ visible, onClose }: Props) {
 
           <ScrollView>
             <Text style={styles.subtitle}>
-              어제 기억나는 것만 골라도 돼요. 복구하면 끊긴 연속 기록이 이어지고, 어제 쓴 방패도 돌려받아요.
+              어제 기억나는 것만 골라도 돼요. 기록을 남기면 끊긴 연속 기록이 이어지고, 어제 쓴 방패도 돌려받아요.
             </Text>
 
             <Text style={styles.label}>
@@ -103,7 +103,7 @@ export function BackfillModal({ visible, onClose }: Props) {
           </ScrollView>
 
           <Text style={styles.cost}>
-            복구 비용 <Ionicons name="water" size={13} color="#1B7F66" /> {BACKFILL_COST} · 보유{' '}
+            기록 비용 <Ionicons name="water" size={13} color="#1B7F66" /> {BACKFILL_COST} · 보유{' '}
             <Ionicons name="water" size={13} color="#1B7F66" /> {state.currency}
           </Text>
           <TouchableOpacity
@@ -115,7 +115,7 @@ export function BackfillModal({ visible, onClose }: Props) {
               <ActivityIndicator color="#FFFFFF" />
             ) : (
               <Text style={styles.submitText}>
-                {enoughJelly ? `젤리 ${BACKFILL_COST}개로 복구하기` : '젤리가 부족해요'}
+                {enoughJelly ? `젤리 ${BACKFILL_COST}개로 기록 남기기` : '젤리가 부족해요'}
               </Text>
             )}
           </TouchableOpacity>

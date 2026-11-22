@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from 'react';
-import { Alert, AppState } from 'react-native';
+import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserState, LogItem } from '@/types/foodymon';
 import {
@@ -33,6 +33,7 @@ import { successFeel, tapFeel } from '@/lib/haptics';
 import { foodIcon, type FoodIcon } from '@/lib/foodIcon';
 import { formatLogTime, withDayPoints } from '@/lib/serverState';
 import * as gameApi from '@/lib/gameApi';
+import { toast } from '@/components/Toast';
 
 // How often to check whether the calendar day changed while the app stays open.
 const DAY_CHECK_INTERVAL_MS = 60 * 1000;
@@ -178,8 +179,8 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
 
   const withScore = (next: UserState): UserState => withDayPoints(next);
 
-  /** Recounts growth on the server; celebrates when FoodyMon grows a stage. */
-  const refreshGrowth = async () => {
+  /** Recounts growth on the server; returns the toast to show when FoodyMon grew a stage. */
+  const recountGrowth = async () => {
     const g = await gameApi.syncGrowth(toDateKey(new Date()));
     // The server also judges today's small goal, so its points replace the local estimate.
     applyState({
@@ -191,9 +192,17 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
     });
     if (g.evolved) {
       const info = levelsData.find((l) => l.level === g.level);
-      successFeel();
-      Alert.alert('푸디몬이 자랐어요!', `Lv.${g.level} ${info?.name ?? ''}이(가) 되었어요. 함께 쌓은 기록 덕분이야!`);
+      return {
+        tone: 'success' as const,
+        title: '푸디몬이 자랐어요!',
+        message: `Lv.${g.level} ${info?.name ?? ''}이(가) 되었어요. 함께 쌓은 기록 덕분이야!`,
+      };
     }
+  };
+
+  const refreshGrowth = async () => {
+    const grown = await recountGrowth();
+    if (grown) toast(grown);
   };
 
   /** Reloads everything from the server; the server also closes out ended days. */
@@ -304,15 +313,16 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
       logs: [newLog(log), ...current.logs],
     });
     applyState(next);
-    successFeel();
     const reactions = dialoguesData.reaction[log.type];
     setCurrentDialogue(reactions[Math.floor(Math.random() * reactions.length)]);
     try {
       const logDate = next.lastActiveDate ?? toDateKey(new Date());
       await save(logDate);
-      await refreshGrowth();
+      const grown = await recountGrowth();
       await gameApi.saveCheckin(userId, stateRef.current, log);
       setSyncError(null);
+      // After the check-in thanks toast (shown by the caller) so it doesn't replace this news.
+      if (grown) setTimeout(() => toast(grown), 1500);
       return true;
     } catch (e) {
       console.error('Failed to save check-in:', e);
@@ -539,6 +549,7 @@ export function FoodyMonProvider({ userId, children }: { userId: string; childre
       ownedBackgrounds:
         type === 'background' ? [...current.ownedBackgrounds, id] : current.ownedBackgrounds,
     });
+    successFeel();
     return { success: true, message: `${item.name}을(를) 구매했습니다!` };
   };
 

@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
   },
   backBtnText: {
     fontSize: 14,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '800',
   },
   stepContent: {

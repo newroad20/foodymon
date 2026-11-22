@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     fontSize: 13,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '800',
   },
   segmentTextActive: {
@@ -307,13 +307,13 @@ const styles = StyleSheet.create({
   },
   levelMeta: {
     fontSize: 11,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   hint: {
     marginTop: 16,
     fontSize: 12,
-    color: '#94A3B8',
+    color: '#64748B',
     textAlign: 'center',
     fontWeight: '600',
   },
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
   },
   itemMeta: {
     fontSize: 11,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   locked: {
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: 11,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   badgeCard: {
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
   badgeDesc: {
     fontSize: 10,
     lineHeight: 14,
-    color: '#94A3B8',
+    color: '#64748B',
     textAlign: 'center',
     fontWeight: '600',
   },

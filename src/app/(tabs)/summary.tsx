@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '800',
   },
   segmentTextActive: {
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 11,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   loader: {

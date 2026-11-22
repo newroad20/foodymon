@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
   },
   email: {
     fontSize: 13,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   levelBadge: {
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 11,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   sectionTitle: {
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
   },
   linkSub: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   rowBtn: {

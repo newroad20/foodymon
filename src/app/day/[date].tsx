@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   muted: {
     fontSize: 13,
-    color: '#94A3B8',
+    color: '#64748B',
     fontWeight: '600',
   },
   quote: {

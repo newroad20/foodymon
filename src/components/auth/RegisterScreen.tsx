@@ -191,7 +191,7 @@ export function Consent({ checked, onToggle, label }: { checked: boolean; onTogg
       onPress={onToggle}
       accessibilityRole="checkbox"
       accessibilityState={{ checked }}>
-      <Ionicons name={checked ? 'checkbox' : 'square-outline'} size={22} color={checked ? '#1B7F66' : '#94A3B8'} />
+      <Ionicons name={checked ? 'checkbox' : 'square-outline'} size={22} color={checked ? '#1B7F66' : '#64748B'} />
       <Text style={styles.consentText}>{label}</Text>
     </TouchableOpacity>
   );

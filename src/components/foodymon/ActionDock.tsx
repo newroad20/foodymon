@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   },
   testButtonText: {
     fontSize: 12,
-    color: '#718096',
+    color: '#64748B',
     fontWeight: '700',
   },
   dockCard: {

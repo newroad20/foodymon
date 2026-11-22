@@ -19,7 +19,6 @@ import { ActionDock } from '@/components/foodymon/ActionDock';
 import { MealModal } from '@/components/foodymon/MealModal';
 import { SleepModal } from '@/components/foodymon/SleepModal';
 import { EmotionModal } from '@/components/foodymon/EmotionModal';
-import { ShelterModal } from '@/components/foodymon/ShelterModal';
 import { CategoryHistoryModal } from '@/components/foodymon/CategoryHistoryModal';
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 import { BackfillModal } from '@/components/foodymon/BackfillModal';
@@ -68,7 +67,6 @@ export default function FoodyMonHomeScreen() {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showBackfillModal, setShowBackfillModal] = useState(false);
   const [showDiaryModal, setShowDiaryModal] = useState(false);
-  const [showShelterModal, setShowShelterModal] = useState(false);
   // "나중에" hides the offer until the app restarts.
   const [backfillDismissed, setBackfillDismissed] = useState<string | null>(null);
   const backfillOffer = state.backfill && backfillDismissed !== state.backfill.date ? state.backfill : null;
@@ -160,7 +158,7 @@ export default function FoodyMonHomeScreen() {
               style={styles.shelterBtn}
               onPress={() => {
                 track('sheet_open', 'shelter');
-                setShowShelterModal(true);
+                router.push('/shelter');
               }}
               accessibilityRole="button"
               accessibilityLabel="마음 쉼터, 푸디몬 부르기">
@@ -213,7 +211,6 @@ export default function FoodyMonHomeScreen() {
         visible={showHistoryModal}
         onClose={() => setShowHistoryModal(false)}
       />
-      <ShelterModal visible={showShelterModal} onClose={() => setShowShelterModal(false)} />
       <BackfillModal visible={showBackfillModal} onClose={() => setShowBackfillModal(false)} />
       {showDiaryModal && <DailyDiaryModal onClose={() => setShowDiaryModal(false)} />}
 

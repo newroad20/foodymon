@@ -22,6 +22,7 @@ import { HATCH_TAPS, HatchEgg } from './HatchEgg';
 import { isContact, mayBeUnder14, parseBirthYear } from '@/lib/age';
 import { bumpFeel } from '@/lib/haptics';
 import { WorldBackdrop } from './WorldBackdrop';
+import { shadow } from '@/constants/theme';
 
 // Step order: prologue story → name → birth year → (guardian consent if under 14) → sleep → meals → usual portion → tutorial pages → egg hatch.
 // FoodyMon speaks from inside the egg until it hatches at the end.
@@ -477,11 +478,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    shadowColor: '#426454',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.12,
-    shadowRadius: 22,
-    elevation: 6,
+    boxShadow: shadow.floating,
   },
   backBtn: {
     position: 'absolute',

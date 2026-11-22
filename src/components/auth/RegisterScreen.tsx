@@ -17,6 +17,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { PrivacyPolicy } from '@/app/privacy';
 import { HatchEgg } from '@/components/foodymon/HatchEgg';
 import { WorldBackdrop } from '@/components/foodymon/WorldBackdrop';
+import { shadow } from '@/constants/theme';
 
 interface RegisterScreenProps {
   onSwitchToLogin: () => void;
@@ -293,11 +294,7 @@ const styles = StyleSheet.create({
     padding: 22,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    shadowColor: '#705A48',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.11,
-    shadowRadius: 22,
-    elevation: 6,
+    boxShadow: shadow.floating,
   },
   cardEyebrow: {
     fontSize: 12,

@@ -4,6 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData } from '@/constants/foodymonData';
 import { router } from 'expo-router';
+import { shadow } from '@/constants/theme';
 
 interface TopStatsHeaderProps {
   onOpenHistory: () => void;
@@ -91,10 +92,7 @@ const styles = StyleSheet.create({
     gap: 4,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    shadowColor: '#456456',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+    boxShadow: shadow.card,
   },
   levelBadge: {
     flexShrink: 1,
@@ -124,9 +122,6 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    shadowColor: '#456456',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+    boxShadow: shadow.card,
   },
 });

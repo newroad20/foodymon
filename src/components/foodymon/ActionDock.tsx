@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { CATEGORY_COLORS as C } from '@/constants/theme';
+import { CATEGORY_COLORS as C, shadow } from '@/constants/theme';
 
 interface ActionDockProps {
   onOpenMeal: () => void;
@@ -96,11 +96,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderWidth: 1,
     borderColor: 'rgba(206, 222, 214, 0.9)',
-    shadowColor: '#3F5E50',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.13,
-    shadowRadius: 16,
-    elevation: 6,
+    boxShadow: shadow.floating,
   },
   dockHeading: {
     flexDirection: 'row',

@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { toDateKey } from '@/lib/dayRollover';
 import { clearSmallGoal, fetchSmallGoal, saveSmallGoal, type GoalKind, type SmallGoalInfo } from '@/lib/gameApi';
+import { shadow } from '@/constants/theme';
 
 const shift = (hhmm: string, delta: number) => {
   const [h, m] = hhmm.split(':').map(Number);
@@ -230,10 +231,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.9)',
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    shadowColor: '#476657',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
+    boxShadow: shadow.card,
   },
   cardLeft: {
     flex: 1,

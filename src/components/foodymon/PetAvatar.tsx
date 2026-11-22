@@ -9,7 +9,7 @@ import {
   Easing,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { CATEGORY_COLORS as C } from '@/constants/theme';
+import { CATEGORY_COLORS as C, shadow } from '@/constants/theme';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData, costumeArt, petImage, petStateArt } from '@/constants/foodymonData';
 import type { PetReaction } from '@/context/FoodyMonContext';
@@ -348,10 +348,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    shadowColor: '#476657',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
+    boxShadow: shadow.card,
   },
   dialogueText: {
     fontSize: 15,
@@ -458,10 +455,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderBottomWidth: 4,
     borderColor: '#E2E8F0',
-    shadowColor: '#476657',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    boxShadow: shadow.card,
   },
   growthRow: {
     flexDirection: 'row',

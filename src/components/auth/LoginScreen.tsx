@@ -16,6 +16,7 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import { useAuth, type SocialProvider } from '@/context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { WorldBackdrop } from '@/components/foodymon/WorldBackdrop';
+import { shadow } from '@/constants/theme';
 
 interface LoginScreenProps {
   onSwitchToRegister: () => void;
@@ -303,11 +304,7 @@ const styles = StyleSheet.create({
     padding: 22,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    shadowColor: '#426454',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.12,
-    shadowRadius: 22,
-    elevation: 6,
+    boxShadow: shadow.floating,
   },
   cardEyebrow: {
     color: '#64748B',

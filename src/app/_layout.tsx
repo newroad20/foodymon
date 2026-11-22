@@ -6,6 +6,7 @@ import { View, ActivityIndicator, StyleSheet, AppState } from 'react-native';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { FoodyMonProvider } from '@/context/FoodyMonContext';
 import { MusicProvider } from '@/context/MusicContext';
+import { ToastProvider } from '@/components/Toast';
 import { NightOverlay } from '@/components/foodymon/NightOverlay';
 import { setAnalyticsUser, track } from '@/lib/analytics';
 import { refreshReminders } from '@/lib/reminders';
@@ -160,7 +161,9 @@ function AppContent() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <AppContent />
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
     </AuthProvider>
   );
 }

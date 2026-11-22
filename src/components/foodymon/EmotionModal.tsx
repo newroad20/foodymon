@@ -16,6 +16,7 @@ import { useFoodyMon } from '@/context/FoodyMonContext';
 import { mindEmotions, mindSituations, petStateArt } from '@/constants/foodymonData';
 import { MAX_MIND_RECORDS, type Emotion, type Situation } from '@/lib/growth';
 import { emotionFollowUp } from '@/lib/followUp';
+import { toast } from '@/components/Toast';
 
 interface EmotionModalProps {
   visible: boolean;
@@ -55,9 +56,10 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
       return;
     }
     onClose();
-    Alert.alert(
-      '마음 날씨',
-      result === 'saved' ? '알려 줘서 고마워. 어떤 마음이든 다 소중해.' : `오늘 마음 기록은 ${MAX_MIND_RECORDS}번까지 할 수 있어요.`
+    toast(
+      result === 'saved'
+        ? { tone: 'success', title: '마음 날씨', message: '알려 줘서 고마워. 어떤 마음이든 다 소중해.' }
+        : { tone: 'info', title: '마음 날씨', message: `오늘 마음 기록은 ${MAX_MIND_RECORDS}번까지 할 수 있어요.` }
     );
   };
 

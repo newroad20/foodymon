@@ -5,6 +5,7 @@ import { useFocusEffect } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData } from '@/constants/foodymonData';
 import { fetchJourney, saveReflection, type Journey } from '@/lib/gameApi';
+import { toast } from '@/components/Toast';
 
 /** The journey so far (재형 피드백 시범 종료 요약): points, stage, counts and the user's own words. */
 export function JourneyCard() {
@@ -37,7 +38,7 @@ export function JourneyCard() {
     try {
       await saveReflection(userId, text.trim());
       setJ({ ...j, reflection: text.trim() });
-      Alert.alert('저장했어요', '적어 준 변화는 푸디몬이 잘 간직할게.');
+      toast({ tone: 'success', title: '저장했어요', message: '적어 준 변화는 푸디몬이 잘 간직할게.' });
     } catch {
       Alert.alert('저장하지 못했어요', '네트워크를 확인하고 다시 시도해 주세요.');
     }

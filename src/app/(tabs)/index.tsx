@@ -29,8 +29,9 @@ import { JOURNEY_DAYS, journeyDay } from '@/lib/journey';
 import { track } from '@/lib/analytics';
 import { BACKFILL_COST } from '@/constants/foodymonData';
 import { RolloverResult, toDateKey } from '@/lib/dayRollover';
+import { toast, type Toast } from '@/components/Toast';
 
-function describeRollover(r: RolloverResult): { title: string; message: string } {
+function describeRollover(r: RolloverResult): Toast {
   const lines: string[] = [];
   if (r.rewardedJelly > 0) lines.push(`어제 나눠 준 기록 덕분에 이슬 +${r.rewardedJelly}개가 맺혔어요!`);
   if (r.milestoneBonus > 0) lines.push(`연속 기록 기념 보너스 +${r.milestoneBonus}개도 함께 담았어요!`);
@@ -38,8 +39,12 @@ function describeRollover(r: RolloverResult): { title: string; message: string }
   if (r.shieldsUsed > 0) lines.push(`방패 ${r.shieldsUsed}개가 쉬어 간 날을 지켜 줬어요. 연속 기록이 그대로예요!`);
   if (r.streakReset) lines.push('쉬어 간 날이 있었네. 괜찮아, 오늘 다시 같이 시작하자');
 
-  const title = r.rewardedJelly > 0 && !r.streakReset ? '새로운 하루 시작!' : '새로운 하루';
-  return { title, message: lines.join('\n') || '오늘도 건강한 하루 보내자!' };
+  const good = r.rewardedJelly > 0 && !r.streakReset;
+  return {
+    tone: good ? 'success' : 'info',
+    title: good ? '새로운 하루 시작!' : '새로운 하루',
+    message: lines.join('\n') || '오늘도 건강한 하루 보내자!',
+  };
 }
 
 
@@ -54,10 +59,8 @@ export default function FoodyMonHomeScreen() {
     if (!pendingRollover) return;
     // Streak news means nothing while the journey is finished.
     if (journeyOver) return dismissRollover();
-    const { title, message } = describeRollover(pendingRollover);
-    Alert.alert(title, message, [{ text: '확인', onPress: dismissRollover }], {
-      onDismiss: dismissRollover,
-    });
+    toast(describeRollover(pendingRollover));
+    dismissRollover();
   }, [pendingRollover, dismissRollover, journeyOver]);
 
   // Modals state
@@ -86,17 +89,15 @@ export default function FoodyMonHomeScreen() {
               if (res.shieldEarned) {
                 bonusMsg += '\n7일 연속 보상으로 스트릭 방패 1개를 추가 획득했습니다!';
               }
-              Alert.alert('새로운 하루 시작!', bonusMsg);
+              toast({ tone: 'success', title: '새로운 하루 시작!', message: bonusMsg });
             } else if (res.shieldUsed) {
-              Alert.alert(
-                '방패 사용!',
-                '어제 기록이 없었지만, 스트릭 방패가 사용되어 연속 기록이 유지되었습니다!'
-              );
+              toast({
+                tone: 'success',
+                title: '방패 사용!',
+                message: '어제 기록이 없었지만, 스트릭 방패가 사용되어 연속 기록이 유지되었습니다!',
+              });
             } else {
-              Alert.alert(
-                '새로운 하루',
-                '어제는 쉬어 갔구나. 괜찮아, 오늘 다시 같이 시작하자!'
-              );
+              toast({ tone: 'info', title: '새로운 하루', message: '어제는 쉬어 갔구나. 괜찮아, 오늘 다시 같이 시작하자!' });
             }
           },
         },

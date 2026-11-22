@@ -26,6 +26,7 @@ import {
   remindersSupported,
 } from '@/lib/reminders';
 import { levelsData, mealTargetOptions, sleepTargetOptions } from '@/constants/foodymonData';
+import { toast } from '@/components/Toast';
 
 export default function MyPageScreen() {
   const { state, updateSettings } = useFoodyMon();
@@ -89,12 +90,8 @@ export default function MyPageScreen() {
       targetMeals,
     });
     setSaving(false);
-    Alert.alert(
-      ok ? '저장했어요' : '저장하지 못했어요',
-      ok
-        ? '저장했어요.'
-        : '네트워크를 확인하고 다시 시도해 주세요.'
-    );
+    if (ok) toast({ tone: 'success', title: '저장했어요' });
+    else Alert.alert('저장하지 못했어요', '네트워크를 확인하고 다시 시도해 주세요.');
   };
 
   const handleSignOut = () => {

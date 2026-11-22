@@ -6,6 +6,7 @@ import * as Sharing from 'expo-sharing';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { ShareCard } from '@/components/foodymon/ShareCard';
 import { hasLoggedToday } from '@/lib/dayRollover';
+import { toast } from '@/components/Toast';
 
 type WebSharePayload = { files?: File[]; title?: string; text?: string };
 type WebNavigator = Navigator & {
@@ -57,7 +58,7 @@ export default function ShareScreen() {
       if (Platform.OS === 'web') {
         const result = await shareOrDownloadOnWeb(uri);
         if (result === 'downloaded') {
-          Alert.alert('이미지를 저장했어요', '브라우저가 공유를 지원하지 않아 이미지 파일로 저장했어요.');
+          toast({ tone: 'info', title: '이미지를 저장했어요', message: '브라우저가 공유를 지원하지 않아 이미지 파일로 저장했어요.' });
         }
         return;
       }

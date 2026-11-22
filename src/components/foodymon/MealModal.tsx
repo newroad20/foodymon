@@ -18,6 +18,7 @@ import { mealStatuses, quizzesData } from '@/constants/foodymonData';
 import { MEAL_SLOTS, type MealStatus } from '@/lib/growth';
 import { mealSlotForHour } from '@/lib/mealType';
 import { mealFollowUp } from '@/lib/followUp';
+import { toast } from '@/components/Toast';
 
 interface MealModalProps {
   visible: boolean;
@@ -97,13 +98,16 @@ export function MealModal({ visible, onClose }: MealModalProps) {
       return;
     }
     onClose();
-    Alert.alert(
-      '감각 나누기',
+    toast(
       photoFailed
-        ? '기록은 남겼는데 사진은 올리지 못했어. 인터넷을 확인해 줘!'
-        : EATEN.includes(status)
-          ? '알아차린 걸 나눠 줘서 고마워! 푸디몬이 냠냠 먹었어.'
-          : '알려 줘서 고마워. 어떤 끼니든 소중한 기록이야.'
+        ? { tone: 'error', title: '감각 나누기', message: '기록은 남겼는데 사진은 올리지 못했어. 인터넷을 확인해 줘!' }
+        : {
+            tone: 'success',
+            title: '감각 나누기',
+            message: EATEN.includes(status)
+              ? '알아차린 걸 나눠 줘서 고마워! 푸디몬이 냠냠 먹었어.'
+              : '알려 줘서 고마워. 어떤 끼니든 소중한 기록이야.',
+          }
     );
   };
 

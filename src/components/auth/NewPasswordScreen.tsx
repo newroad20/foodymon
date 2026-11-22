@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } fr
 import { HintInput } from '@/components/HintInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from '@/components/Toast';
 
 /** Shown after a password-reset link signed the user in. */
 export function NewPasswordScreen() {
@@ -23,10 +24,8 @@ export function NewPasswordScreen() {
     setSaving(true);
     const { error } = await updatePassword(password);
     setSaving(false);
-    Alert.alert(
-      '새 비밀번호',
-      error ? '바꾸지 못했어요. 링크를 다시 받아 시도해 주세요.' : '비밀번호를 바꿨어요. 다시 만나서 반가워!'
-    );
+    if (error) Alert.alert('새 비밀번호', '바꾸지 못했어요. 링크를 다시 받아 시도해 주세요.');
+    else toast({ tone: 'success', title: '새 비밀번호', message: '비밀번호를 바꿨어요. 다시 만나서 반가워!' });
   };
 
   return (

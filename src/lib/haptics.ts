@@ -5,3 +5,5 @@ export const tapFeel = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Lig
 export const bumpFeel = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
 export const successFeel = () =>
   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+export const errorFeel = () =>
+  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});

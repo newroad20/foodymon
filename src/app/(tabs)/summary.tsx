@@ -1,4 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
@@ -86,10 +87,10 @@ export default function SummaryScreen() {
           </View>
 
           <View style={styles.partsRow}>
-            <PartTile icon="moon" color="#8E7CF0" label="수면" weight="/30" value={sleepValue} score={records.sleep ? pts.sleep : null} />
-            <PartTile icon="restaurant" color="#FF9600" label="식사" weight="/40" value={mealValue} score={records.meals.length ? pts.meal : null} />
-            <PartTile icon="happy" color="#FF6FA8" label="마음" weight="/10" value={mindValue} score={records.minds.length ? pts.mind : null} />
-            <PartTile icon="flag" color="#1B7F66" label="목표" weight="/20" value={`영역 ${areas}개`} score={areas ? pts.goal : null} />
+            <PartTile icon="moon" color={C.sleep.ink} label="수면" weight="/30" value={sleepValue} score={records.sleep ? pts.sleep : null} />
+            <PartTile icon="restaurant" color={C.meal.ink} label="식사" weight="/40" value={mealValue} score={records.meals.length ? pts.meal : null} />
+            <PartTile icon="happy" color={C.mind.ink} label="마음" weight="/10" value={mindValue} score={records.minds.length ? pts.mind : null} />
+            <PartTile icon="flag" color={C.goal.ink} label="목표" weight="/20" value={`영역 ${areas}개`} score={areas ? pts.goal : null} />
           </View>
 
           <TouchableOpacity style={styles.shareBtn} activeOpacity={0.85} onPress={() => router.push('/share')}>

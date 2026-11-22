@@ -9,6 +9,7 @@ import {
   Easing,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { levelsData, costumeArt, petImage, petStateArt } from '@/constants/foodymonData';
 import type { PetReaction } from '@/context/FoodyMonContext';
@@ -223,7 +224,7 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
                   ],
                 },
               ]}>
-              <Ionicons name={particleIcon} size={36} color="#FF6FA8" />
+              <Ionicons name={particleIcon} size={36} color="#F08A5D" />
             </Animated.View>
           )}
 
@@ -311,9 +312,9 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
         </View>
         <View style={styles.todayRow}>
           <Text style={styles.todayPoints}>오늘 +{state.todayPoints.total}</Text>
-          <Chip icon="moon" color="#8E7CF0" n={state.records.sleep ? 1 : 0} />
-          <Chip icon="restaurant" color="#FF9600" n={state.records.meals.length} />
-          <Chip icon="happy" color="#FF6FA8" n={state.records.minds.length} />
+          <Chip icon="moon" color={C.sleep.ink} n={state.records.sleep ? 1 : 0} />
+          <Chip icon="restaurant" color={C.meal.ink} n={state.records.meals.length} />
+          <Chip icon="happy" color={C.mind.ink} n={state.records.minds.length} />
         </View>
       </View>
     </View>

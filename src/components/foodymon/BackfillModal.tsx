@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
 import { BACKFILL_COST, emotionOptions } from '@/constants/foodymonData';
 
 const SLEEP_CHOICES = [4, 5, 6, 7, 8, 9, 10];
@@ -64,7 +65,7 @@ export function BackfillModal({ visible, onClose }: Props) {
             </Text>
 
             <Text style={styles.label}>
-              <Ionicons name="moon" size={15} color="#7566C9" /> 어제 잔 시간
+              <Ionicons name="moon" size={15} color={C.sleep.ink} /> 어제 잔 시간
             </Text>
             <View style={styles.chipRow}>
               {SLEEP_CHOICES.map((h) => (
@@ -78,7 +79,7 @@ export function BackfillModal({ visible, onClose }: Props) {
             </View>
 
             <Text style={styles.label}>
-              <Ionicons name="restaurant" size={15} color="#C97719" /> 어제 먹은 끼니
+              <Ionicons name="restaurant" size={15} color={C.meal.ink} /> 어제 먹은 끼니
             </Text>
             <View style={styles.chipRow}>
               {mealChoices.map((m) => (
@@ -87,7 +88,7 @@ export function BackfillModal({ visible, onClose }: Props) {
             </View>
 
             <Text style={styles.label}>
-              <Ionicons name="happy" size={15} color="#C95E83" /> 어제의 기분
+              <Ionicons name="happy" size={15} color={C.mind.ink} /> 어제의 기분
             </Text>
             <View style={styles.chipRow}>
               {emotionOptions.map((e) => (

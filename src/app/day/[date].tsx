@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { CATEGORY_COLORS as C } from '@/constants/categoryColors';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { mealStatuses, mindEmotions, mindSituations } from '@/constants/foodymonData';
@@ -75,7 +76,7 @@ export default function DayScreen() {
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>
-          <Ionicons name="moon" size={16} color="#7C3AED" /> 수면
+          <Ionicons name="moon" size={16} color={C.sleep.ink} /> 수면
         </Text>
         {records.sleep ? (
           <Text style={styles.line}>
@@ -89,7 +90,7 @@ export default function DayScreen() {
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>
-          <Ionicons name="restaurant" size={16} color="#FF9600" /> 식사
+          <Ionicons name="restaurant" size={16} color={C.meal.ink} /> 식사
         </Text>
         {MEAL_SLOTS.map((name, slot) => {
           const m = records.meals.find((r) => r.slot === slot);
@@ -120,7 +121,7 @@ export default function DayScreen() {
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>
-          <Ionicons name="happy" size={16} color="#BE185D" /> 마음
+          <Ionicons name="happy" size={16} color={C.mind.ink} /> 마음
         </Text>
         {records.minds.length === 0 ? (
           <Text style={styles.muted}>기록 없음</Text>
@@ -143,7 +144,7 @@ export default function DayScreen() {
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>
-          <Ionicons name="flag" size={16} color="#1B7F66" /> 작은 목표
+          <Ionicons name="flag" size={16} color={C.goal.ink} /> 작은 목표
         </Text>
         <Text style={styles.line}>
           {points.small_goal

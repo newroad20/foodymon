@@ -164,7 +164,6 @@ export default function CollectionScreen() {
               <View style={styles.summaryRow}>
                 <Summary label="기록한 날" value={`${stats.recordedDays}일`} />
                 <Summary label="최장 연속" value={`${stats.bestRun}일`} />
-                <Summary label="최고 점수" value={stats.bestScore === null ? '–' : `${stats.bestScore}점`} />
               </View>
 
               <Text style={styles.progress}>
@@ -237,6 +236,8 @@ const styles = StyleSheet.create({
   },
   segmentBtn: {
     flex: 1,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingVertical: 8,
     borderRadius: 10,
     alignItems: 'center',

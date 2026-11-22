@@ -27,13 +27,13 @@ export function TopStatsHeader({ onOpenHistory }: TopStatsHeaderProps) {
         {/* Streak · jelly · shields in one pill */}
         <View style={styles.badge} accessibilityLabel={`연속 ${state.streak}일, 젤리 ${state.currency}개, 방패 ${state.shields}개`}>
           <Ionicons name="flame" size={14} color="#E8734A" />
-          <Text style={styles.badgeText}>{state.streak}</Text>
+          <Text style={[styles.badgeText, styles.num]}>{state.streak}</Text>
           <View style={styles.sep} />
           <Ionicons name="water" size={14} color="#1B7F66" />
-          <Text style={styles.badgeText}>{state.currency}</Text>
+          <Text style={[styles.badgeText, styles.num]}>{state.currency}</Text>
           <View style={styles.sep} />
           <Ionicons name="shield-checkmark" size={14} color="#64748B" />
-          <Text style={styles.badgeText}>{state.shields}</Text>
+          <Text style={[styles.badgeText, styles.num]}>{state.shields}</Text>
         </View>
       </View>
 
@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
     color: '#1E293B',
     fontWeight: '800',
   },
+  num: { fontVariant: ['tabular-nums'] },
   historyButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     width: 38,

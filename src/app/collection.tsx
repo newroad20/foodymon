@@ -274,6 +274,7 @@ const styles = StyleSheet.create({
     color: '#1E293B',
     marginBottom: 12,
     fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   progressGap: {
     marginTop: 20,

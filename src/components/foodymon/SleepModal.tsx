@@ -215,6 +215,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: '#7566C9',
     fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   note: {
     fontSize: 12,

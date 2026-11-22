@@ -232,6 +232,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '900',
     color: '#334155',
+    fontVariant: ['tabular-nums'],
   },
   pet: {
     width: 200,

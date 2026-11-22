@@ -310,6 +310,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontSize: 12,
     fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   countTextActive: {
     color: '#FFFFFF',
@@ -397,6 +398,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#64748B',
     fontWeight: '700',
+    fontVariant: ['tabular-nums'],
   },
   logContent: {
     fontSize: 13,

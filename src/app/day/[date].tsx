@@ -216,6 +216,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#1B7F66',
     fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   pointLabel: {
     fontSize: 12,

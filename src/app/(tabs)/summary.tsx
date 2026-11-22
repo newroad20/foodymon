@@ -209,6 +209,7 @@ const styles = StyleSheet.create({
     color: '#1E293B',
     marginVertical: 2,
     fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   heroUnit: {
     fontSize: 20,
@@ -243,6 +244,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#1E293B',
     fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   partLabel: {
     fontSize: 12,
@@ -319,6 +321,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: '#334155',
     fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   statLabel: {
     fontSize: 12,

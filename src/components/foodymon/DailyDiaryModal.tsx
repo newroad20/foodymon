@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   saveRow: { flexDirection: 'row', alignItems: 'center', gap: 5, borderTopWidth: 1, borderTopColor: '#E2E8F0', paddingHorizontal: 14, paddingVertical: 9 },
   saveText: { color: '#64748B', fontSize: 12, fontWeight: '700' },
   saveTextError: { color: '#B45309' },
-  countText: { marginLeft: 'auto', color: '#64748B', fontSize: 12, fontWeight: '700' },
+  countText: { marginLeft: 'auto', color: '#64748B', fontSize: 12, fontWeight: '700', fontVariant: ['tabular-nums'] },
   recentSection: { gap: 8 },
   recentCard: { backgroundColor: '#FFFFFF', borderRadius: 16, borderCurve: 'continuous', padding: 13, borderWidth: 2, borderBottomWidth: 4, borderColor: '#E2E8F0' },
   recentDate: { color: '#64748B', fontSize: 12, fontWeight: '900', marginBottom: 5 },

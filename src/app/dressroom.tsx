@@ -6,7 +6,7 @@ import { useFoodyMon } from '@/context/FoodyMonContext';
 import { GIFT_BOX_COST, backgroundsData, costumeArt, costumesData, petImage } from '@/constants/foodymonData';
 
 type Category = 'costume' | 'background';
-type Item = { id: string; icon: string; name: string; price: number };
+type Item = { id: string; name: string; price: number };
 
 /** D1 dressroom, Roblox avatar-editor style: big live preview on top, item grid below, try on before buying. */
 export default function DressroomScreen() {
@@ -26,7 +26,9 @@ export default function DressroomScreen() {
   const costume = costumesData.find((c) => c.id === costumeId);
   const roomIds =
     trying?.type === 'background' ? [trying.item.id] : state.equippedBackgrounds;
-  const roomItems = backgroundsData.filter((b) => roomIds.includes(b.id));
+  const roomArt = backgroundsData.find((b) => b.id === roomIds[roomIds.length - 1])?.image;
+  const itemArt = (id: string) =>
+    category === 'costume' ? costumeArt[state.level]?.[id] : backgroundsData.find((b) => b.id === id)?.image;
 
   const canAfford = !trying || state.currency >= trying.item.price;
 
@@ -73,7 +75,7 @@ export default function DressroomScreen() {
     const item = (res.type === 'costume' ? costumesData : backgroundsData).find((i) => i.id === res.id);
     const wear = () => (res.type === 'costume' ? toggleCostume(res.id) : toggleBackground(res.id));
     setCategory(res.type);
-    Alert.alert('선물이 나왔어요! 🎁', `${item?.icon ?? ''} ${item?.name ?? res.id}을(를) 받았어요.`, [
+    Alert.alert('선물이 나왔어요!', `${item?.name ?? res.id}을(를) 받았어요.`, [
       { text: '나중에', style: 'cancel' },
       { text: '바로 입기', onPress: wear },
     ]);
@@ -83,12 +85,11 @@ export default function DressroomScreen() {
     <View style={styles.container}>
       {/* Live preview */}
       <View style={styles.stage}>
+        {roomArt && <Image source={roomArt} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" />}
         <View style={styles.jelly}>
           <Ionicons name="water" size={14} color="#1B7F66" />
           <Text style={styles.jellyText}>{state.currency}</Text>
         </View>
-        {roomItems.length > 0 && <Text style={styles.room}>{roomItems.map((b) => b.emoji).join('  ')}</Text>}
-        {costume && !costumeArt[state.level]?.[costume.id] && <Text style={styles.costume}>{costume.icon}</Text>}
         <Image source={petImage(state.level, costume?.id ?? null)} style={styles.pet} contentFit="contain" />
         {trying && <Text style={styles.tryingTag}>미리보기: {trying.item.name}</Text>}
       </View>
@@ -154,7 +155,11 @@ export default function DressroomScreen() {
                   <Ionicons name="checkmark" size={12} color="#FFFFFF" />
                 </View>
               )}
-              <Text style={[styles.tileIcon, !has && !tried && styles.locked]}>{item.icon}</Text>
+              <Image
+                source={itemArt(item.id)}
+                style={[styles.tileArt, !has && !tried && styles.locked]}
+                contentFit={category === 'costume' ? 'contain' : 'cover'}
+              />
               <Text style={styles.tileName} numberOfLines={1}>
                 {item.name}
               </Text>
@@ -220,21 +225,12 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 2,
     borderColor: '#E5E5E5',
+    backgroundColor: '#FFFFFF', // readable over the room art
   },
   jellyText: {
     fontSize: 13,
     fontWeight: '900',
     color: '#334155',
-  },
-  room: {
-    position: 'absolute',
-    bottom: 14,
-    fontSize: 26,
-  },
-  costume: {
-    fontSize: 44,
-    marginBottom: -20,
-    zIndex: 1,
   },
   pet: {
     width: 200,
@@ -247,6 +243,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
     color: '#17765D',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   giftBox: {
     flexDirection: 'row',
@@ -348,8 +349,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#1B7F66',
   },
-  tileIcon: {
-    fontSize: 34,
+  tileArt: {
+    width: 56,
+    height: 56,
+    borderRadius: 12,
   },
   locked: {
     opacity: 0.45,

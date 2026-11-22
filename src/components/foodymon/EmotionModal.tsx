@@ -34,7 +34,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
 
   const used = state.records.minds.length;
   // Faces drawn on the user's own FoodyMon; the emoji is the fallback for stages without them.
-  const faces = petStateArt[state.level]?.face;
+  const faces = (petStateArt[state.level] ?? petStateArt[3]).face;
   const full = used >= MAX_MIND_RECORDS;
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
           <View style={styles.header}>
             <Text style={styles.title}>마음 기록</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessibilityLabel="닫기">
-              <Text style={styles.closeBtnText}>✕</Text>
+              <Ionicons name="close" size={22} color="#A0AEC0" />
             </TouchableOpacity>
           </View>
 
@@ -106,11 +106,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
                   <Ionicons name="chevron-back" size={26} color="#64748B" />
                 </TouchableOpacity>
                 <View style={styles.pickerCenter} accessibilityLiveRegion="polite">
-                  {faces?.[mindEmotions[focus].id] ? (
-                    <Image source={faces[mindEmotions[focus].id]} style={styles.bigFace} contentFit="contain" />
-                  ) : (
-                    <Text style={styles.bigEmoji}>{mindEmotions[focus].emoji}</Text>
-                  )}
+                  <Image source={faces[mindEmotions[focus].id]} style={styles.bigFace} contentFit="contain" />
                   <Text style={styles.bigLabel}>{mindEmotions[focus].label}</Text>
                 </View>
                 <TouchableOpacity
@@ -129,11 +125,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
                     accessibilityRole="radio"
                     accessibilityState={{ selected: i === focus }}
                     accessibilityLabel={m.label}>
-                    {faces?.[m.id] ? (
-                      <Image source={faces[m.id]} style={styles.dotFace} contentFit="contain" />
-                    ) : (
-                      <Text style={styles.dotEmoji}>{m.emoji}</Text>
-                    )}
+                    <Image source={faces[m.id]} style={styles.dotFace} contentFit="contain" />
                   </TouchableOpacity>
                 ))}
               </View>
@@ -147,7 +139,7 @@ export function EmotionModal({ visible, onClose }: EmotionModalProps) {
           ) : (
             <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
               <Text style={styles.subtitle}>
-                {chosen.emoji} {chosen.label}
+                {chosen.label}
               </Text>
               <View style={styles.followUpBox}>
                 <Text style={styles.followUpEyebrow}>푸디몬의 다음 질문</Text>
@@ -218,11 +210,6 @@ const styles = StyleSheet.create({
   closeBtn: {
     padding: 6,
   },
-  closeBtnText: {
-    fontSize: 18,
-    color: '#A0AEC0',
-    fontWeight: '800',
-  },
   helpLink: {
     fontSize: 13,
     color: '#17765D',
@@ -277,9 +264,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
-  bigEmoji: {
-    fontSize: 84,
-  },
   bigLabel: {
     fontSize: 20,
     color: '#1E293B',
@@ -308,9 +292,6 @@ const styles = StyleSheet.create({
   dotActive: {
     borderColor: '#1B7F66',
     backgroundColor: '#E3F6EF',
-  },
-  dotEmoji: {
-    fontSize: 22,
   },
   dotFace: {
     width: 44,

@@ -10,9 +10,11 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
-import { levelsData, costumesData, costumeArt, mindEmotions, petImage, petStateArt } from '@/constants/foodymonData';
+import { levelsData, costumeArt, petImage, petStateArt } from '@/constants/foodymonData';
 import type { PetReaction } from '@/context/FoodyMonContext';
 import { growthProgress } from '@/lib/growth';
+
+const PARTICLES = ['heart', 'sparkles', 'musical-notes', 'star', 'happy', 'balloon'] as const;
 
 interface PetAvatarProps {
   onTap?: () => void;
@@ -91,7 +93,7 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
   const bounceAnim = useRef(new Animated.Value(0)).current;
   const floatAnim = useRef(new Animated.Value(0)).current;
   const particleScale = useRef(new Animated.Value(0)).current;
-  const [particleEmoji, setParticleEmoji] = React.useState('💖');
+  const [particleIcon, setParticleIcon] = React.useState<(typeof PARTICLES)[number]>('heart');
   const [showParticle, setShowParticle] = React.useState(false);
 
   // Floating ambient animation
@@ -116,8 +118,7 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
 
   const handlePress = () => {
     triggerPetInteraction();
-    const emojis = ['💖', '✨', '🎶', '⭐', '🥰', '🎈'];
-    setParticleEmoji(emojis[Math.floor(Math.random() * emojis.length)]);
+    setParticleIcon(PARTICLES[Math.floor(Math.random() * PARTICLES.length)]);
     setShowParticle(true);
 
     // Bounce
@@ -173,12 +174,8 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
         : reaction?.kind === 'mood'
           ? art?.mood?.[reaction.emotion]
           : undefined;
-  const moodEmoji =
-    reaction?.kind === 'mood' && !reactionArt ? (reaction.emotion === 'very_hard' ? '💧' : mindEmotions.find((m) => m.id === reaction.emotion)?.emoji) : null;
-
-  const equippedCostumeItem = costumesData.find(
-    (c) => c.id === state.equippedCostume
-  );
+  // With a costume on, the feeling shows as a small face beside the pet.
+  const moodFace = reaction?.kind === 'mood' && !reactionArt ? petStateArt[state.level]?.face[reaction.emotion] : null;
 
   return (
     <View style={styles.container}>
@@ -214,15 +211,6 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
               ],
             },
           ]}>
-          {/* Equipped Costume Icon on top of pet */}
-          {equippedCostumeItem && !wearing && (
-            <View style={styles.costumeContainer}>
-              <Text style={styles.costumeEmoji}>
-                {equippedCostumeItem.icon}
-              </Text>
-            </View>
-          )}
-
           {/* Floating Tap Reaction Particle */}
           {showParticle && (
             <Animated.View
@@ -235,7 +223,7 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
                   ],
                 },
               ]}>
-              <Text style={styles.particleEmoji}>{particleEmoji}</Text>
+              <Ionicons name={particleIcon} size={36} color="#FF6FA8" />
             </Animated.View>
           )}
 
@@ -254,7 +242,7 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
             />
           </Animated.View>
 
-          {reaction?.kind === 'sleep' && <Text style={styles.zzz}>💤</Text>}
+          {reaction?.kind === 'sleep' && <Text style={styles.zzz}>Zzz</Text>}
 
           {/* The meal flies in and gets eaten */}
           {reaction?.kind === 'eat' && (
@@ -274,14 +262,14 @@ export function PetAvatar({ onTap, onOpenChat, interactionLabel = '눌러서 이
               {reaction.photoUri ? (
                 <Image source={{ uri: reaction.photoUri }} style={styles.foodPhoto} />
               ) : (
-                <Text style={styles.foodEmoji}>{reaction.emoji}</Text>
+                <Ionicons name={reaction.icon} size={56} color="#FF9600" />
               )}
             </Animated.View>
           )}
           {reaction?.kind === 'eat' && <Text style={styles.yum}>냠냠</Text>}
 
           {/* The feeling FoodyMon shares with the user */}
-          {moodEmoji && <Text style={styles.moodEmoji}>{moodEmoji}</Text>}
+          {moodFace && <Image source={moodFace} style={styles.moodFace} resizeMode="contain" />}
         </Animated.View>
 
         {/* Soft Shadow */}
@@ -406,7 +394,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 18,
-    fontSize: 34,
+    fontSize: 30,
+    fontWeight: '900',
+    color: '#7566C9',
   },
   food: {
     position: 'absolute',
@@ -421,9 +411,6 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#FFFFFF',
   },
-  foodEmoji: {
-    fontSize: 56,
-  },
   yum: {
     position: 'absolute',
     bottom: 30,
@@ -432,30 +419,18 @@ const styles = StyleSheet.create({
     color: '#17765D',
     fontWeight: '900',
   },
-  moodEmoji: {
+  moodFace: {
     position: 'absolute',
     top: 4,
     left: 14,
-    fontSize: 38,
-  },
-  costumeContainer: {
-    position: 'absolute',
-    top: 5,
-    zIndex: 10,
-  },
-  costumeEmoji: {
-    fontSize: 42,
-    fontWeight: '600',
+    width: 48,
+    height: 48,
   },
   particle: {
     position: 'absolute',
     top: -10,
     right: 20,
     zIndex: 20,
-  },
-  particleEmoji: {
-    fontSize: 36,
-    fontWeight: '600',
   },
   // A circle squashed flat reads as a soft oval; the margins give back the space the squash frees.
   shadow: {

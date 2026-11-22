@@ -8,9 +8,12 @@ export interface DailyRecordRow {
   emotion: number | null;
 }
 
+/** Ionicons names, kept as plain strings so this file loads in node. */
+export type BadgeIcon = 'leaf' | 'calendar' | 'calendar-number' | 'flame' | 'flash' | 'trophy' | 'star' | 'shirt' | 'home';
+
 export interface BadgeDef {
   id: string;
-  icon: string;
+  icon: BadgeIcon;
   name: string;
   description: string;
 }
@@ -29,15 +32,15 @@ export interface CollectionStats {
 }
 
 export const badgeDefs: BadgeDef[] = [
-  { id: 'first_step', icon: '🌱', name: '첫 걸음', description: '처음으로 체크인했어요' },
-  { id: 'days_7', icon: '📅', name: '일주일 기록', description: '7일 동안 기록했어요' },
-  { id: 'days_30', icon: '🗓️', name: '한 달 기록', description: '30일 동안 기록했어요' },
-  { id: 'run_3', icon: '🔥', name: '3일 연속', description: '3일 연속으로 기록했어요' },
-  { id: 'run_7', icon: '💪', name: '7일 연속', description: '7일 연속으로 기록했어요' },
-  { id: 'run_30', icon: '🏆', name: '30일 연속', description: '30일 연속으로 기록했어요' },
-  { id: 'score_95', icon: '🌟', name: '천상계 달성', description: '하루 성장점 95점 이상을 모았어요' },
-  { id: 'fashion_3', icon: '👗', name: '패셔니스타', description: '의상을 3개 모았어요' },
-  { id: 'room_all', icon: '🏡', name: '마이룸 완성', description: '마이룸 소품을 모두 모았어요' },
+  { id: 'first_step', icon: 'leaf', name: '첫 걸음', description: '처음으로 체크인했어요' },
+  { id: 'days_7', icon: 'calendar', name: '일주일 기록', description: '7일 동안 기록했어요' },
+  { id: 'days_30', icon: 'calendar-number', name: '한 달 기록', description: '30일 동안 기록했어요' },
+  { id: 'run_3', icon: 'flame', name: '3일 연속', description: '3일 연속으로 기록했어요' },
+  { id: 'run_7', icon: 'flash', name: '7일 연속', description: '7일 연속으로 기록했어요' },
+  { id: 'run_30', icon: 'trophy', name: '30일 연속', description: '30일 연속으로 기록했어요' },
+  { id: 'score_95', icon: 'star', name: '천상계 달성', description: '하루 성장점 95점 이상을 모았어요' },
+  { id: 'fashion_3', icon: 'shirt', name: '패셔니스타', description: '의상을 3개 모았어요' },
+  { id: 'room_all', icon: 'home', name: '마이룸 완성', description: '마이룸 소품을 모두 모았어요' },
 ];
 
 const levelForScore = (score: number, levels: readonly { level: number; maxScore: number }[]) =>

@@ -1,9 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from 'expo-router';
 import { useFoodyMon } from '@/context/FoodyMonContext';
-import { backgroundsData, costumesData, levelsData } from '@/constants/foodymonData';
+import { backgroundsData, costumeArt, costumesData, levelsData } from '@/constants/foodymonData';
 import { hasLoggedToday, toDateKey } from '@/lib/dayRollover';
 import { badgeDefs, computeCollection, DailyRecordRow, earnedBadges } from '@/lib/collection';
 import { fetchDailyRecords } from '@/lib/gameApi';
@@ -118,7 +119,8 @@ export default function CollectionScreen() {
               {costumesData.map((c) => (
                 <ItemCard
                   key={c.id}
-                  icon={c.icon}
+                  art={costumeArt[state.level]?.[c.id]}
+                  fit="contain"
                   name={c.name}
                   owned={state.ownedCostumes.includes(c.id)}
                   price={c.price}
@@ -132,7 +134,8 @@ export default function CollectionScreen() {
               {backgroundsData.map((b) => (
                 <ItemCard
                   key={b.id}
-                  icon={b.icon}
+                  art={b.image}
+                  fit="cover"
                   name={b.name}
                   owned={state.ownedBackgrounds.includes(b.id)}
                   price={b.price}
@@ -149,7 +152,7 @@ export default function CollectionScreen() {
           ) : (
             <>
               <View style={styles.shieldCard}>
-                <Text style={styles.shieldIcon}>🛡️</Text>
+                <Ionicons name="shield-checkmark" size={34} color="#64748B" />
                 <View style={styles.shieldText}>
                   <Text style={styles.shieldTitle}>스트릭 방패 {state.shields}개 보관 중</Text>
                   <Text style={styles.shieldSub}>
@@ -172,7 +175,7 @@ export default function CollectionScreen() {
                   const got = earned.has(b.id);
                   return (
                     <View key={b.id} style={[styles.badgeCard, !got && styles.locked]}>
-                      <Text style={[styles.badgeIcon, !got && styles.lockedIcon]}>{got ? b.icon : '🔒'}</Text>
+                      <Ionicons name={got ? b.icon : 'lock-closed'} size={30} color={got ? '#1B7F66' : '#94A3B8'} style={!got && styles.lockedIcon} />
                       <Text style={styles.badgeName}>{b.name}</Text>
                       <Text style={styles.badgeDesc}>{b.description}</Text>
                     </View>
@@ -186,12 +189,26 @@ export default function CollectionScreen() {
   );
 }
 
-function ItemCard({ icon, name, owned, price }: { icon: string; name: string; owned: boolean; price: number }) {
+function ItemCard({
+  art,
+  fit,
+  name,
+  owned,
+  price,
+}: {
+  art: React.ComponentProps<typeof Image>['source'];
+  fit: 'contain' | 'cover';
+  name: string;
+  owned: boolean;
+  price: number;
+}) {
   return (
     <View style={[styles.itemCard, !owned && styles.locked]}>
-      <Text style={[styles.itemIcon, !owned && styles.lockedIcon]}>{icon}</Text>
+      <Image source={art} style={[styles.itemArt, !owned && styles.lockedIcon]} contentFit={fit} />
       <Text style={styles.itemName}>{name}</Text>
-      <Text style={styles.itemMeta}>{owned ? '보유 중' : `✨ ${price}`}</Text>
+      <Text style={styles.itemMeta}>
+        {owned ? '보유 중' : <><Ionicons name="water" size={11} color="#1B7F66" /> {price}</>}
+      </Text>
     </View>
   );
 }
@@ -308,9 +325,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  itemIcon: {
-    fontSize: 32,
-    fontWeight: '600',
+  itemArt: {
+    width: 48,
+    height: 48,
+    borderRadius: 10,
   },
   itemName: {
     fontSize: 13,
@@ -336,10 +354,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 16,
     marginBottom: 12,
-  },
-  shieldIcon: {
-    fontSize: 34,
-    fontWeight: '600',
   },
   shieldText: {
     flex: 1,
@@ -386,10 +400,6 @@ const styles = StyleSheet.create({
     padding: 12,
     alignItems: 'center',
     gap: 4,
-  },
-  badgeIcon: {
-    fontSize: 30,
-    fontWeight: '600',
   },
   badgeName: {
     fontSize: 12,

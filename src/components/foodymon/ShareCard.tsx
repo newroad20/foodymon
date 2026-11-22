@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { UserState } from '@/types/foodymon';
-import { backgroundsData, costumeArt, costumesData, levelsData, petImage } from '@/constants/foodymonData';
+import { backgroundsData, levelsData, petImage } from '@/constants/foodymonData';
 import { hasLoggedToday } from '@/lib/dayRollover';
 
 export const SHARE_CARD_WIDTH = 320;
@@ -17,8 +17,8 @@ const todayLabel = () => {
  */
 export const ShareCard = forwardRef<View, { state: UserState }>(function ShareCard({ state }, ref) {
   const levelInfo = levelsData.find((l) => l.level === state.level) ?? levelsData[2];
-  const costume = costumesData.find((c) => c.id === state.equippedCostume);
-  const roomItems = backgroundsData.filter((b) => state.equippedBackgrounds.includes(b.id));
+  // Same room the home screen shows: the last one equipped.
+  const roomArt = backgroundsData.find((b) => b.id === state.equippedBackgrounds[state.equippedBackgrounds.length - 1])?.image;
   const logged = hasLoggedToday(state);
 
   return (
@@ -29,14 +29,11 @@ export const ShareCard = forwardRef<View, { state: UserState }>(function ShareCa
         <Text style={styles.date}>{todayLabel()}</Text>
       </View>
 
-      <Text style={styles.title}>{state.masterName || '마스터'}의 푸디몬 💛</Text>
+      <Text style={styles.title}>{state.masterName || '마스터'}의 푸디몬</Text>
 
       <View style={styles.stage}>
-        {roomItems.length > 0 && (
-          <Text style={styles.room}>{roomItems.map((b) => b.emoji).join(' ')}</Text>
-        )}
-        {costume && !costumeArt[state.level]?.[costume.id] && <Text style={styles.costume}>{costume.icon}</Text>}
-        <Image source={petImage(state.level, costume?.id ?? null)} style={styles.pet} resizeMode="contain" />
+        {roomArt && <Image source={roomArt} style={StyleSheet.absoluteFill} resizeMode="cover" />}
+        <Image source={petImage(state.level, state.equippedCostume)} style={styles.pet} resizeMode="contain" />
         <Text style={styles.levelBadge}>
           Lv.{levelInfo.level} {levelInfo.name}
         </Text>
@@ -97,19 +94,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 18,
     paddingBottom: 14,
-  },
-  room: {
-    position: 'absolute',
-    top: 10,
-    left: 12,
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  costume: {
-    fontSize: 34,
-    marginBottom: -16,
-    zIndex: 1,
-    fontWeight: '600',
+    overflow: 'hidden',
   },
   pet: {
     width: 170,

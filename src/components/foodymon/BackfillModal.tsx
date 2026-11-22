@@ -4,6 +4,7 @@ import { useFoodyMon } from '@/context/FoodyMonContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { CATEGORY_COLORS as C } from '@/constants/theme';
 import { BACKFILL_COST, emotionOptions } from '@/constants/foodymonData';
+import { toast } from '@/components/Toast';
 
 const SLEEP_CHOICES = [4, 5, 6, 7, 8, 9, 10];
 
@@ -43,8 +44,9 @@ export function BackfillModal({ visible, onClose }: Props) {
     setSaving(true);
     const res = await backfillYesterday({ sleepHours, mealCount, emotion });
     setSaving(false);
-    Alert.alert(res.success ? '어제 기록을 남겼어요' : '기록을 남기지 못했어요', res.message);
-    if (res.success) onClose();
+    if (!res.success) return Alert.alert('기록을 남기지 못했어요', res.message);
+    onClose();
+    toast({ tone: 'success', title: '어제 기록을 남겼어요', message: res.message });
   };
 
   return (

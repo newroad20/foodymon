@@ -3,6 +3,7 @@ import { Modal, View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-na
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFoodyMon } from '@/context/FoodyMonContext';
 import { bedtimeDistanceMinutes, isBedtimeRecommended, sleepGuidance, sleepMinutes } from '@/lib/growth';
+import { toast } from '@/components/Toast';
 
 interface SleepModalProps {
   visible: boolean;
@@ -49,7 +50,11 @@ export function SleepModal({ visible, onClose }: SleepModalProps) {
       return;
     }
     onClose();
-    Alert.alert('숲의 밤', saved ? '수면 기록을 고쳤어. 점수도 새 시간으로 다시 계산했어.' : '잠 이야기 고마워. 숲에도 고요한 밤이 왔어.');
+    toast({
+      tone: 'success',
+      title: '숲의 밤',
+      message: saved ? '수면 기록을 고쳤어. 점수도 새 시간으로 다시 계산했어.' : '잠 이야기 고마워. 숲에도 고요한 밤이 왔어.',
+    });
   };
 
   return (

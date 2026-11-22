@@ -18,6 +18,8 @@ import { ActionDock } from '@/components/foodymon/ActionDock';
 import { MealModal } from '@/components/foodymon/MealModal';
 import { SleepModal } from '@/components/foodymon/SleepModal';
 import { EmotionModal } from '@/components/foodymon/EmotionModal';
+import { ShelterModal } from '@/components/foodymon/ShelterModal';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { CategoryHistoryModal } from '@/components/foodymon/CategoryHistoryModal';
 import { OnboardingModal } from '@/components/foodymon/OnboardingModal';
 import { BackfillModal } from '@/components/foodymon/BackfillModal';
@@ -66,6 +68,7 @@ export default function FoodyMonHomeScreen() {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showBackfillModal, setShowBackfillModal] = useState(false);
   const [showDiaryModal, setShowDiaryModal] = useState(false);
+  const [showShelterModal, setShowShelterModal] = useState(false);
   // "나중에" hides the offer until the app restarts.
   const [backfillDismissed, setBackfillDismissed] = useState<string | null>(null);
   const backfillOffer = state.backfill && backfillDismissed !== state.backfill.date ? state.backfill : null;
@@ -152,6 +155,22 @@ export default function FoodyMonHomeScreen() {
             onOpenChat={journeyOver ? undefined : () => setShowDiaryModal(true)}
             interactionLabel="오늘의 일기 쓰기"
           />
+          {!journeyOver && (
+            <TouchableOpacity
+              style={styles.shelterBtn}
+              onPress={() => {
+                track('sheet_open', 'shelter');
+                setShowShelterModal(true);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="마음 쉼터, 푸디몬 부르기">
+              <Ionicons name="leaf" size={22} color="#FFFFFF" />
+              <View>
+                <Text style={styles.shelterTitle}>마음 쉼터</Text>
+                <Text style={styles.shelterSub}>푸디몬 부르기</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </ScrollView>
 
         {/* Bottom Action Dock */}
@@ -194,6 +213,7 @@ export default function FoodyMonHomeScreen() {
         visible={showHistoryModal}
         onClose={() => setShowHistoryModal(false)}
       />
+      <ShelterModal visible={showShelterModal} onClose={() => setShowShelterModal(false)} />
       <BackfillModal visible={showBackfillModal} onClose={() => setShowBackfillModal(false)} />
       {showDiaryModal && <DailyDiaryModal onClose={() => setShowDiaryModal(false)} />}
 
@@ -290,5 +310,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 8,
+  },
+  shelterBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 8,
+    paddingHorizontal: 22,
+    paddingVertical: 10,
+    borderRadius: 18,
+    backgroundColor: '#1B7F66',
+    borderWidth: 2,
+    borderColor: '#125A48',
+    borderBottomWidth: 4,
+  },
+  shelterTitle: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: '900',
+  },
+  shelterSub: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
 });
